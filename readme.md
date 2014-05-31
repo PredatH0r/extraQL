@@ -8,13 +8,4 @@
 - a middleware that allows scripts to utilize certain windows functions that are not accessible from within QL
 - a small javascript library that provides commonly used functions to user scripts
 
-extraQL and QLHM
-================
-
-extraQL and the QuakeLive Hook Manager (QLHM) work hand in hand. extraQL installs the QLHM "hook.js" file in 
-your QL directory, so you will be able to use QLHM from within QL to chose which scripts you want to use.
-extraQL acts as a local script server for QLHM, so it loads the scripts from your local installation instead of the internet.
-This makes it easy to customize existing scripts or write new ones.
-
-
 [Find out more about extraQL in the Wiki](https://github.com/PredatH0r/extraQL/wiki)
