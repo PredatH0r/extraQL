@@ -1,4 +1,5 @@
 ﻿What is extraQL?
+================
 
 - an all-in-one package that allows you to install, choose and run user scripts to exhance your QuakeLive experience
 - for QL Focus members (beta testers) a tool to quickly switch between public and test environments
@@ -7,14 +8,16 @@
 - a middleware that allows scripts to utilize certain windows functions that are not accessible from within QL
 - a small javascript library that provides commonly used functions to userscripts
 
-extraQL and QLHM (Quake Live Hook Manager):
+extraQL and QLHM (Quake Live Hook Manager)
+==========================================
 
 These two work hand in hand. extraQL installs the QLHM "hook.js" file in your QL directory, so you will be able to
 use QLHM from within QL to chose which scripts you want to use.
 extraQL acts as a local script server for QLHM, so it loads the scripts from your local installation instead of the internet.
 This makes it easy to customize existing scripts or write new ones.
 
-Scripts included in this package:
+Scripts included in this package
+================================
 
 - hook.js: modified version of QLHM 0.4pre which will be copied into your %APPDATA%\..\LocalLow\id Software\<realm>\home\baseq3
   This script is loaded by QL and will then load all other scripts.
@@ -37,21 +40,22 @@ Scripts included in this package:
 - twitter: adds the @quakelive Twitter feed to your Chat bar
 
 
-Getting started with QL scripting:
+Getting started with QL scripting
+=================================
 
-1) Install Google Chrome browser. You'll need its built-in developer tools.
-2) Download and install Awesomium for Windows from http://www.awesomium.com/download/
-3) Copy C:\Program Files (x86)\Awesomium Technologies LLC\Awesomium SDK\1.7.3.0\build\bin\inspector.pak 
+1. Install Google Chrome browser. You'll need its built-in developer tools.
+2. Download and install Awesomium for Windows from http://www.awesomium.com/download/
+3. Copy C:\Program Files (x86)\Awesomium Technologies LLC\Awesomium SDK\1.7.3.0\build\bin\inspector.pak 
    in the directory that holds your quakelive.exe, which is "%APPDATA%\..\Local\id Software\quakelive\".
    If you are a "QL Focus" member (beta-tester), copy it also to "%APPDATA%\..\Local\id Software\focus\"
-4) If you want, you can uninstall Awesomium again. You only need the inspector.pak
-5) Start QL and execute this in the console: /set web_console 1
+4. If you want, you can uninstall Awesomium again. You only need the inspector.pak
+5. Start QL and execute this in the console: /set web_console 1
    This will enable log messages in your QL console and enables port to look into your QL UI.
    You have to restart QL for these changes to take effect.
-6) Open http://localhost:42666/ in Chrome and click on "- QUAKE LIVE Home"
+6. Open http://localhost:42666/ in Chrome and click on "- QUAKE LIVE Home"
    The "Elements" view will show you the HTML code and CSS rules that make up the QL web UI.
    In the "Console" you can run any javascript commands, including jQuery expressions.
-7) Click on "Scripts" and the little folder icon in the upper left corner (under "Elements")
+7. Click on "Scripts" and the little folder icon in the upper left corner (under "Elements")
    Locate www.quakelive.com / compiled_v2010080501.0.js, click it and select all the text in the window.
    Paste that text into some editor that is able to "prettify" this compressed Javascript code back
    into a readable format. I used Visual Studio 2010 and 2013 with ReSharper code cleanup (Ctrl+E, Ctrl+C).
