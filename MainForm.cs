@@ -231,22 +231,19 @@ namespace ExtraQL
     #endregion
     
     #region Log()
-    private void Log(string msg)
-    {
-      if (this.InvokeRequired)
-        this.BeginInvoke((Action)(() => this.LogInUiThread(msg)));
-      else
-        this.LogInUiThread(msg);
-    }
 
     private delegate void Action();
 
-    private void LogInUiThread(string msg)
+    private void Log(string msg)
     {
-      if (!string.IsNullOrEmpty(msg))
+      if (string.IsNullOrEmpty(msg))
+        return;
+
+      if (this.InvokeRequired)
+        this.BeginInvoke((Action) (() => this.Log(msg)));
+      else
         this.txtLog.Text += "[" + DateTime.Now.ToString("T") + "] " + msg + "\r\n";
     }
-
     #endregion
 
     #region Launch()
@@ -347,6 +344,7 @@ document.loginform.submit();";
         timer.Interval = 5000;
         timer.Tick += (sender2, args) =>
         {
+          timer.Stop();
           File.Delete(file);
           ((IDisposable)sender2).Dispose();
         };
