@@ -8,4 +8,6 @@
 - a middleware that allows scripts to utilize certain windows functions that are not accessible from within QL
 - a small javascript library that provides commonly used functions to user scripts
 
+[Download extraQL](https://github.com/PredatH0r/extraQL/releases)
+
 [Find out more about extraQL in the Wiki](https://github.com/PredatH0r/extraQL/wiki)

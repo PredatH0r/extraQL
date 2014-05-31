@@ -122,7 +122,7 @@
     <Content Include="extraQL.ico" />
     <Content Include="focus\readme.txt" />
     <Content Include="quakelive\readme.txt" />
-    <Content Include="readme.txt" />
+    <None Include="readme.md" />
     <Content Include="scripts\autoInvite.usr.js" />
     <Content Include="scripts\escaper.usr.js" />
     <Content Include="scripts\extGraphHist.usr.js" />
