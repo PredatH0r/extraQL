@@ -1,4 +1,8 @@
-﻿Version 0.91
+﻿Version 0.92
+- grouped QL Focus related fields together in a section that can be hidden/shown
+- minor code cleanup
+
+Version 0.91
 - showing more user friendly names instead of realm URLs
 - added links for QL beta testers to login to QL Focus and open QL Focus forum
 

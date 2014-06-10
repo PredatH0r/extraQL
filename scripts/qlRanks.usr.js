@@ -816,10 +816,10 @@ var $st
   , tries = 200 // ~20 seconds
 ;
 
-intStatusTop = setInterval(initLogoAreaElo);
+intStatusTop = setInterval(initLogoAreaElo, 100);
 
 // sometimes after playing some matches the QLRanks info in the logo area disappears
-quakelive.AddHook("OnShowContent", initLogoAreaElo);
+quakelive.AddHook("OnContentLoaded", injectLogoAreaEloHtml);
 
 function initLogoAreaElo() {
   $st = $("#qlv_statusTop");

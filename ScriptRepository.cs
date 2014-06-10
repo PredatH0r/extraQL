@@ -47,9 +47,9 @@ namespace ExtraQL
         if (localMeta.ContainsKey("downloadUrl"))
           url = localMeta["downloadUrl"][0];
         else if (int.TryParse(id, out nr))
-          url = "http://userscripts.org/scripts/source/" + nr + ".user.js";
+          url = "http://userscripts.org:8080/scripts/source/" + nr + ".user.js";
         else
-          continue;
+          url = "https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/" + Path.GetFileName(scriptfile);
 
         try
         {
