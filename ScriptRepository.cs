@@ -1,4 +1,6 @@
-﻿using System;
+﻿#undef USERSCRIPT_ORG
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -46,8 +48,10 @@ namespace ExtraQL
         string url;
         if (localMeta.ContainsKey("downloadUrl"))
           url = localMeta["downloadUrl"][0];
+#if USERSCRIPT_ORG
         else if (int.TryParse(id, out nr))
           url = "http://userscripts.org:8080/scripts/source/" + nr + ".user.js";
+#endif
         else
           url = "https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/" + Path.GetFileName(scriptfile);
 

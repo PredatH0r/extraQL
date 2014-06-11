@@ -25,6 +25,11 @@ Version 1.0
   var extraQL = window.extraQL;
 
   function init() {
+    // delay init so that twitch, twitter, ESR and IRC scripts add items to chat menu bar in a defined order
+    setTimeout(delayedInit, 800);
+  }
+
+  function delayedInit() {
     onContentLoaded();
     quakelive.AddHook("OnContentLoaded", onContentLoaded);
   }

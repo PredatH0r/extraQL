@@ -99,7 +99,7 @@ namespace ExtraQL
         this.panelAdvanced.Visible = false;
         this.panelAdvanced.Dock = DockStyle.None;
         this.Height -= panelAdvanced.Height;
-        this.FormBorderStyle = FormBorderStyle.FixedDialog;
+        this.FormBorderStyle = FormBorderStyle.FixedSingle;
       }
     }
     #endregion

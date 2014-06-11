@@ -18,6 +18,11 @@
   var URL_IRC = "http://webchat.quakenet.org/?nick=" + quakelive.username + "&channels=quakelive&prompt=1";
 
   function init() {
+    // delay init so that twitch, twitter, ESR and IRC scripts add items to chat menu bar in a defined order
+    setTimeout(delayedInit, 2400);
+  }
+
+  function delayedInit() {
     onContentLoaded();
     //extraQL.addStyle("#tab_irc { float: right; }");
     quakelive.AddHook("OnContentLoaded", onContentLoaded);

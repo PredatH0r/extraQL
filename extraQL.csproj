@@ -104,7 +104,7 @@
     <None Include="images\minsize.png" />
     <None Include="scripts\toolTip.usr.js" />
     <None Include="scripts\autoExec.usr.js" />
-    <None Include="scripts\12_twitter.usr.js" />
+    <None Include="scripts\twitter.usr.js" />
     <None Include="scripts\resizeLayout.usr.js" />
     <None Include="scripts\docker.usr.js" />
     <None Include="images\right.png" />
@@ -132,7 +132,7 @@
     <Content Include="scripts\friendCommands.usr.js" />
     <Content Include="scripts\gametype.usr.js" />
     <Content Include="scripts\hook.js" />
-    <Content Include="scripts\14_irc.usr.js" />
+    <Content Include="scripts\irc.usr.js" />
     <Content Include="scripts\keyboardNav.usr.js" />
     <Content Include="scripts\linkify.usr.js" />
     <Content Include="scripts\antiAjax.usr.js" />
@@ -145,8 +145,8 @@
     <Content Include="scripts\raceTop10.usr.js" />
     <Content Include="scripts\samPresets.usr.js" />
     <Content Include="scripts\matchtip.usr.js" />
-    <Content Include="scripts\13_esreality.usr.js" />
-    <Content Include="scripts\11_twitch.usr.js" />
+    <Content Include="scripts\esreality.usr.js" />
+    <Content Include="scripts\twitch.usr.js" />
     <Content Include="changelog.txt" />
     <Content Include="scripts\bugfixes.js" />
     <Content Include="scripts\specHelper.usr.js" />
