@@ -2,7 +2,7 @@
 // @name        Quake Live Twich.tv Streams and VODs
 // @version     1.0
 // @author      PredatH0r
-// @downloadUrl https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/11_twitch.usr.js
+// @downloadUrl https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/twitch.usr.js
 // @description	Shows a list of twitch.tv QL live streams and videos
 // @include     http://*.quakelive.com/*
 // @exclude     http://*.quakelive.com/forum*

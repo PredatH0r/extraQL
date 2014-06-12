@@ -2,7 +2,7 @@
 // @name        Quake Live ESReality.com Integration
 // @version     0.9
 // @author      PredatH0r
-// @downloadUrl https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/13_esreality.usr.js
+// @downloadUrl https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/esreality.usr.js
 // @description	Shows a list of esreality.tv QL live Forums and videos
 // @include     http://*.quakelive.com/*
 // @exclude     http://*.quakelive.com/forum*
