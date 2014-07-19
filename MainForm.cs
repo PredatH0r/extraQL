@@ -12,8 +12,13 @@ namespace ExtraQL
   public partial class MainForm : Form
   {
     private int timerCount;
-    private readonly Dictionary<string,string> dirByRealm = new Dictionary<string, string>();
-    private readonly List<string> realms = new List<string>();
+
+    private static readonly List<RealmInfo> realms = new List<RealmInfo>
+    {
+      new RealmInfo("Prod", "https://secure.quakelive.com", "quakelive"),
+      new RealmInfo("Pre-Prod NG0", "https://ng0.quakelive.com", "quakelive"),
+      new RealmInfo("Focus", "https://focus.quakelive.com", "focus")
+    };
 
     #region ctor()
     public MainForm()
@@ -67,7 +72,7 @@ namespace ExtraQL
       if (e.KeyData == Keys.Enter)
       {
         this.btnStartFocus.Select();
-        this.Launch("focus");
+        this.Launch();
         e.Handled = true;
       }
     }
@@ -128,14 +133,14 @@ namespace ExtraQL
     #region btnInstallHook_Click
     private void btnInstallHook_Click(object sender, EventArgs e)
     {
-      this.InstallHookJs(this.comboRealm.Text, true);
+      this.InstallHookJs(realms[this.comboRealm.SelectedIndex], true);
     }
     #endregion
 
     #region btnStartLauncher_Click
     private void btnStartLauncher_Click(object sender, EventArgs e)
     {
-      Launch(realms[this.comboRealm.SelectedIndex]);
+      Launch();
     }
     #endregion
 
@@ -197,14 +202,10 @@ namespace ExtraQL
 
       int i = 0;
       int selIndex = 0;
-      foreach (var realmInfo in Settings.Default.RealmInfo.Split('|'))
+      foreach (var realmInfo in realms)
       {
-        var urlAndDir = realmInfo.Split(';');
-        realms.Add(urlAndDir[0]);
-        dirByRealm[urlAndDir[0]] = urlAndDir[1];
-        this.comboRealm.Items.Add(urlAndDir[2]);
-
-        if (Settings.Default.Realm == urlAndDir[0])
+        this.comboRealm.Items.Add(realmInfo.Label);
+        if (Settings.Default.Realm == realmInfo.Url)
           selIndex = i;
         ++i;
       }
@@ -224,7 +225,7 @@ namespace ExtraQL
       Settings.Default.Password = Cypher.EncryptString(this.txtPassword.Text);
       Settings.Default.Focus = this.cbFocus.Checked;
       Settings.Default.Advanced = this.cbAdvanced.Checked;
-      Settings.Default.Realm = this.realms[this.comboRealm.SelectedIndex];
+      Settings.Default.Realm = realms[this.comboRealm.SelectedIndex].Url;
       Settings.Default.LauncherExe = this.txtLauncherExe.Text;
       Settings.Default.Save();
     }
@@ -248,15 +249,10 @@ namespace ExtraQL
 
     #region Launch()
 
-    private void Launch(string realm)
+    private void Launch()
     {
-      if (string.IsNullOrEmpty(realm))
-      {
-        MessageBox.Show(this, "Please select a Realm in the advanced settings.", "extraQL", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-        return;
-      }
-
       SaveSettings();
+      var realm = realms[this.comboRealm.SelectedIndex];
       InstallHookJs(realm);
       StartLauncher(realm);
     }
@@ -264,13 +260,13 @@ namespace ExtraQL
 
     #region InstallHookJs()
 
-    private void InstallHookJs(string realm, bool force = false)
+    private void InstallHookJs(RealmInfo realm, bool force = false)
     {
       var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
       if (path.EndsWith("Roaming"))
         path = Path.GetDirectoryName(path) + "\\LocalLow";
 
-      path += "\\id Software\\" + this.dirByRealm[realm] + "\\home\\baseq3\\";
+      path += "\\id Software\\" + realm.Directory + "\\home\\baseq3\\";
 
       // create backup of original hook.js
       if (!File.Exists(path + "hook_.js"))
@@ -300,7 +296,7 @@ namespace ExtraQL
 
     #region StartLauncher()
 
-    private void StartLauncher(string realm)
+    private void StartLauncher(RealmInfo realm)
     {
       if (!File.Exists(this.txtLauncherExe.Text))
       {
@@ -312,7 +308,7 @@ namespace ExtraQL
 
       ProcessStartInfo si = new ProcessStartInfo();
       si.FileName = this.txtLauncherExe.Text;
-      si.Arguments = "--realm=" + realm;
+      si.Arguments = "--realm=" + realm.Url;
       Process.Start(si);
       this.WindowState = FormWindowState.Minimized;
 
@@ -390,4 +386,20 @@ document.loginform.submit();";
     #endregion
 
   }
+
+  #region class RealmInfo
+  class RealmInfo
+  {
+    public readonly string Label;
+    public readonly string Url;
+    public readonly string Directory;
+
+    public RealmInfo(string label, string url, string directory)
+    {
+      this.Label = label;
+      this.Url = url;
+      this.Directory = directory;
+    }
+  }
+  #endregion
 }

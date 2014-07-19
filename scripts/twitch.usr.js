@@ -23,7 +23,7 @@ Version 1.0
 
   // config
   var games = ["Quake Live", "Quake II", "Quake"];
-  var videoChannels = ["faceittv", "zlive", "leveluptv", "tastyspleentv"];
+  var videoChannels = ["faceittv", "zlive", "leveluptv", "tastyspleentv", "quakecon"];
 
   // constants
   var URL_STREAMS = "https://api.twitch.tv/kraken/streams?limit=50&game={0}";

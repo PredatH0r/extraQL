@@ -85,19 +85,6 @@ namespace ExtraQL.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://secure.quakelive.com;quakelive;Prod|https://ng0.quakelive.com;quakelive;P" +
-            "re-Prod NG0|https://focus.quakelive.com;focus;Focus")]
-        public string RealmInfo {
-            get {
-                return ((string)(this["RealmInfo"]));
-            }
-            set {
-                this["RealmInfo"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool Focus {
             get {

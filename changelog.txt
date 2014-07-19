@@ -1,4 +1,8 @@
-﻿Version 0.92
+﻿Version 0.93
+- fixed exception when installing hook.js or starting QL
+- added QuakeCon channel to twitch script
+
+Version 0.92
 - grouped QL Focus related fields together in a section that can be hidden/shown
 - minor code cleanup
 

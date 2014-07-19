@@ -17,9 +17,6 @@
     <Setting Name="Advanced" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="RealmInfo" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://secure.quakelive.com;quakelive;Prod|https://ng0.quakelive.com;quakelive;Pre-Prod NG0|https://focus.quakelive.com;focus;Focus</Value>
-    </Setting>
     <Setting Name="Focus" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
