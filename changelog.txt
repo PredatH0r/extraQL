@@ -1,4 +1,10 @@
-﻿Version 0.93
+﻿Version 0.94
+- UI design similar to Quake Live Launcher
+- allow multiple email/password combinations
+- allow arbitrary URLs as realms
+- renamed "Hook" menu to "Userscripts"
+
+Version 0.93
 - fixed exception when installing hook.js or starting QL
 - added QuakeCon channel to twitch script
 

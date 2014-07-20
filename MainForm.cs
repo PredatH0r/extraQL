@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -12,13 +13,9 @@ namespace ExtraQL
   public partial class MainForm : Form
   {
     private int timerCount;
+    private readonly Dictionary<string,string> passwordByEmail = new Dictionary<string, string>();
 
-    private static readonly List<RealmInfo> realms = new List<RealmInfo>
-    {
-      new RealmInfo("Prod", "https://secure.quakelive.com", "quakelive"),
-      new RealmInfo("Pre-Prod NG0", "https://ng0.quakelive.com", "quakelive"),
-      new RealmInfo("Focus", "https://focus.quakelive.com", "focus")
-    };
+    private Size windowDragOffset;
 
     #region ctor()
     public MainForm()
@@ -27,6 +24,9 @@ namespace ExtraQL
 
       this.LoadSettings();
       base.Text = base.Text + " " + Program.Version;
+      this.lblVersion.Text = Program.Version;
+      this.lblExtra.Parent = this.picLogo;
+      this.lblVersion.Parent = this.picLogo;
     }
     #endregion
 
@@ -55,12 +55,52 @@ namespace ExtraQL
     }
     #endregion
 
-    #region txtEmail_KeyDown
-    private void txtEmail_KeyDown(object sender, KeyEventArgs e)
+    #region picLogo_MouseDown
+    private void picLogo_MouseDown(object sender, MouseEventArgs e)
+    {
+      var mouseCoord = MousePosition;
+      this.windowDragOffset = new Size(mouseCoord.X - this.Left, mouseCoord.Y - this.Top);
+    }
+    #endregion
+
+    #region picLogo_MouseMove
+    private void picLogo_MouseMove(object sender, MouseEventArgs e)
+    {
+      if ((e.Button & MouseButtons.Left) == 0)
+        return;
+      this.Location = MousePosition - this.windowDragOffset;
+    }
+    #endregion
+
+    #region picMinimize_Click
+    private void picMinimize_Click(object sender, EventArgs e)
+    {
+      this.WindowState = FormWindowState.Minimized;
+    }
+    #endregion
+
+    #region picClose_Click
+    private void picClose_Click(object sender, EventArgs e)
+    {
+      this.Close();
+    }
+    #endregion
+
+    #region comboEmail_SelectedIndexChanged
+    private void comboEmail_SelectedIndexChanged(object sender, EventArgs e)
+    {
+      string pwd;
+      this.passwordByEmail.TryGetValue(this.comboEmail.Text, out pwd);
+      this.txtPassword.Text = pwd ?? "";
+    }
+    #endregion
+
+    #region comboEmail_KeyDown
+    private void comboEmail_KeyDown(object sender, KeyEventArgs e)
     {
       if (e.KeyData == Keys.Enter)
       {
-        this.lblPassword.Select();
+        this.txtPassword.Select();
         e.Handled = true;
       }
     }
@@ -78,14 +118,22 @@ namespace ExtraQL
     }
     #endregion
 
+    #region txtPassword_Validating
+    private void txtPassword_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+      if (this.comboEmail.Text.Length > 0)
+        this.passwordByEmail[this.comboEmail.Text] = this.txtPassword.Text;
+    }
+    #endregion
+
     #region cbFocus_CheckedChanged
     private void cbFocus_CheckedChanged(object sender, EventArgs e)
     {
       this.panelFocus.Visible = this.cbFocus.Checked;
-      if (!this.cbFocus.Checked)
-        this.Height -= this.panelFocus.Height;
-      else
+      if (this.cbFocus.Checked)
         this.Height += this.panelFocus.Height;
+      else
+        this.Height -= this.panelFocus.Height;        
     }
     #endregion
 
@@ -94,17 +142,14 @@ namespace ExtraQL
     {
       if (this.cbAdvanced.Checked)
       {
-        this.FormBorderStyle = FormBorderStyle.Sizable;
         this.Height += panelAdvanced.Height;
+        this.panelAdvanced.BringToFront();
         this.panelAdvanced.Visible = true;
-        this.panelAdvanced.Dock = DockStyle.Fill;
       }
       else
       {
         this.panelAdvanced.Visible = false;
-        this.panelAdvanced.Dock = DockStyle.None;
         this.Height -= panelAdvanced.Height;
-        this.FormBorderStyle = FormBorderStyle.FixedSingle;
       }
     }
     #endregion
@@ -133,7 +178,7 @@ namespace ExtraQL
     #region btnInstallHook_Click
     private void btnInstallHook_Click(object sender, EventArgs e)
     {
-      this.InstallHookJs(realms[this.comboRealm.SelectedIndex], true);
+      this.InstallHookJs(true);
     }
     #endregion
 
@@ -154,7 +199,7 @@ namespace ExtraQL
     #region linkAbout_LinkClicked
     private void linkAbout_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-      Process.Start("http://www.quakelive.com/#!/profile/summary/PredatH0r/");
+      Process.Start("https://github.com/PredatH0r/extraQL");
     }
     #endregion
 
@@ -193,27 +238,38 @@ namespace ExtraQL
     #region LoadSettings()
     private void LoadSettings()
     {
+      var pwds = Cypher.DecryptString(Settings.Default.Password).Split('\t');
+      int i;
+
+      if (!string.IsNullOrEmpty(Settings.Default.Email))
+      {
+        i = 0;
+        foreach (var email in Settings.Default.Email.Split('\t'))
+        {
+          this.comboEmail.Items.Add(email);
+          this.passwordByEmail[email] = pwds[i++];
+        }
+        if (!string.IsNullOrEmpty(Settings.Default.LastEmail))
+          this.comboEmail.Text = Settings.Default.LastEmail;
+        else if (this.comboEmail.Items.Count > 0)
+          this.comboEmail.SelectedIndex = 0;
+      }
+
       this.txtLauncherExe.Text = Settings.Default.LauncherExe;
-      if (Settings.Default.Password != "")
-        this.txtPassword.Text = Cypher.DecryptString(Settings.Default.Password);
-      this.txtEmail.Text = Settings.Default.Email;
       if (string.IsNullOrEmpty(this.txtLauncherExe.Text))
         this.txtLauncherExe.Text = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\Quake Live\\Launcher.exe";
 
-      int i = 0;
-      int selIndex = 0;
-      foreach (var realmInfo in realms)
+      if (!string.IsNullOrEmpty(Settings.Default.RealmHistory))
       {
-        this.comboRealm.Items.Add(realmInfo.Label);
-        if (Settings.Default.Realm == realmInfo.Url)
-          selIndex = i;
-        ++i;
+        this.comboRealm.Items.Add("");
+        foreach (var realm in Settings.Default.RealmHistory.Trim().Split('\t'))
+          this.comboRealm.Items.Add(realm);
       }
-      this.comboRealm.SelectedIndex = selIndex;
+      this.comboRealm.Text = Settings.Default.Realm;
 
       this.cbAdvanced.Checked = Settings.Default.Advanced;
       this.cbFocus.Checked = Settings.Default.Focus;
-      this.ActiveControl = this.txtEmail;
+      this.ActiveControl = this.comboEmail;
     }
 
     #endregion
@@ -221,11 +277,31 @@ namespace ExtraQL
     #region SaveSettings()
     private void SaveSettings()
     {
-      Settings.Default.Email = this.txtEmail.Text;
-      Settings.Default.Password = Cypher.EncryptString(this.txtPassword.Text);
+      if (!this.comboEmail.Items.Contains(this.comboEmail.Text))
+        this.comboEmail.Items.Add(this.comboEmail.Text);
+      this.passwordByEmail[this.comboEmail.Text] = this.txtPassword.Text;
+
+      string emails = "";
+      string pwds = "";
+      foreach (string email in this.comboEmail.Items)
+      {
+        emails += "\t" + email;
+        pwds += "\t" + this.passwordByEmail[email];
+      }
+
+      string realmHistory = "";
+      string realmUrl = this.comboRealm.Text.Trim();
+      if (!this.comboRealm.Items.Contains(realmUrl))
+        this.comboRealm.Items.Add(realmUrl);
+      foreach (var realm in this.comboRealm.Items)
+        realmHistory += realm + "\t";
+
+      Settings.Default.Email = emails.Length == 0 ? "" : emails.Substring(1);     
+      Settings.Default.Password = Cypher.EncryptString(pwds.Length == 0 ? "" : pwds.Substring(1));
       Settings.Default.Focus = this.cbFocus.Checked;
       Settings.Default.Advanced = this.cbAdvanced.Checked;
-      Settings.Default.Realm = realms[this.comboRealm.SelectedIndex].Url;
+      Settings.Default.Realm = this.comboRealm.Text;
+      Settings.Default.RealmHistory = realmHistory.Trim();
       Settings.Default.LauncherExe = this.txtLauncherExe.Text;
       Settings.Default.Save();
     }
@@ -252,21 +328,21 @@ namespace ExtraQL
     private void Launch()
     {
       SaveSettings();
-      var realm = realms[this.comboRealm.SelectedIndex];
-      InstallHookJs(realm);
-      StartLauncher(realm);
+      InstallHookJs();
+      StartLauncher();
     }
     #endregion
 
     #region InstallHookJs()
 
-    private void InstallHookJs(RealmInfo realm, bool force = false)
+    private void InstallHookJs(bool force = false)
     {
       var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
       if (path.EndsWith("Roaming"))
         path = Path.GetDirectoryName(path) + "\\LocalLow";
 
-      path += "\\id Software\\" + realm.Directory + "\\home\\baseq3\\";
+      string realmDir = this.comboRealm.Text.Contains("focus") ? "focus" : "quakelive";
+      path += "\\id Software\\" + realmDir + "\\home\\baseq3\\";
 
       // create backup of original hook.js
       if (!File.Exists(path + "hook_.js"))
@@ -296,7 +372,7 @@ namespace ExtraQL
 
     #region StartLauncher()
 
-    private void StartLauncher(RealmInfo realm)
+    private void StartLauncher()
     {
       if (!File.Exists(this.txtLauncherExe.Text))
       {
@@ -305,10 +381,12 @@ namespace ExtraQL
       }
 
       this.Log("Starting Quake Live Laucher...");
+      string realmUrl = this.comboRealm.Text.Trim();
 
       ProcessStartInfo si = new ProcessStartInfo();
       si.FileName = this.txtLauncherExe.Text;
-      si.Arguments = "--realm=" + realm.Url;
+      if (!string.IsNullOrEmpty(realmUrl))
+        si.Arguments = "--realm=\"" + realmUrl + "\"";
       Process.Start(si);
       this.WindowState = FormWindowState.Minimized;
 
@@ -326,7 +404,7 @@ namespace ExtraQL
         webRequest.Encoding = Encoding.UTF8;
         var html = webRequest.DownloadString("http://focus.quakelive.com/focusgate/");
         string js = @"
-document.loginform.login.value = '" + this.txtEmail.Text + @"';
+document.loginform.login.value = '" + this.comboEmail.Text + @"';
 document.loginform.passwd.value = '" + this.txtPassword.Text + @"';
 document.loginform.submit();";
         html = html.Replace("document.loginform.login.focus();", js);
@@ -374,7 +452,7 @@ document.loginform.submit();";
         if (name.ToString() == "WindowsForms10.EDIT.app.0.33c0d9d")
         {
           if (i++ == 0)
-            Win32.SendMessage(hwndChild, Win32.WM_SETTEXT, 0, this.txtEmail.Text);
+            Win32.SendMessage(hwndChild, Win32.WM_SETTEXT, 0, this.comboEmail.Text);
           else
           {
             Win32.SendMessage(hwndChild, Win32.WM_SETTEXT, 0, this.txtPassword.Text);
@@ -386,20 +464,4 @@ document.loginform.submit();";
     #endregion
 
   }
-
-  #region class RealmInfo
-  class RealmInfo
-  {
-    public readonly string Label;
-    public readonly string Url;
-    public readonly string Directory;
-
-    public RealmInfo(string label, string url, string directory)
-    {
-      this.Label = label;
-      this.Url = url;
-      this.Directory = directory;
-    }
-  }
-  #endregion
 }

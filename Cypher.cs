@@ -29,7 +29,7 @@ namespace ExtraQL
       }
       catch
       {
-        return null;
+        return "";
       }
     }
   }

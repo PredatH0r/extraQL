@@ -61,7 +61,7 @@ namespace ExtraQL.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("focus")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string Realm {
             get {
                 return ((string)(this["Realm"]));
@@ -92,6 +92,30 @@ namespace ExtraQL.Properties {
             }
             set {
                 this["Focus"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastEmail {
+            get {
+                return ((string)(this["LastEmail"]));
+            }
+            set {
+                this["LastEmail"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RealmHistory {
+            get {
+                return ((string)(this["RealmHistory"]));
+            }
+            set {
+                this["RealmHistory"] = value;
             }
         }
     }

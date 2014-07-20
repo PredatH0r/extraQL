@@ -20,6 +20,7 @@ var config = {
   , EXTRAQL_URL: "http://127.0.0.1:27963/"
   , manual: []
   , debug: false
+  , menuCaption: "Userscripts"
 };
 
 // !!!
@@ -202,12 +203,12 @@ HudManager.prototype.onMenuItemClicked = function(aItem) {
 HudManager.prototype.rebuildNav = function() {
   // method could have been called by the timer before the menu was created
   this.rebuildNavBarTimer = undefined;
-  if (!nav.navbar["Hook"])
+  if (!nav.navbar[config.menuCaption])
     return;
 
   // Generate script command submenu
   for (var caption in scriptMenuItems) {
-    nav.navbar["Hook"].submenu[caption] = { class: "qlhm_nav_scriptMenuItem", callback: "" };
+    nav.navbar[config.menuCaption].submenu[caption] = { class: "qlhm_nav_scriptMenuItem", callback: "" };
   }
 
   // Rebuild the navbar
@@ -246,7 +247,7 @@ HudManager.prototype.injectMenuEntry = function() {
 
   // New...
   if ($("#tn_exit").length) {
-    nav.navbar["Hook"] = {
+    nav.navbar[config.menuCaption] = {
       id: "qlhm_nav"
       , callback: ""
       , submenu: {
@@ -276,6 +277,15 @@ HudManager.prototype.injectMenuEntry = function() {
   }
 }
 
+function cleanupName(name) {
+  if (name.indexOf("Quake Live ") == 0)
+    return name.substr(11);
+  if (name.indexOf("QL ") == 0)
+    return name.substr(3);
+  return name;
+}
+
+
 HudManager.prototype.scriptRowFromScript = function(aScript) {
   var id = aScript._meta.id.toString()
     , enabled = storage.scripts.enabled[id]
@@ -283,7 +293,7 @@ HudManager.prototype.scriptRowFromScript = function(aScript) {
 
   return "<li id='userscript" + id + "' data-id='" + id + "'>"
        + "<input type='checkbox' class='userscript-state' " + (enabled ? "checked" : "") + ">"
-       + " <label for='userscript" + id + "'><a href='javascript:void(0)'>" + e(aScript.headers.name[0]) + "</a></label>"
+       + " <label for='userscript" + id + "'><a href='javascript:void(0)'>" + e(cleanupName(aScript.headers.name[0])) + "</a></label>"
        + "</li>";
 }
 
@@ -292,7 +302,7 @@ HudManager.prototype.scriptRowFromScriptRepository = function(aScriptInfo) {
   return "<li id='userscript" + id + "' data-id='" + id + "'>"
        + "<input type='checkbox' class='userscript-state'>"
        + " <label for='userscript" + id + "'>"
-       + "<a class='notInstalled italic' href='javascript:void(0)' target='_empty'>" + e(aScriptInfo.name) + "</a></label>"
+       + "<a class='notInstalled italic' href='javascript:void(0)' target='_empty'>" + e(cleanupName(aScriptInfo.name)) + "</a></label>"
        + "</li>";
 }
 
@@ -301,7 +311,7 @@ HudManager.prototype.loadRepository = function() {
   $.getScript(USERSCRIPT_REPOSITORY_URL).always(function() { self.showConsole.call(self) });
 }
 
-HudManager.prototype.showConsole = function() {
+HudManager.prototype.showConsole = function () {
   var self = this;
 
   webReloadRequired = false;
@@ -317,8 +327,8 @@ HudManager.prototype.showConsole = function() {
   });
 
   scripts.sort(function(a, b) {
-    var x = a.headers ? a.headers.name[0] : a.name;
-    var y = b.headers ? b.headers.name[0] : b.name;
+    var x = cleanupName(a.headers ? a.headers.name[0] : a.name);
+    var y = cleanupName(b.headers ? b.headers.name[0] : b.name);
     x = x.toLowerCase(), y = y.toLowerCase();
     return (x < y ? -1 : x > y ? 1 : 0);
   });
@@ -795,7 +805,7 @@ HookManager.prototype.toggleUserScript = function(aID, aEnable) {
     ;
 
   if (!script) return false;
-  name = script.headers.name[0];
+  name = cleanupName(script.headers.name[0]);
 
   if (enable && !storage.scripts.enabled[aID]) {
     storage.scripts.enabled[aID] = true;
@@ -814,7 +824,7 @@ HookManager.prototype.toggleUserScript = function(aID, aEnable) {
 }
 
 HookManager.prototype.injectUserScript = function(aScript) {
-  log("^7Starting userscript ^5" + aScript._meta.id + "^7: ^3" + aScript.headers.name[0] + "^7");
+  log("^7Starting userscript ^5" + aScript._meta.id + "^7: ^3" + cleanupName(aScript.headers.name[0]) + "^7");
   var closure = ";(function() {" + aScript.content + "\n})();";
 
   // inject script file when possible to preserve file name in log and error messages

@@ -113,6 +113,7 @@
     <None Include="images\topright.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\background.png" />
     <Content Include="c:\users\hbeham\appdata\locallow\id software\focus\home\baseq3\hook.js">
       <Link>focus\hook.js</Link>
     </Content>
@@ -123,6 +124,9 @@
     <Content Include="focus\readme.txt" />
     <Content Include="quakelive\readme.txt" />
     <None Include="readme.md" />
+    <None Include="resources\close.png" />
+    <None Include="resources\logo.png" />
+    <None Include="resources\minimize.png" />
     <Content Include="scripts\autoInvite.usr.js" />
     <Content Include="scripts\escaper.usr.js" />
     <Content Include="scripts\extGraphHist.usr.js" />

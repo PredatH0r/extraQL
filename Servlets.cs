@@ -338,7 +338,7 @@ namespace ExtraQL
     {
       var args = HttpUtility.ParseQueryString(uri.Query);
       string text = "";
-      string scriptId = uri.AbsolutePath.Substring("/uso/".Length);
+      string scriptId = uri.AbsolutePath.StartsWith("/uso/") ? uri.AbsolutePath.Substring(5) : null;
       
       var scriptInfo = string.IsNullOrEmpty(scriptId) ? null : this.scriptRepository.GetScriptByIdOrUrl(scriptId);
       if (scriptInfo == null)

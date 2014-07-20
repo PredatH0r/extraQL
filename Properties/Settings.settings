@@ -12,13 +12,19 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Realm" Type="System.String" Scope="User">
-      <Value Profile="(Default)">focus</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Advanced" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="Focus" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LastEmail" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RealmHistory" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>
