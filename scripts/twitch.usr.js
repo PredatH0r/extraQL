@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name        Quake Live Twich.tv Streams and VODs
-// @version     1.0
+// @version     1.1
 // @author      PredatH0r
 // @downloadUrl https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/twitch.usr.js
 // @description	Shows a list of twitch.tv QL live streams and videos
@@ -10,6 +10,9 @@
 // ==/UserScript==
 
 /*
+
+Version 1.1
+- show videos grouped by channel
 
 Version 1.0
 - first public release
@@ -23,12 +26,14 @@ Version 1.0
 
   // config
   var games = ["Quake Live", "Quake II", "Quake"];
-  var videoChannels = ["faceittv", "zlive", "leveluptv", "tastyspleentv", "quakecon"];
+  var videoChannels = ["quakecon", "faceittv", "zlive", "leveluptv", "tastyspleentv" ];
+  var groupVideosByChannel = true;
 
   // constants
   var URL_STREAMS = "https://api.twitch.tv/kraken/streams?limit=50&game={0}";
   var URL_VIDEOS = "https://api.twitch.tv/kraken/channels/{0}/videos?limit=50&broadcasts={1}";
   var UPDATE_INTERVAL = 60000;
+  var FLAT_VIDEO_LIST = "All Channels";
 
   var VIEW_STREAMS = "streams";
   var VIEW_CASTS = "casts";
@@ -65,7 +70,8 @@ Version 1.0
       "#twitchContent div { padding: 3px 6px; max-height: 14px; overflow: hidden; }",
       "#twitchContent .active { background-color: #ccc; }",
       "#twitchContent a { color: black; text-decoration: none; }",
-      "#twitchContent a:hover { text-decoration: underline; }"
+      "#twitchContent a:hover { text-decoration: underline; }",
+      "#twitchContent h1 { color: white; background-color: #444; text-align: center; }"
       );
 
     var content =
@@ -207,7 +213,7 @@ Version 1.0
     if (divs.length == 0) {
       $("#twitchDetails img").attr("src", extraQL.BASE_URL+"images/offline.jpg");
       $("#twitchStatus").text("Offline");
-      $("#twitchContent").html("<div>No live streams found.</div>");
+      $("#twitchContent").html("<div>No streams/videos found.</div>");
     } else {
       showStreamDetails.apply(divs[0]);
       $(divs[0]).addClass("active");
@@ -230,10 +236,12 @@ Version 1.0
   var videoChannelIndex;
   var videos;
   var loadCasts;
+  var latestVideoByChannel;
 
   function updateVideos(casts) {
     videoChannelIndex = 0;
-    videos = [];
+    videos = {};
+    latestVideoByChannel = {};
     loadCasts = casts;
     showLoadingScreen();
     for (var threads = 0; threads < VIDEO_THREADS; threads++)
@@ -258,17 +266,22 @@ Version 1.0
         url: extraQL.format(URL_VIDEOS, channel, loadCasts),
         dataType: "jsonp",
         jsonp: "callback",
-        success: parseVideosFromChannel,
+        success: function(data) { parseVideosFromChannel(channel, data); },
         error: function () { extraQL.log("^1Failed^7 to load twitch video list for channel " + channel); },
         complete: loadVideosForNextChannel
       });
   }
 
-  function parseVideosFromChannel(data) {
+  function parseVideosFromChannel(channel, data) {
+    var groupName = groupVideosByChannel ? channel : FLAT_VIDEO_LIST;
     $.each(data.videos, function (i, video) {
       if (games.indexOf(video.game) < 0) return; // ignore videos of unsubscribed games
-      if (loadCasts && videoChannels.indexOf(video.channel.name) < 0) return;  // ignore past casts from non-featured channels
-      videos.push(video);
+      if (loadCasts && videoChannels.indexOf(video.channel.name) < 0) return;  // ignore recorded casts from non-featured channels
+      if (!videos[groupName])
+        videos[groupName] = Array();
+      videos[groupName].push(video);
+      if (!latestVideoByChannel[channel])
+        latestVideoByChannel[channel] = video.recorded_at;
     });
   }
 
@@ -276,28 +289,38 @@ Version 1.0
     try {
       var $streams = $("#twitchContent");
       $streams.empty();
-      if (videos.length == 0) {
-        $streams.append("<div>No videos found</div>");
-        return;
-      }
 
-      videos.sort(function(a, b) { return -(a.recorded_at < b.recorded_at ? -1 : a.recorded_at > b.recorded_at ? +1 : 0); });
+      // get groups in order of their latest video
+      var groups = groupVideosByChannel ? videoChannels.slice() : [ FLAT_VIDEO_LIST ];
+      groups.sort(function (a, b) { return -(latestVideoByChannel[a] < latestVideoByChannel[b] ? -1 : latestVideoByChannel[a] > latestVideoByChannel[b] ? +1 : 0); });
 
-      // update video list
-      $.each(videos, function (i, item) {
-        if (i > 100) return;
-        var date = new Date(item.recorded_at);
-        var vidDate = (1900 + date.getYear()) + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
-        var hours = item.length / 3600;
-        hours = hours < 1 ? "" : Math.floor(hours) + "h";
-        var vidLength = " " + hours + ("0" + Math.round(item.length / 60 % 60)).slice(-2) + "m" + " - ";
-        var channel = item.channel ? (item.channel.display_name ? item.channel.display_name : item.channel.name) : "";
-        //var descr = item.description && item.description != item.title ? extraQL.escapeHtml(item.description) + "&lt;br&gt;" : "";
-        $streams.append("<div" +
-          " data-preview='" + item.preview + "'" +
-          " data-status=\"[" + vidDate + "] " + vidLength + " &lt;b&gt;" + extraQL.escapeHtml(channel) + "&lt;/b&gt;&lt;br&gt;"+ extraQL.escapeHtml(item.title) + "\"" +
-          ">" +
-          "<a href='" + item.url + "' target='_blank'>" + extraQL.escapeHtml(item.title) + "</a></div>");
+      $.each(groups, function (groupIndex, groupName) {
+        var videosInGroup = videos[groupName];
+        videosInGroup.sort(function(a, b) { return -(a.recorded_at < b.recorded_at ? -1 : a.recorded_at > b.recorded_at ? +1 : 0); });
+
+        $streams.append("<h1>" + groupName + "</h1>");
+
+        if (videosInGroup.length == 0) {
+          $streams.append("<div>No videos found</div>");
+          return;
+        }
+
+        // update video list
+        $.each(videosInGroup, function(i, item) {
+          if (i > 100) return;
+          var date = new Date(item.recorded_at);
+          var vidDate = (1900 + date.getYear()) + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
+          var hours = item.length / 3600;
+          hours = hours < 1 ? "" : Math.floor(hours) + "h";
+          var vidLength = " " + hours + ("0" + Math.round(item.length / 60 % 60)).slice(-2) + "m" + " - ";
+          var channel = item.channel ? (item.channel.display_name ? item.channel.display_name : item.channel.name) : "";
+          //var descr = item.description && item.description != item.title ? extraQL.escapeHtml(item.description) + "&lt;br&gt;" : "";
+          $streams.append("<div" +
+            " data-preview='" + item.preview + "'" +
+            " data-status=\"[" + vidDate + "] " + vidLength + " &lt;b&gt;" + extraQL.escapeHtml(channel) + "&lt;/b&gt;&lt;br&gt;" + extraQL.escapeHtml(item.title) + "\"" +
+            ">" +
+            "<a href='" + item.url + "' target='_blank'>" + extraQL.escapeHtml(item.title) + "</a></div>");
+        });
       });
       $("#twitchContent div").hover(showStreamDetails);
 
