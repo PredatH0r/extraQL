@@ -115,7 +115,7 @@ namespace ExtraQL
     /// </summary>
     private void Version(TcpClient client, Uri uri, string request)
     {
-      HttpOk(client, Program.Version);
+      HttpOk(client, MainForm.Version);
     }
 
     #endregion

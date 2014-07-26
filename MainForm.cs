@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -7,13 +8,16 @@ using System.Net;
 using System.Text;
 using System.Windows.Forms;
 using ExtraQL.Properties;
+using Microsoft.Win32;
 
 namespace ExtraQL
 {
   public partial class MainForm : Form
   {
+    public const string Version = "0.95";
+
     private int timerCount;
-    private readonly Dictionary<string,string> passwordByEmail = new Dictionary<string, string>();
+    private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
 
     private Size windowDragOffset;
 
@@ -23,8 +27,8 @@ namespace ExtraQL
       InitializeComponent();
 
       this.LoadSettings();
-      base.Text = base.Text + " " + Program.Version;
-      this.lblVersion.Text = Program.Version;
+      base.Text = base.Text + " " + Version;
+      this.lblVersion.Text = Version;
       this.lblExtra.Parent = this.picLogo;
       this.lblVersion.Parent = this.picLogo;
     }
@@ -111,15 +115,14 @@ namespace ExtraQL
     {
       if (e.KeyData == Keys.Enter)
       {
-        this.btnStartFocus.Select();
-        this.Launch();
+        this.btnStartLauncher.Select();
         e.Handled = true;
       }
     }
     #endregion
 
     #region txtPassword_Validating
-    private void txtPassword_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+    private void txtPassword_Validating(object sender, CancelEventArgs e)
     {
       if (this.comboEmail.Text.Length > 0)
         this.passwordByEmail[this.comboEmail.Text] = this.txtPassword.Text;
@@ -154,6 +157,13 @@ namespace ExtraQL
     }
     #endregion
 
+    #region comboRealm_SelectedValueChanged
+    private void comboRealm_SelectedValueChanged(object sender, EventArgs e)
+    {
+      this.btnStartSteam.Enabled = this.comboRealm.Text == "" && this.GetBaseq3Path(true) != null;
+    }
+    #endregion
+
     #region cbDisableScripts_CheckedChanged
     private void cbDisableScripts_CheckedChanged(object sender, EventArgs e)
     {
@@ -178,21 +188,21 @@ namespace ExtraQL
     #region btnInstallHook_Click
     private void btnInstallHook_Click(object sender, EventArgs e)
     {
-      this.InstallHookJs(true);
+      this.InstallHookJs(false, force: true);
     }
     #endregion
 
     #region btnStartLauncher_Click
     private void btnStartLauncher_Click(object sender, EventArgs e)
     {
-      Launch();
+      this.Launch(false);
     }
     #endregion
 
-    #region btnQuit_Click
-    private void btnQuit_Click(object sender, EventArgs e)
+    #region btnStartSteam_Click
+    private void btnStartSteam_Click(object sender, EventArgs e)
     {
-      this.Close();
+      this.Launch(true);
     }
     #endregion
 
@@ -217,19 +227,19 @@ namespace ExtraQL
     }
     #endregion
 
-    #region timer1_Tick
-    private void timer1_Tick(object sender, EventArgs e)
+    #region laucherDetectionTimer_Tick
+    private void laucherDetectionTimer_Tick(object sender, EventArgs e)
     {
       // find Launcher main window handle
       var handle = LauncherWindowHandle;
       if (handle == IntPtr.Zero)
       {
         if (++this.timerCount == 20)
-          this.timer1.Stop();
+          this.launcherDetectionTimer.Stop();
         return;
       }
 
-      this.timer1.Stop();
+      this.launcherDetectionTimer.Stop();
       this.FillLaucherWithEmailAndPassword(handle);
     }
     #endregion
@@ -241,7 +251,7 @@ namespace ExtraQL
       var pwds = Cypher.DecryptString(Settings.Default.Password).Split('\t');
       int i;
 
-      if (!string.IsNullOrEmpty(Settings.Default.Email))
+      if (!String.IsNullOrEmpty(Settings.Default.Email))
       {
         i = 0;
         foreach (var email in Settings.Default.Email.Split('\t'))
@@ -249,17 +259,17 @@ namespace ExtraQL
           this.comboEmail.Items.Add(email);
           this.passwordByEmail[email] = pwds[i++];
         }
-        if (!string.IsNullOrEmpty(Settings.Default.LastEmail))
+        if (!String.IsNullOrEmpty(Settings.Default.LastEmail))
           this.comboEmail.Text = Settings.Default.LastEmail;
         else if (this.comboEmail.Items.Count > 0)
           this.comboEmail.SelectedIndex = 0;
       }
 
       this.txtLauncherExe.Text = Settings.Default.LauncherExe;
-      if (string.IsNullOrEmpty(this.txtLauncherExe.Text))
+      if (String.IsNullOrEmpty(this.txtLauncherExe.Text))
         this.txtLauncherExe.Text = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\Quake Live\\Launcher.exe";
 
-      if (!string.IsNullOrEmpty(Settings.Default.RealmHistory))
+      if (!String.IsNullOrEmpty(Settings.Default.RealmHistory))
       {
         this.comboRealm.Items.Add("");
         foreach (var realm in Settings.Default.RealmHistory.Trim().Split('\t'))
@@ -313,7 +323,7 @@ namespace ExtraQL
 
     private void Log(string msg)
     {
-      if (string.IsNullOrEmpty(msg))
+      if (String.IsNullOrEmpty(msg))
         return;
 
       if (this.InvokeRequired)
@@ -325,47 +335,79 @@ namespace ExtraQL
 
     #region Launch()
 
-    private void Launch()
+    private void Launch(bool steam)
     {
       SaveSettings();
-      InstallHookJs();
-      StartLauncher();
+      InstallHookJs(steam);
+      if (steam)
+        StartSteam();
+      else
+        StartLauncher();
     }
     #endregion
 
     #region InstallHookJs()
 
-    private void InstallHookJs(bool force = false)
+    private void InstallHookJs(bool steam, bool force = false)
     {
-      var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-      if (path.EndsWith("Roaming"))
-        path = Path.GetDirectoryName(path) + "\\LocalLow";
-
-      string realmDir = this.comboRealm.Text.Contains("focus") ? "focus" : "quakelive";
-      path += "\\id Software\\" + realmDir + "\\home\\baseq3\\";
+      string path = this.GetBaseq3Path(steam);
+      if (path == null)
+      {
+        this.Log("Unable to detect Quake Live's baseq3 directory");
+        return;
+      }
+      var targetHook = path + "hook.js";
+      var backupHook = path + "hook_.js";
 
       // create backup of original hook.js
-      if (!File.Exists(path + "hook_.js"))
+      if (!File.Exists(backupHook))
       {
-        if (File.Exists(path + "hook.js"))
+        if (File.Exists(targetHook))
         {
-          File.Move(path + "hook.js", path + "hook_.js");
+          File.Move(targetHook, backupHook);
           Log("renamed existing hook.js to hook_.js");
         }
         else
-          File.Create(path + "hook_.js").Close();
+          File.Create(backupHook).Close();
       }
 
-      if (force)
-        File.Delete(path + "hook.js");
-      if (!File.Exists(path + "hook.js"))
+      var bundledHook = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
+      if (bundledHook.EndsWith("\\bin\\Debug"))
+        bundledHook = Path.GetDirectoryName(Path.GetDirectoryName(bundledHook));
+      bundledHook += "\\scripts\\hook.js";
+
+      if (force || new FileInfo(targetHook).LastWriteTimeUtc < new FileInfo(bundledHook).LastWriteTimeUtc)
+        File.Delete(targetHook);
+
+      if (!File.Exists(targetHook))
       {
-        var exeDir = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
-        if (exeDir.EndsWith("\\bin\\Debug"))
-          exeDir = Path.GetDirectoryName(Path.GetDirectoryName(exeDir));
-        File.Copy(exeDir + "\\scripts\\hook.js", path + "hook.js");
+        File.Copy(bundledHook, targetHook);
         Log("installed new hook.js");
       }
+    }
+    #endregion
+
+    #region GetBaseq3Path()
+    private string GetBaseq3Path(bool steam)
+    {
+      string path;
+      if (steam)
+      {
+        path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
+        if (path != null)
+          path += @"\SteamApps\Common\Quake Live\baseq3";
+      }
+      else
+      {
+        path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        if (path.EndsWith("Roaming"))
+          path = Path.GetDirectoryName(path) + "\\LocalLow";
+
+        string realmDir = this.comboRealm.Text.Contains("focus") ? "focus" : "quakelive";
+        path += "\\id Software\\" + realmDir + "\\home\\baseq3\\";
+      }
+
+      return path != null && Directory.Exists(path) ? path : null;
     }
 
     #endregion
@@ -385,15 +427,24 @@ namespace ExtraQL
 
       ProcessStartInfo si = new ProcessStartInfo();
       si.FileName = this.txtLauncherExe.Text;
-      if (!string.IsNullOrEmpty(realmUrl))
+      if (!String.IsNullOrEmpty(realmUrl))
         si.Arguments = "--realm=\"" + realmUrl + "\"";
       Process.Start(si);
       this.WindowState = FormWindowState.Minimized;
 
       this.timerCount = 0;
-      this.timer1.Start();
+      this.launcherDetectionTimer.Start();
     }
 
+    #endregion
+
+    #region StartSteam()
+    private void StartSteam()
+    {
+      this.Log("Starting Quake Live Steam App...");
+      Process.Start("steam://rungameid/282440");
+      this.WindowState = FormWindowState.Minimized;
+    }
     #endregion
 
     #region LoginToQlFocus()
@@ -462,6 +513,5 @@ document.loginform.submit();";
       }
     }
     #endregion
-
   }
 }

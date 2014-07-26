@@ -1,11 +1,16 @@
-﻿namespace ExtraQL
+﻿using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace ExtraQL
 {
   partial class MainForm
   {
     /// <summary>
     /// Required designer variable.
     /// </summary>
-    private System.ComponentModel.IContainer components = null;
+    private IContainer components = null;
 
     /// <summary>
     /// Clean up any resources being used.
@@ -34,7 +39,7 @@
       this.txtLauncherExe = new System.Windows.Forms.TextBox();
       this.btnLauncherExe = new System.Windows.Forms.Button();
       this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-      this.timer1 = new System.Windows.Forms.Timer(this.components);
+      this.launcherDetectionTimer = new System.Windows.Forms.Timer(this.components);
       this.lblRealm = new System.Windows.Forms.Label();
       this.btnInstallHook = new System.Windows.Forms.Button();
       this.panelAdvanced = new System.Windows.Forms.Panel();
@@ -58,8 +63,8 @@
       this.txtPassword = new System.Windows.Forms.TextBox();
       this.lblPassword = new System.Windows.Forms.Label();
       this.lblEmail = new System.Windows.Forms.Label();
-      this.btnQuit = new System.Windows.Forms.Button();
-      this.btnStartFocus = new System.Windows.Forms.Button();
+      this.btnStartSteam = new System.Windows.Forms.Button();
+      this.btnStartLauncher = new System.Windows.Forms.Button();
       this.panelFocus = new System.Windows.Forms.Panel();
       this.grpFocus = new System.Windows.Forms.GroupBox();
       this.panelAdvanced.SuspendLayout();
@@ -87,19 +92,20 @@
             | System.Windows.Forms.AnchorStyles.Right)));
       this.txtLauncherExe.Location = new System.Drawing.Point(10, 37);
       this.txtLauncherExe.Name = "txtLauncherExe";
-      this.txtLauncherExe.Size = new System.Drawing.Size(356, 21);
+      this.txtLauncherExe.Size = new System.Drawing.Size(359, 21);
       this.txtLauncherExe.TabIndex = 1;
       // 
       // btnLauncherExe
       // 
       this.btnLauncherExe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnLauncherExe.BackColor = System.Drawing.SystemColors.ButtonFace;
       this.btnLauncherExe.ForeColor = System.Drawing.Color.Black;
       this.btnLauncherExe.Location = new System.Drawing.Point(375, 37);
       this.btnLauncherExe.Name = "btnLauncherExe";
       this.btnLauncherExe.Size = new System.Drawing.Size(23, 21);
       this.btnLauncherExe.TabIndex = 2;
       this.btnLauncherExe.Text = "…";
-      this.btnLauncherExe.UseVisualStyleBackColor = true;
+      this.btnLauncherExe.UseVisualStyleBackColor = false;
       this.btnLauncherExe.Click += new System.EventHandler(this.btnLauncherExe_Click);
       // 
       // openFileDialog1
@@ -109,10 +115,10 @@
       this.openFileDialog1.Filter = "EXE Files|*.exe";
       this.openFileDialog1.RestoreDirectory = true;
       // 
-      // timer1
+      // launcherDetectionTimer
       // 
-      this.timer1.Interval = 500;
-      this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+      this.launcherDetectionTimer.Interval = 500;
+      this.launcherDetectionTimer.Tick += new System.EventHandler(this.laucherDetectionTimer_Tick);
       // 
       // lblRealm
       // 
@@ -125,13 +131,15 @@
       // 
       // btnInstallHook
       // 
+      this.btnInstallHook.BackColor = System.Drawing.SystemColors.ButtonFace;
+      this.btnInstallHook.FlatAppearance.BorderSize = 2;
       this.btnInstallHook.ForeColor = System.Drawing.Color.Black;
       this.btnInstallHook.Location = new System.Drawing.Point(10, 64);
       this.btnInstallHook.Name = "btnInstallHook";
-      this.btnInstallHook.Size = new System.Drawing.Size(172, 23);
+      this.btnInstallHook.Size = new System.Drawing.Size(172, 29);
       this.btnInstallHook.TabIndex = 3;
       this.btnInstallHook.Text = "Re-install hook.js";
-      this.btnInstallHook.UseVisualStyleBackColor = true;
+      this.btnInstallHook.UseVisualStyleBackColor = false;
       this.btnInstallHook.Click += new System.EventHandler(this.btnInstallHook_Click);
       // 
       // panelAdvanced
@@ -189,7 +197,7 @@
       // cbDisableScripts
       // 
       this.cbDisableScripts.AutoSize = true;
-      this.cbDisableScripts.Location = new System.Drawing.Point(227, 68);
+      this.cbDisableScripts.Location = new System.Drawing.Point(233, 70);
       this.cbDisableScripts.Name = "cbDisableScripts";
       this.cbDisableScripts.Size = new System.Drawing.Size(116, 17);
       this.cbDisableScripts.TabIndex = 4;
@@ -232,6 +240,7 @@
       this.comboRealm.Name = "comboRealm";
       this.comboRealm.Size = new System.Drawing.Size(341, 21);
       this.comboRealm.TabIndex = 3;
+      this.comboRealm.SelectedValueChanged += new System.EventHandler(this.comboRealm_SelectedValueChanged);
       // 
       // panelTop
       // 
@@ -248,8 +257,8 @@
       this.panelTop.Controls.Add(this.txtPassword);
       this.panelTop.Controls.Add(this.lblPassword);
       this.panelTop.Controls.Add(this.lblEmail);
-      this.panelTop.Controls.Add(this.btnQuit);
-      this.panelTop.Controls.Add(this.btnStartFocus);
+      this.panelTop.Controls.Add(this.btnStartSteam);
+      this.panelTop.Controls.Add(this.btnStartLauncher);
       this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
       this.panelTop.Location = new System.Drawing.Point(0, 0);
       this.panelTop.Name = "panelTop";
@@ -282,7 +291,7 @@
       // 
       this.lblVersion.AutoSize = true;
       this.lblVersion.Font = new System.Drawing.Font("Tahoma", 10F);
-      this.lblVersion.Location = new System.Drawing.Point(384, 40);
+      this.lblVersion.Location = new System.Drawing.Point(384, 37);
       this.lblVersion.Name = "lblVersion";
       this.lblVersion.Size = new System.Drawing.Size(36, 17);
       this.lblVersion.TabIndex = 1;
@@ -293,12 +302,12 @@
       // lblExtra
       // 
       this.lblExtra.AutoSize = true;
-      this.lblExtra.Font = new System.Drawing.Font("Arial Black", 16F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Italic | System.Drawing.FontStyle.Underline))));
-      this.lblExtra.Location = new System.Drawing.Point(6, 20);
+      this.lblExtra.Font = new System.Drawing.Font("Arial Black", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Italic | System.Drawing.FontStyle.Underline))));
+      this.lblExtra.Location = new System.Drawing.Point(300, 34);
       this.lblExtra.Name = "lblExtra";
-      this.lblExtra.Size = new System.Drawing.Size(80, 31);
+      this.lblExtra.Size = new System.Drawing.Size(81, 23);
       this.lblExtra.TabIndex = 0;
-      this.lblExtra.Text = "Extra";
+      this.lblExtra.Text = "extraQL";
       this.lblExtra.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseDown);
       this.lblExtra.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseMove);
       // 
@@ -337,7 +346,7 @@
       this.cbFocus.Size = new System.Drawing.Size(111, 17);
       this.cbFocus.TabIndex = 8;
       this.cbFocus.Text = "QL Focus Member";
-      this.cbFocus.UseVisualStyleBackColor = true;
+      this.cbFocus.UseVisualStyleBackColor = false;
       this.cbFocus.CheckedChanged += new System.EventHandler(this.cbFocus_CheckedChanged);
       // 
       // linkAbout
@@ -398,33 +407,38 @@
       this.lblEmail.TabIndex = 2;
       this.lblEmail.Text = "E-Mail (optional):";
       // 
-      // btnQuit
+      // btnStartSteam
       // 
-      this.btnQuit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnQuit.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-      this.btnQuit.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnQuit.Location = new System.Drawing.Point(242, 127);
-      this.btnQuit.Name = "btnQuit";
-      this.btnQuit.Size = new System.Drawing.Size(175, 37);
-      this.btnQuit.TabIndex = 7;
-      this.btnQuit.Text = "Exit";
-      this.btnQuit.UseVisualStyleBackColor = false;
-      this.btnQuit.Click += new System.EventHandler(this.btnQuit_Click);
+      this.btnStartSteam.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnStartSteam.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+      this.btnStartSteam.FlatAppearance.BorderSize = 2;
+      this.btnStartSteam.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+      this.btnStartSteam.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
+      this.btnStartSteam.ForeColor = System.Drawing.Color.Gold;
+      this.btnStartSteam.Location = new System.Drawing.Point(242, 127);
+      this.btnStartSteam.Name = "btnStartSteam";
+      this.btnStartSteam.Size = new System.Drawing.Size(175, 37);
+      this.btnStartSteam.TabIndex = 7;
+      this.btnStartSteam.Text = "Start Steam";
+      this.btnStartSteam.UseVisualStyleBackColor = false;
+      this.btnStartSteam.Click += new System.EventHandler(this.btnStartSteam_Click);
       // 
-      // btnStartFocus
+      // btnStartLauncher
       // 
-      this.btnStartFocus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+      this.btnStartLauncher.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnStartFocus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-      this.btnStartFocus.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
-      this.btnStartFocus.ForeColor = System.Drawing.Color.Gold;
-      this.btnStartFocus.Location = new System.Drawing.Point(12, 127);
-      this.btnStartFocus.Name = "btnStartFocus";
-      this.btnStartFocus.Size = new System.Drawing.Size(212, 37);
-      this.btnStartFocus.TabIndex = 6;
-      this.btnStartFocus.Text = "Start Quake Live Launcher";
-      this.btnStartFocus.UseVisualStyleBackColor = false;
-      this.btnStartFocus.Click += new System.EventHandler(this.btnStartLauncher_Click);
+      this.btnStartLauncher.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+      this.btnStartLauncher.FlatAppearance.BorderSize = 2;
+      this.btnStartLauncher.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+      this.btnStartLauncher.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
+      this.btnStartLauncher.ForeColor = System.Drawing.Color.Gold;
+      this.btnStartLauncher.Location = new System.Drawing.Point(12, 127);
+      this.btnStartLauncher.Name = "btnStartLauncher";
+      this.btnStartLauncher.Size = new System.Drawing.Size(212, 37);
+      this.btnStartLauncher.TabIndex = 6;
+      this.btnStartLauncher.Text = "Start Quake Live Launcher";
+      this.btnStartLauncher.UseVisualStyleBackColor = false;
+      this.btnStartLauncher.Click += new System.EventHandler(this.btnStartLauncher_Click);
       // 
       // panelFocus
       // 
@@ -488,38 +502,38 @@
 
     #endregion
 
-    private System.Windows.Forms.Label label1;
-    private System.Windows.Forms.TextBox txtLauncherExe;
-    private System.Windows.Forms.Button btnLauncherExe;
-    private System.Windows.Forms.OpenFileDialog openFileDialog1;
-    private System.Windows.Forms.Timer timer1;
-    private System.Windows.Forms.Label lblRealm;
-    private System.Windows.Forms.Button btnInstallHook;
-    private System.Windows.Forms.Panel panelAdvanced;
-    private System.Windows.Forms.Panel panelTop;
-    private System.Windows.Forms.CheckBox cbAdvanced;
-    private System.Windows.Forms.TextBox txtPassword;
-    private System.Windows.Forms.Label lblPassword;
-    private System.Windows.Forms.Label lblEmail;
-    private System.Windows.Forms.Button btnQuit;
-    private System.Windows.Forms.Button btnStartFocus;
-    private System.Windows.Forms.TextBox txtLog;
-    private System.Windows.Forms.Label label2;
-    private System.Windows.Forms.ComboBox comboRealm;
-    private System.Windows.Forms.LinkLabel linkAbout;
-    private System.Windows.Forms.LinkLabel linkFocusLogin;
-    private System.Windows.Forms.LinkLabel linkFocusForum;
-    private System.Windows.Forms.CheckBox cbDisableScripts;
-    private System.Windows.Forms.GroupBox grpAdvanced;
-    private System.Windows.Forms.CheckBox cbFocus;
-    private System.Windows.Forms.Panel panelFocus;
-    private System.Windows.Forms.GroupBox grpFocus;
-    private System.Windows.Forms.ComboBox comboEmail;
-    private System.Windows.Forms.PictureBox picLogo;
-    private System.Windows.Forms.Label lblVersion;
-    private System.Windows.Forms.Label lblExtra;
-    private System.Windows.Forms.PictureBox picClose;
-    private System.Windows.Forms.PictureBox picMinimize;
+    private Label label1;
+    private TextBox txtLauncherExe;
+    private Button btnLauncherExe;
+    private OpenFileDialog openFileDialog1;
+    private Timer launcherDetectionTimer;
+    private Label lblRealm;
+    private Button btnInstallHook;
+    private Panel panelAdvanced;
+    private Panel panelTop;
+    private CheckBox cbAdvanced;
+    private TextBox txtPassword;
+    private Label lblPassword;
+    private Label lblEmail;
+    private Button btnStartSteam;
+    private Button btnStartLauncher;
+    private TextBox txtLog;
+    private Label label2;
+    private ComboBox comboRealm;
+    private LinkLabel linkAbout;
+    private LinkLabel linkFocusLogin;
+    private LinkLabel linkFocusForum;
+    private CheckBox cbDisableScripts;
+    private GroupBox grpAdvanced;
+    private CheckBox cbFocus;
+    private Panel panelFocus;
+    private GroupBox grpFocus;
+    private ComboBox comboEmail;
+    private PictureBox picLogo;
+    private Label lblVersion;
+    private Label lblExtra;
+    private PictureBox picClose;
+    private PictureBox picMinimize;
   }
 }
 

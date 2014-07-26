@@ -1,4 +1,8 @@
-﻿Version 0.94
+﻿Version 0.95
+- added support to start QuakeLive via Steam
+- always copy hook.js to target directory if it's file timestamp is older
+
+Version 0.94
 - UI design similar to Quake Live Launcher
 - allow multiple email/password combinations
 - allow arbitrary URLs as realms

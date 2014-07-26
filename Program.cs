@@ -5,8 +5,6 @@ namespace ExtraQL
 {
   static class Program
   {
-    public const string Version = "0.94";
-
     [STAThread]
     static void Main()
     {
