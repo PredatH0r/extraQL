@@ -303,7 +303,7 @@ namespace ExtraQL
       // 
       this.lblExtra.AutoSize = true;
       this.lblExtra.Font = new System.Drawing.Font("Arial Black", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Italic | System.Drawing.FontStyle.Underline))));
-      this.lblExtra.Location = new System.Drawing.Point(300, 34);
+      this.lblExtra.Location = new System.Drawing.Point(3, 31);
       this.lblExtra.Name = "lblExtra";
       this.lblExtra.Size = new System.Drawing.Size(81, 23);
       this.lblExtra.TabIndex = 0;
