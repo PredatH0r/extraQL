@@ -147,9 +147,9 @@ namespace ExtraQL
       this.panelAdvanced.BackColor = System.Drawing.Color.Transparent;
       this.panelAdvanced.Controls.Add(this.grpAdvanced);
       this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.panelAdvanced.Location = new System.Drawing.Point(0, 326);
+      this.panelAdvanced.Location = new System.Drawing.Point(0, 337);
       this.panelAdvanced.Name = "panelAdvanced";
-      this.panelAdvanced.Size = new System.Drawing.Size(430, 308);
+      this.panelAdvanced.Size = new System.Drawing.Size(430, 297);
       this.panelAdvanced.TabIndex = 2;
       // 
       // grpAdvanced
@@ -167,7 +167,7 @@ namespace ExtraQL
       this.grpAdvanced.ForeColor = System.Drawing.Color.White;
       this.grpAdvanced.Location = new System.Drawing.Point(12, 7);
       this.grpAdvanced.Name = "grpAdvanced";
-      this.grpAdvanced.Size = new System.Drawing.Size(406, 285);
+      this.grpAdvanced.Size = new System.Drawing.Size(406, 274);
       this.grpAdvanced.TabIndex = 0;
       this.grpAdvanced.TabStop = false;
       this.grpAdvanced.Text = "Advanced";
@@ -182,7 +182,7 @@ namespace ExtraQL
       this.txtLog.Name = "txtLog";
       this.txtLog.ReadOnly = true;
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.txtLog.Size = new System.Drawing.Size(388, 154);
+      this.txtLog.Size = new System.Drawing.Size(388, 143);
       this.txtLog.TabIndex = 6;
       // 
       // label2
@@ -262,7 +262,7 @@ namespace ExtraQL
       this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
       this.panelTop.Location = new System.Drawing.Point(0, 0);
       this.panelTop.Name = "panelTop";
-      this.panelTop.Size = new System.Drawing.Size(430, 212);
+      this.panelTop.Size = new System.Drawing.Size(430, 223);
       this.panelTop.TabIndex = 0;
       // 
       // picClose
@@ -291,7 +291,7 @@ namespace ExtraQL
       // 
       this.lblVersion.AutoSize = true;
       this.lblVersion.Font = new System.Drawing.Font("Tahoma", 10F);
-      this.lblVersion.Location = new System.Drawing.Point(384, 37);
+      this.lblVersion.Location = new System.Drawing.Point(384, 41);
       this.lblVersion.Name = "lblVersion";
       this.lblVersion.Size = new System.Drawing.Size(36, 17);
       this.lblVersion.TabIndex = 1;
@@ -302,12 +302,13 @@ namespace ExtraQL
       // lblExtra
       // 
       this.lblExtra.AutoSize = true;
-      this.lblExtra.Font = new System.Drawing.Font("Arial Black", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Italic | System.Drawing.FontStyle.Underline))));
-      this.lblExtra.Location = new System.Drawing.Point(3, 31);
+      this.lblExtra.Font = new System.Drawing.Font("Tahoma", 28F, System.Drawing.FontStyle.Bold);
+      this.lblExtra.Location = new System.Drawing.Point(127, 17);
       this.lblExtra.Name = "lblExtra";
-      this.lblExtra.Size = new System.Drawing.Size(81, 23);
+      this.lblExtra.Size = new System.Drawing.Size(172, 46);
       this.lblExtra.TabIndex = 0;
       this.lblExtra.Text = "extraQL";
+      this.lblExtra.Visible = false;
       this.lblExtra.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseDown);
       this.lblExtra.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseMove);
       // 
@@ -321,6 +322,7 @@ namespace ExtraQL
       this.picLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
       this.picLogo.TabIndex = 24;
       this.picLogo.TabStop = false;
+      this.picLogo.Paint += new System.Windows.Forms.PaintEventHandler(this.picLogo_Paint);
       this.picLogo.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseDown);
       this.picLogo.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseMove);
       // 
@@ -329,7 +331,7 @@ namespace ExtraQL
       this.comboEmail.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.comboEmail.FormattingEnabled = true;
-      this.comboEmail.Location = new System.Drawing.Point(12, 93);
+      this.comboEmail.Location = new System.Drawing.Point(12, 100);
       this.comboEmail.Name = "comboEmail";
       this.comboEmail.Size = new System.Drawing.Size(212, 21);
       this.comboEmail.TabIndex = 3;
@@ -341,7 +343,7 @@ namespace ExtraQL
       this.cbFocus.AutoSize = true;
       this.cbFocus.Checked = true;
       this.cbFocus.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbFocus.Location = new System.Drawing.Point(12, 180);
+      this.cbFocus.Location = new System.Drawing.Point(12, 187);
       this.cbFocus.Name = "cbFocus";
       this.cbFocus.Size = new System.Drawing.Size(111, 17);
       this.cbFocus.TabIndex = 8;
@@ -355,7 +357,7 @@ namespace ExtraQL
       this.linkAbout.AutoSize = true;
       this.linkAbout.LinkArea = new System.Windows.Forms.LinkArea(6, 22);
       this.linkAbout.LinkColor = System.Drawing.Color.Gold;
-      this.linkAbout.Location = new System.Drawing.Point(290, 181);
+      this.linkAbout.Location = new System.Drawing.Point(290, 188);
       this.linkAbout.Name = "linkAbout";
       this.linkAbout.Size = new System.Drawing.Size(120, 18);
       this.linkAbout.TabIndex = 10;
@@ -369,7 +371,7 @@ namespace ExtraQL
       this.cbAdvanced.AutoSize = true;
       this.cbAdvanced.Checked = true;
       this.cbAdvanced.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbAdvanced.Location = new System.Drawing.Point(135, 180);
+      this.cbAdvanced.Location = new System.Drawing.Point(135, 187);
       this.cbAdvanced.Name = "cbAdvanced";
       this.cbAdvanced.Size = new System.Drawing.Size(74, 17);
       this.cbAdvanced.TabIndex = 9;
@@ -380,7 +382,7 @@ namespace ExtraQL
       // txtPassword
       // 
       this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtPassword.Location = new System.Drawing.Point(242, 93);
+      this.txtPassword.Location = new System.Drawing.Point(242, 100);
       this.txtPassword.Name = "txtPassword";
       this.txtPassword.PasswordChar = '☺';
       this.txtPassword.Size = new System.Drawing.Size(175, 21);
@@ -392,7 +394,7 @@ namespace ExtraQL
       // 
       this.lblPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.lblPassword.AutoSize = true;
-      this.lblPassword.Location = new System.Drawing.Point(242, 77);
+      this.lblPassword.Location = new System.Drawing.Point(242, 84);
       this.lblPassword.Name = "lblPassword";
       this.lblPassword.Size = new System.Drawing.Size(106, 13);
       this.lblPassword.TabIndex = 4;
@@ -401,7 +403,7 @@ namespace ExtraQL
       // lblEmail
       // 
       this.lblEmail.AutoSize = true;
-      this.lblEmail.Location = new System.Drawing.Point(12, 77);
+      this.lblEmail.Location = new System.Drawing.Point(12, 84);
       this.lblEmail.Name = "lblEmail";
       this.lblEmail.Size = new System.Drawing.Size(88, 13);
       this.lblEmail.TabIndex = 2;
@@ -415,7 +417,7 @@ namespace ExtraQL
       this.btnStartSteam.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
       this.btnStartSteam.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
       this.btnStartSteam.ForeColor = System.Drawing.Color.Gold;
-      this.btnStartSteam.Location = new System.Drawing.Point(242, 127);
+      this.btnStartSteam.Location = new System.Drawing.Point(242, 134);
       this.btnStartSteam.Name = "btnStartSteam";
       this.btnStartSteam.Size = new System.Drawing.Size(175, 37);
       this.btnStartSteam.TabIndex = 7;
@@ -432,7 +434,7 @@ namespace ExtraQL
       this.btnStartLauncher.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
       this.btnStartLauncher.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
       this.btnStartLauncher.ForeColor = System.Drawing.Color.Gold;
-      this.btnStartLauncher.Location = new System.Drawing.Point(12, 127);
+      this.btnStartLauncher.Location = new System.Drawing.Point(12, 134);
       this.btnStartLauncher.Name = "btnStartLauncher";
       this.btnStartLauncher.Size = new System.Drawing.Size(212, 37);
       this.btnStartLauncher.TabIndex = 6;
@@ -445,7 +447,7 @@ namespace ExtraQL
       this.panelFocus.BackColor = System.Drawing.Color.Transparent;
       this.panelFocus.Controls.Add(this.grpFocus);
       this.panelFocus.Dock = System.Windows.Forms.DockStyle.Top;
-      this.panelFocus.Location = new System.Drawing.Point(0, 212);
+      this.panelFocus.Location = new System.Drawing.Point(0, 223);
       this.panelFocus.Name = "panelFocus";
       this.panelFocus.Size = new System.Drawing.Size(430, 114);
       this.panelFocus.TabIndex = 1;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Text;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -14,7 +15,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.95";
+    public const string Version = "0.96";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -33,6 +34,7 @@ namespace ExtraQL
       this.lblVersion.Parent = this.picLogo;
     }
     #endregion
+
 
     #region OnShown()
     protected override void OnShown(EventArgs e)
@@ -56,6 +58,23 @@ namespace ExtraQL
       this.SaveSettings();
       Servlets.ShutDown();
       base.OnClosed(e);
+    }
+    #endregion
+
+    #region picLogo_Paint
+    private void picLogo_Paint(object sender, PaintEventArgs e)
+    {
+      using (Font font = new Font("Tahoma", 28, FontStyle.Bold, GraphicsUnit.Point))
+      using (SolidBrush textBrush = new SolidBrush(Color.White))
+      using (SolidBrush shadowBrush = new SolidBrush(Color.FromArgb(128, 64, 64, 64)))
+      {
+        e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+        Point p = this.lblExtra.Location;
+        p.Offset(2, 2);
+        e.Graphics.DrawString("extraQL", font, shadowBrush, p);
+
+        e.Graphics.DrawString("extraQL", font, textBrush, this.lblExtra.Location);
+      }
     }
     #endregion
 
@@ -245,6 +264,7 @@ namespace ExtraQL
     #endregion
 
 
+ 
     #region LoadSettings()
     private void LoadSettings()
     {
@@ -513,5 +533,6 @@ document.loginform.submit();";
       }
     }
     #endregion
+
   }
 }
