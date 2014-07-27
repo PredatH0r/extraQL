@@ -1,6 +1,4 @@
-﻿#undef USERSCRIPT_ORG
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -12,48 +10,47 @@ namespace ExtraQL
 {
   public class ScriptRepository
   {
+    private const string DEFAULT_UPDATE_BASE_URL = "https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/";
     private readonly Dictionary<string, ScriptInfo> scriptById = new Dictionary<string, ScriptInfo>();
 
     public ScriptRepository()
     {
-      this.Log =  txt => { };
+      this.Log = txt => { };
 
-      ScriptDir = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
-      if (ScriptDir.EndsWith("\\bin\\Debug"))
-        ScriptDir = Path.GetDirectoryName(Path.GetDirectoryName(ScriptDir));
-      ScriptDir += "\\scripts";
+      this.ScriptDir = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
+      if (this.ScriptDir.EndsWith("\\bin\\Debug"))
+        this.ScriptDir = Path.GetDirectoryName(Path.GetDirectoryName(ScriptDir));
+      this.ScriptDir += "\\scripts";
     }
 
     public Action<string> Log { get; set; }
 
-    public readonly string ScriptDir;
+    public string ScriptDir { get; private set; }
 
     #region UpdateScripts()
     public void UpdateScripts()
     {
-      foreach (var scriptfile in Directory.GetFiles(ScriptDir, "*.usr.js"))
+      foreach (var scriptfile in Directory.GetFiles(ScriptDir, "*.js"))
       {
         var localCode = File.ReadAllText(scriptfile);
         var localMeta = GetMetadata(localCode);
 
-        var id = localMeta.ContainsKey("id") ? localMeta["id"][0] : "";
-        if (string.IsNullOrEmpty(id))
-          id = StripAllExtenstions(scriptfile);
-        this.scriptById[id] = new ScriptInfo(id, scriptfile, localMeta, localCode);
+        if (scriptfile.EndsWith(".usr.js"))
+        {
+          var id = localMeta.ContainsKey("id") ? localMeta["id"][0] : "";
+          if (string.IsNullOrEmpty(id))
+            id = StripAllExtenstions(scriptfile);
+          this.scriptById[id] = new ScriptInfo(id, scriptfile, localMeta, localCode);
+        }
 
         if (!localMeta.ContainsKey("version"))
           continue;
 
-        int nr;
         string url;
         if (localMeta.ContainsKey("downloadUrl"))
           url = localMeta["downloadUrl"][0];
-#if USERSCRIPT_ORG
-        else if (int.TryParse(id, out nr))
-          url = "http://userscripts.org:8080/scripts/source/" + nr + ".user.js";
-#endif
         else
-          url = "https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/" + Path.GetFileName(scriptfile);
+          url = DEFAULT_UPDATE_BASE_URL + Path.GetFileName(scriptfile);
 
         try
         {
@@ -63,6 +60,37 @@ namespace ExtraQL
         }
         catch (WebException) { }
       }
+    }
+    #endregion
+
+    #region GetMetaData()
+    private Dictionary<string, List<string>> GetMetadata(string script)
+    {
+      var metadata = new Dictionary<string, List<String>>();
+      var start = script.IndexOf("// ==UserScript==");
+      var end = script.IndexOf("// ==/UserScript==");
+      if (start < 0 || end < 0)
+      {
+        start = script.IndexOf("/*");
+        end = script.IndexOf("*/", start + 1);
+      }
+      if (start >= 0 && end >= 0)
+      {
+        var regex = new Regex("^\\s*//\\s*@(\\w+)\\s+(.*?)\\s*$");
+        var lines = script.Substring(start, end - start + 1).Split('\n');
+        foreach (var line in lines)
+        {
+          var match = regex.Match(line);
+          if (!match.Success)
+            continue;
+          var key = match.Groups[1].Value;
+          var value = match.Groups[2].Value;
+          if (!metadata.ContainsKey(key))
+            metadata[key] = new List<string>();
+          metadata[key].Add(value);
+        }
+      }
+      return metadata;
     }
     #endregion
 
@@ -129,29 +157,10 @@ namespace ExtraQL
     }
     #endregion
 
-    #region GetMetaData()
-    private Dictionary<string, List<string>> GetMetadata(string script)
+    #region GetScriptIds()
+    public List<ScriptInfo> GetScriptIds()
     {
-      var metadata = new Dictionary<string, List<String>>();
-      var start = script.IndexOf("// ==UserScript==");
-      var end = script.IndexOf("// ==/UserScript==");
-      if (start >= 0 && end >= 0)
-      {
-        var regex = new Regex("^\\s*//\\s*@(\\w+)\\s+(.*?)\\s*$");
-        var lines = script.Substring(start, end - start + 1).Split('\n');
-        foreach (var line in lines)
-        {
-          var match = regex.Match(line);
-          if (!match.Success)
-            continue;
-          var key = match.Groups[1].Value;
-          var value = match.Groups[2].Value;
-          if (!metadata.ContainsKey(key))
-            metadata[key] = new List<string>();
-          metadata[key].Add(value);
-        }
-      }
-      return metadata;
+      return new List<ScriptInfo>(scriptById.Values);
     }
     #endregion
 
@@ -197,13 +206,6 @@ namespace ExtraQL
         }
         return script;
       }
-    }
-    #endregion
-
-    #region GetScripts()
-    public List<ScriptInfo> GetScripts()
-    {
-      return new List<ScriptInfo>(scriptById.Values);
     }
     #endregion
   }
