@@ -129,9 +129,8 @@
     <None Include="resources\minimize.png" />
     <Content Include="scripts\autoInvite.usr.js" />
     <Content Include="scripts\escaper.usr.js" />
-    <Content Include="scripts\extGraphHist.usr.js" />
+    <Content Include="scripts\attic\extGraphHist.usr.js" />
     <Content Include="scripts\extraQL.js" />
-    <Content Include="scripts\crawler.js" />
     <Content Include="scripts\extStats.usr.js" />
     <Content Include="scripts\friendCommands.usr.js" />
     <Content Include="scripts\gametype.usr.js" />
@@ -139,11 +138,11 @@
     <Content Include="scripts\irc.usr.js" />
     <Content Include="scripts\keyboardNav.usr.js" />
     <Content Include="scripts\linkify.usr.js" />
-    <Content Include="scripts\antiAjax.usr.js" />
+    <Content Include="scripts\attic\antiAjax.usr.js" />
     <Content Include="scripts\playerStatus.usr.js" />
     <Content Include="scripts\messageBeep.usr.js" />
     <Content Include="scripts\profileJumper.usr.js" />
-    <Content Include="scripts\qlping.usr.js" />
+    <Content Include="scripts\attic\qlping.usr.js" />
     <Content Include="scripts\qlRanks.usr.js" />
     <Content Include="scripts\raceboard.usr.js" />
     <Content Include="scripts\raceTop10.usr.js" />
@@ -152,10 +151,9 @@
     <Content Include="scripts\esreality.usr.js" />
     <Content Include="scripts\twitch.usr.js" />
     <Content Include="changelog.txt" />
-    <Content Include="scripts\bugfixes.js" />
     <Content Include="scripts\specHelper.usr.js" />
-    <Content Include="scripts\streamNotifier.usr.js" />
-    <Content Include="scripts\weightedAcc.usr.js" />
+    <Content Include="scripts\attic\streamNotifier.usr.js" />
+    <Content Include="scripts\attic\weightedAcc.usr.js" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="data\" />

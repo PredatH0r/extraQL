@@ -14,7 +14,7 @@
 WARNING:  This is not a general-purpose script!
 When enabled, it WILL screw up your user interface after entering a game.
 To restore your UI, execute "/web_reload" in your console.
-To enable the script, edit this file and set ENABLED = true
+To enable the script, move it to the "script" folder
 
 Version 1.1
 - allowing comma separated list of white-listed URLs in sv_ajaxWhitelist
@@ -26,7 +26,7 @@ Version 1.0
 */
 
 (function (win) {
-  var ENABLED = false;
+  var ENABLED = true;
 
   var oldHandlers = {};
   var handlerNames = ["IM_OnMessage", "IM_OnPresence", "IM_OnItemAdded", "IM_OnItemRemoved"];
