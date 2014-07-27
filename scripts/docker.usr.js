@@ -1,10 +1,10 @@
 ﻿// ==UserScript==
-// @name        QL Window Docker
+// @id          docker
+// @name        Window Docker
 // @version     1.0
 // @author      PredatH0r
-// @description	
-// @include     http://*.quakelive.com/*
-// @exclude     http://*.quakelive.com/forum*
+// @description	Adds a menu that allows you to dock the QL window to a side of your screen using your full screen height or width
+// @note        This script requires extraQL.exe to be running!
 // @unwrap
 // ==/UserScript==
 
@@ -127,5 +127,5 @@
   if (extraQL)
     init();
   else
-    $.getScript("http://beham.biz/ql/extraQL.js", init);
+    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
 })();

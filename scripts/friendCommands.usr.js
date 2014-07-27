@@ -2,7 +2,6 @@
 // @id             152168
 // @name           Quake Live ingame friend commands
 // @version        0.104
-// @namespace      https://github.com/rulex/ql-friends
 // @author         https://github.com/rulex/
 // @description    List online friends in console. Show info about friend who are ingame. Use /join <friend> to join friends game
 // @include        http://*.quakelive.com/*

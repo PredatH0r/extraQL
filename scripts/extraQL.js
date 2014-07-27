@@ -1,10 +1,13 @@
 ﻿/*
-  extraQL: Quake Live add-on utilities
+// @name        extraQL
+// @description Quake Live userscript utilities
+// @author      PredatH0r
+// @version     0.96
 
- This script provides common functions to various Quake Live user scripts.
+This script provides common functions to various Quake Live user scripts.
 
- In bundle with extraQL.exe and the modified version of QLHM/hook.js, this
- script also acts as the boot strapper to load the locally installed scripts.
+In bundle with extraQL.exe and the modified version of QLHM/hook.js, this
+script also acts as the boot strapper to load the locally installed scripts.
 
 */
 
@@ -14,7 +17,6 @@
   var console = window.console;
 
   var BASE_URL = "http://127.0.0.1:27963/";
-  var IGNORE_SCRIPTS = new  Array("hook.js", "extraQL.js");
   var tabClickHandlers = {};
   var chatBarTabified = false;
   var lastServerCheckTimestamp = 0;
@@ -22,60 +24,6 @@
 
   function init() {
     addStyle("#chatContainer .fullHeight { height:550px; }");
-  }
-
-  // internal: called by the modified hook.js, which is part of the extraQL.exe HTTP server, to load all locally stored scripts
-  function loadScripts() {
-    //addStyle("#qlhm_nav.right { float: none; }");
-    return;
-    try {
-      log("^2[extraQL]^7");
-      $.ajax({
-        url: BASE_URL + "scripts?json",
-        dataType: "json",
-        success: function(scripts) { loadScriptsFromList(scripts, 0); },
-        error: function() { log("Loading extraQL scripts ^1FAILED^7"); }
-      });
-
-      quakelive.AddHook("OnContentLoaded", onContentLoaded);
-    } catch (e) {
-      log("^1extraQL:^7" + e);
-    }
-  }
-
-  // private: helper function
-  function loadScriptsFromList(scripts, index)
-  {
-    try {
-      if (index >= scripts.length) {
-        log("^2[/extraQL]^7");
-        return;
-      }
-
-      var script = scripts[index];
-      if (IGNORE_SCRIPTS.indexOf(script) >= 0)
-        loadScriptsFromList(scripts, index + 1);
-      else
-        loadScript(scripts, index);
-    }
-    catch (e) {}
-  }
-
-  // private: helper function
-  function loadScript(scripts, index) {
-    var script = scripts[index];
-    var idx = script.indexOf(".");
-    var basename = script.substr(0, idx);
-    $.ajax({
-      url: BASE_URL + "scripts/" + script,
-      dataType: "html",
-      success: function (code) {
-        $.globalEval(code);
-        log("^3" + basename + "^7");
-      },
-      error: function() { log(basename + " ^1FAILED^7"); },
-      complete: function() { loadScriptsFromList(scripts, index + 1); }
-    });
   }
 
   // public: test if the local extraQL HTTP server is running
@@ -187,12 +135,6 @@
     $("#collapsableChat .tab").removeClass("active");
   }
 
-  // private: event callback
-  function onContentLoaded() {
-    restoreTabPageClickHandlers();
-    //$("#qlhm_nav").addClass("right");
-  }
-
   // private: helper function
   function restoreTabPageClickHandlers() {
     $("#collapsableChat").unbind("click").click(closeTabPage);
@@ -254,10 +196,6 @@
 
   // export public functions
   window.extraQL = {
-    // for internal use through hook.js only
-    __loadScripts: loadScripts,
-
-    // public API
     BASE_URL: BASE_URL,
     isServerRunning: isServerRunning,
     log: log,

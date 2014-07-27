@@ -44,6 +44,6 @@
   if (extraQL)
     init();
   else
-    $.getScript("http://beham.biz/ql/extraQL.js", init);
+    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
 })(window);
 

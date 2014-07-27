@@ -1,25 +1,25 @@
 ﻿// ==UserScript==
 // @id             110327
-// @name           Quake Live Escaper
-// @version        1.6
+// @name           Escaper
+// @version        1.6.1
 // @namespace      phob.net
 // @author         wn
+// @contributor    PredatH0r
 // @description    Press escape to close Quake Live's Game Summary, Live Game Info and notification popups
-// @include        http://*.quakelive.com/*
-// @exclude        http://*.quakelive.com/forum*
-// @run-at         document-end
-// @updateURL      https://userscripts.org/scripts/source/110327.meta.js
+// @unwrap
 // ==/UserScript==
 
-function QLE() {
-  document.addEventListener("keyup", function (e) {
-    if (e.keyCode != 27) return;
-    window.quakelive.matchtip.HideMatchTooltip(-1);
-    window.jQuery("#stats_details, #ql_notifier .ql_notice").remove();
-  }, false);
-}
+(function() {
+  function QLE() {
+    document.addEventListener("keyup", function(e) {
+      if (e.keyCode != 27) return;
+      window.quakelive.matchtip.HideMatchTooltip(-1);
+      window.jQuery("#stats_details, #ql_notifier .ql_notice").remove();
+    }, false);
+  }
 
-var scriptNode = document.createElement("script");
-scriptNode.setAttribute("type", "text/javascript");
-scriptNode.text = "(" + QLE.toString() + ")();";
-document.body.appendChild(scriptNode);
+  var scriptNode = document.createElement("script");
+  scriptNode.setAttribute("type", "text/javascript");
+  scriptNode.text = "(" + QLE.toString() + ")();";
+  document.body.appendChild(scriptNode);
+})();

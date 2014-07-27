@@ -1,11 +1,9 @@
 // ==UserScript==
 // @id             186664
-// @name           Quake Live Auto Invite (QLHM Edition)
-// @namespace      beham.biz
-// @description    Your friends will be able to write the word "invite" to you, and automatically get a real invite to the server you're on.
+// @name           Auto Invite
+// @version        2.0
 // @author         PredatH0r
-// @include        http://*.quakelive.com/*
-// @exclude        http://*.quakelive.com/forum*
+// @description    Your friends will be able to write the word "invite" to you, and automatically get a real invite to the server you're on.
 // @unwrap
 // ==/UserScript==
 

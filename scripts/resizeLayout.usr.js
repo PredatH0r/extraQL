@@ -10,7 +10,7 @@
 
 /*
 
-This script find the optimal layout for the QL chat, based on the current window size.
+This script finds the optimal layout for the QL chat popup, based on the current window size.
 
 When the window is less then 1310 pixels wide, the chat will overlap the content area, 
 but leaves some space on the top (configurable by web_chatOverlapIndent, default 150)
@@ -261,5 +261,5 @@ CVARS:
   if (extraQL)
     init();
   else
-    $.getScript("http://beham.biz/ql/extraQL.js", init);
+    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
 })();

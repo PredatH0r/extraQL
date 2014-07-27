@@ -1,11 +1,9 @@
 // ==UserScript==
 // @id          188803
-// @name        AutoExec for game start/end (e.g. toggle fullscreen)
+// @name        AutoExec and Full-Screen Toggle when game starts/ends
 // @version     2.0
 // @author      PredatH0r
 // @description	Automates execution of commands when starting/ending game-mode or switching fullscreen
-// @include     http://*.quakelive.com/*
-// @exclude     http://*.quakelive.com/forum*
 // @unwrap
 // ==/UserScript==
 

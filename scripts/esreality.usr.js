@@ -1,11 +1,10 @@
 ﻿// ==UserScript==
-// @name        Quake Live ESReality.com Integration
+// @id          esreality
+// @name        ESReality.com Integration
 // @version     0.9
 // @author      PredatH0r
+// @description	Shows a list of esreality.com Quake Live forum posts
 // @downloadUrl https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/esreality.usr.js
-// @description	Shows a list of esreality.tv QL live Forums and videos
-// @include     http://*.quakelive.com/*
-// @exclude     http://*.quakelive.com/forum*
 // @unwrap
 // ==/UserScript==
 
@@ -135,5 +134,5 @@ Version 1.0
   if (extraQL)
     init();
   else
-    $.getScript("http://beham.biz/ql/extraQL.js", init);
+    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
 })();
