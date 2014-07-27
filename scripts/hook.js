@@ -1,7 +1,10 @@
-﻿/**
- * QUAKE LIVE HOOK MANAGER
- * Version: 0.4pre
- */
+﻿/*
+// @name        QUAKE LIVE HOOK MANAGER
+// @version     0.5
+// @author      wn
+// @contributor PredatH0r
+// @description	Manages the installation and execution of QuakeLive userscripts
+*/
 
 // called in ql.Init
 function main_hook() {
@@ -443,8 +446,8 @@ HudManager.prototype.showDetails = function(elem) {
   }
   else {
     author = repoScript.author;
-    version = "<i>not installed</i>";
-    descr = "";
+    version = repoScript.version || "<i>not installed</i>";
+    descr = repoScript.description || "";
     entrySource = "QLHM Repository";
     deleteCaption = "";
   }
@@ -455,7 +458,7 @@ HudManager.prototype.showDetails = function(elem) {
 
   $details.append("<div class='table'>"
     + "<div class='row'>"
-    + "<div class='cell'><b>USO ID:</b></div>"
+    + "<div class='cell'><b>Script ID:</b></div>"
     + "<div class='cell'><a href='https://userscripts.org/scripts/show/" + id + "' target='_empty'>" + id + "</a></div>"
     + "</div>"
     + "<div class='row'><div class='cell'><b>Author:</b></div><div class='cell'>" + author + "</div></div>"
@@ -616,7 +619,7 @@ HudManager.prototype.handleConsoleClose = function() {
  */
 function HookManager(aProps) {
   readOnly(this, "name", "Quake Live Hook Manager");
-  readOnly(this, "version", 0.4);
+  readOnly(this, "version", 0.5);
   readOnly(this, "debug", !!aProps.debug);
 }
 
@@ -644,9 +647,29 @@ HookManager.prototype.initScripts = function() {
 }
 
 HookManager.prototype.initExtraQL = function() {
-  JSONP_PROXY_TEMPLATE = config.EXTRAQL_URL + "uso/{{id}}";
-  USERSCRIPT_REPOSITORY_URL = config.EXTRAQL_URL + "qlhmUserscriptRepository.js";
   log("Using ^3extraQL^7 script repository");
+  USERSCRIPT_REPOSITORY_URL = config.EXTRAQL_URL + "qlhmUserscriptRepository.js";
+  JSONP_PROXY_TEMPLATE = config.EXTRAQL_URL + "uso/{{id}}";
+
+  // after first installation, when no scripts are available yet, activate all scripts
+  try {
+    var enableAllScripts = true;
+    $.each(storage.scripts.available, function() {
+      enableAllScripts = false;
+    });
+    if (!enableAllScripts)
+      return;
+
+    var js = $.ajax({
+      url: USERSCRIPT_REPOSITORY_URL,
+      dataType: "html",
+      async: false
+    });
+    eval(js); // this will set HOOK_MANAGER.userscriptRepository
+    $.each(HOOK_MANAGER.userscriptRepository, function(index, script) {
+      storage.scripts.enabled[script.ID] = true;
+    });
+  } catch(ex) {}
 }
 
 HookManager.prototype.versionCheck = function() {
@@ -675,7 +698,7 @@ HookManager.prototype.versionCheck = function() {
 HookManager.prototype.loadScripts = function() {
   var self = this;
 
-  // get sorted list of enabled script IDs (allows rudimentary control over dependencies / execution order)
+  // get sorted list of enabled script IDs (to make execution order a bit less random)
   var scriptIds = [];
   $.each(storage.scripts.enabled, function(scriptID, enabled) {
     if (enabled) scriptIds.push(scriptID);
@@ -771,10 +794,9 @@ HookManager.prototype.hasUserScript = function(aID) {
 HookManager.prototype.addUserScript = function(aScript) {
   var id = aScript._meta.id.toString();
   // Only add entries if this is a new script...
-  if (!this.hasUserScript(id)) {
-    storage.scripts.available[id] = true;
-    storage.scripts.enabled[id] = true;
-  }
+  storage.scripts.available[id] = true;
+  storage.scripts.enabled[id] = true;
+
   storage.scripts.cache[id] = aScript;
   storage.save();
   this.injectUserScript(aScript);

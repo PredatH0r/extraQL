@@ -385,7 +385,7 @@ namespace ExtraQL
     {
       string text = "HOOK_MANAGER.userscriptRepository = [";
       string sep = "";
-      foreach (var info in this.scriptRepository.GetScripts())
+      foreach (var info in this.scriptRepository.GetScriptIds())
       {
         text += sep + "\n{id:\"" + info.Id + "\"";
         foreach (var entry in info.Metadata)
