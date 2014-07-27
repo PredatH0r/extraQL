@@ -1,4 +1,10 @@
-﻿Version 0.95
+﻿Version 0.96
+- replaced logo
+- after first installation, all userscripts are enabled by default
+- updated meta-information about the userscripts
+- moved unsupported scripts to the attic folder
+
+Version 0.95
 - added support to start QuakeLive via Steam
 - always copy hook.js to target directory if it's file timestamp is older
 
