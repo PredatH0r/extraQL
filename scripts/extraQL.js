@@ -33,6 +33,7 @@ script also acts as the boot strapper to load the locally installed scripts.
     $.ajax({
       url: BASE_URL + "version",
       async: false,
+      dataType: "json",
       success: function (version) {
         lastServerCheckResult = true;
         extraQL.serverVersion = version;

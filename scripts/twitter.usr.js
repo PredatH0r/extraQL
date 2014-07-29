@@ -2,10 +2,7 @@
 // @name        QL Twitter integration
 // @version     1.0
 // @author      PredatH0r
-// @downloadUrl https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/twitter.usr.js
 // @description	Show @quakelive tweets in chat bar
-// @include     http://*.quakelive.com/*
-// @exclude     http://*.quakelive.com/forum*
 // @unwrap
 // ==/UserScript==
 

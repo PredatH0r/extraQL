@@ -18,7 +18,14 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
-2014-07-29
+Version 0.98
+---
+
+- disabling userscripts now deletes hook.js
+- fixed broken @downloadUrl in some scripts that still pointed to GitHub
+- fixed default script update URL to use SourceForge
+
+Version 0.97
 ---
 
 - moved Git repository from GitHub to SourceForge

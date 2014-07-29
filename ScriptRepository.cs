@@ -10,7 +10,7 @@ namespace ExtraQL
 {
   public class ScriptRepository
   {
-    private const string DEFAULT_UPDATE_BASE_URL = "https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/";
+    private const string DEFAULT_UPDATE_BASE_URL = "https://sourceforge.net/p/extraql/source/ci/master/tree/scripts/{0}?format=raw";
     private readonly Dictionary<string, ScriptInfo> scriptById = new Dictionary<string, ScriptInfo>();
 
     public ScriptRepository()
@@ -50,7 +50,7 @@ namespace ExtraQL
         if (localMeta.ContainsKey("downloadUrl"))
           url = localMeta["downloadUrl"][0];
         else
-          url = DEFAULT_UPDATE_BASE_URL + Path.GetFileName(scriptfile);
+          url = string.Format(DEFAULT_UPDATE_BASE_URL, Path.GetFileName(scriptfile));
 
         try
         {

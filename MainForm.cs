@@ -385,10 +385,17 @@ namespace ExtraQL
         if (File.Exists(targetHook))
         {
           File.Move(targetHook, backupHook);
-          Log("renamed existing hook.js to hook_.js");
+          Log("Renamed old hook.js to hook_.js");
         }
         else
           File.Create(backupHook).Close();
+      }
+
+      if (this.cbDisableScripts.Checked)
+      {
+        File.Delete(targetHook);
+        Log("Deleted hook.js");
+        return;
       }
 
       var bundledHook = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
@@ -402,7 +409,7 @@ namespace ExtraQL
       if (!File.Exists(targetHook))
       {
         File.Copy(bundledHook, targetHook);
-        Log("installed new hook.js");
+        Log("Installed new hook.js");
       }
     }
     #endregion

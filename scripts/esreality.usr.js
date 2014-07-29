@@ -4,7 +4,6 @@
 // @version     0.9
 // @author      PredatH0r
 // @description	Shows a list of esreality.com Quake Live forum posts
-// @downloadUrl https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/esreality.usr.js
 // @unwrap
 // ==/UserScript==
 

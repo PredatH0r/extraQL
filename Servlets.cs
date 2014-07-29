@@ -115,7 +115,7 @@ namespace ExtraQL
     /// </summary>
     private void Version(TcpClient client, Uri uri, string request)
     {
-      HttpOk(client, MainForm.Version);
+      HttpOk(client, "{ version: " + MainForm.Version + ", enabled: " + this.EnableScripts + " }");
     }
 
     #endregion
@@ -130,10 +130,7 @@ namespace ExtraQL
     /// <param name="request"></param>
     private void GetLocalScript(TcpClient client, Uri uri, string request)
     {
-      if (this.EnableScripts)
-        DeliverFileOrDirectoryListing(client, uri, "scripts", @".*\.usr\.js$");
-      else
-        HttpOk(client);
+      DeliverFileOrDirectoryListing(client, uri, "scripts", @".*\.usr\.js$");
     }
 
     #endregion

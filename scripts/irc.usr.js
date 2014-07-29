@@ -2,11 +2,8 @@
 // @id             186820
 // @name           Quake Live IRC Link
 // @version        1.0
-// @description    Adds a link to the QuakeNet.org IRC Web Chat to your chat window
-// @downloadUrl    https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/irc.usr.js
 // @author         PredatH0r
-// @include        http://*.quakelive.com/*
-// @exclude        http://*.quakelive.com/forum*
+// @description    Adds a link to the QuakeNet.org IRC Web Chat to your chat window
 // @unwrap
 // ==/UserScript==
 
