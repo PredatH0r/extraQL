@@ -15,7 +15,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.96";
+    public const string Version = "0.97";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -228,7 +228,7 @@ namespace ExtraQL
     #region linkAbout_LinkClicked
     private void linkAbout_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-      Process.Start("https://github.com/PredatH0r/extraQL");
+      Process.Start("https://sourceforge.net/projects/extraql");
     }
     #endregion
 

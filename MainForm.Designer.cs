@@ -197,7 +197,7 @@ namespace ExtraQL
       // cbDisableScripts
       // 
       this.cbDisableScripts.AutoSize = true;
-      this.cbDisableScripts.Location = new System.Drawing.Point(233, 70);
+      this.cbDisableScripts.Location = new System.Drawing.Point(209, 71);
       this.cbDisableScripts.Name = "cbDisableScripts";
       this.cbDisableScripts.Size = new System.Drawing.Size(116, 17);
       this.cbDisableScripts.TabIndex = 4;
@@ -209,7 +209,7 @@ namespace ExtraQL
       // 
       this.linkFocusForum.LinkArea = new System.Windows.Forms.LinkArea(0, 37);
       this.linkFocusForum.LinkColor = System.Drawing.Color.Gold;
-      this.linkFocusForum.Location = new System.Drawing.Point(230, 57);
+      this.linkFocusForum.Location = new System.Drawing.Point(209, 57);
       this.linkFocusForum.Name = "linkFocusForum";
       this.linkFocusForum.Size = new System.Drawing.Size(111, 18);
       this.linkFocusForum.TabIndex = 5;
@@ -291,7 +291,7 @@ namespace ExtraQL
       // 
       this.lblVersion.AutoSize = true;
       this.lblVersion.Font = new System.Drawing.Font("Tahoma", 10F);
-      this.lblVersion.Location = new System.Drawing.Point(384, 41);
+      this.lblVersion.Location = new System.Drawing.Point(382, 41);
       this.lblVersion.Name = "lblVersion";
       this.lblVersion.Size = new System.Drawing.Size(36, 17);
       this.lblVersion.TabIndex = 1;
@@ -333,7 +333,7 @@ namespace ExtraQL
       this.comboEmail.FormattingEnabled = true;
       this.comboEmail.Location = new System.Drawing.Point(12, 100);
       this.comboEmail.Name = "comboEmail";
-      this.comboEmail.Size = new System.Drawing.Size(212, 21);
+      this.comboEmail.Size = new System.Drawing.Size(197, 21);
       this.comboEmail.TabIndex = 3;
       this.comboEmail.SelectedIndexChanged += new System.EventHandler(this.comboEmail_SelectedIndexChanged);
       this.comboEmail.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboEmail_KeyDown);
@@ -355,14 +355,14 @@ namespace ExtraQL
       // 
       this.linkAbout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.linkAbout.AutoSize = true;
-      this.linkAbout.LinkArea = new System.Windows.Forms.LinkArea(6, 22);
+      this.linkAbout.LinkArea = new System.Windows.Forms.LinkArea(10, 22);
       this.linkAbout.LinkColor = System.Drawing.Color.Gold;
       this.linkAbout.Location = new System.Drawing.Point(290, 188);
       this.linkAbout.Name = "linkAbout";
-      this.linkAbout.Size = new System.Drawing.Size(120, 18);
+      this.linkAbout.Size = new System.Drawing.Size(128, 18);
       this.linkAbout.TabIndex = 10;
       this.linkAbout.TabStop = true;
-      this.linkAbout.Text = "visit extraQL on GitHub";
+      this.linkAbout.Text = "visit the extraQL website";
       this.linkAbout.UseCompatibleTextRendering = true;
       this.linkAbout.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkAbout_LinkClicked);
       // 
@@ -382,10 +382,10 @@ namespace ExtraQL
       // txtPassword
       // 
       this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtPassword.Location = new System.Drawing.Point(242, 100);
+      this.txtPassword.Location = new System.Drawing.Point(221, 100);
       this.txtPassword.Name = "txtPassword";
       this.txtPassword.PasswordChar = '☺';
-      this.txtPassword.Size = new System.Drawing.Size(175, 21);
+      this.txtPassword.Size = new System.Drawing.Size(197, 21);
       this.txtPassword.TabIndex = 5;
       this.txtPassword.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPassword_KeyDown);
       this.txtPassword.Validating += new System.ComponentModel.CancelEventHandler(this.txtPassword_Validating);
@@ -394,7 +394,7 @@ namespace ExtraQL
       // 
       this.lblPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.lblPassword.AutoSize = true;
-      this.lblPassword.Location = new System.Drawing.Point(242, 84);
+      this.lblPassword.Location = new System.Drawing.Point(218, 84);
       this.lblPassword.Name = "lblPassword";
       this.lblPassword.Size = new System.Drawing.Size(106, 13);
       this.lblPassword.TabIndex = 4;
@@ -403,7 +403,7 @@ namespace ExtraQL
       // lblEmail
       // 
       this.lblEmail.AutoSize = true;
-      this.lblEmail.Location = new System.Drawing.Point(12, 84);
+      this.lblEmail.Location = new System.Drawing.Point(9, 84);
       this.lblEmail.Name = "lblEmail";
       this.lblEmail.Size = new System.Drawing.Size(88, 13);
       this.lblEmail.TabIndex = 2;
@@ -417,9 +417,9 @@ namespace ExtraQL
       this.btnStartSteam.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
       this.btnStartSteam.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
       this.btnStartSteam.ForeColor = System.Drawing.Color.Gold;
-      this.btnStartSteam.Location = new System.Drawing.Point(242, 134);
+      this.btnStartSteam.Location = new System.Drawing.Point(221, 134);
       this.btnStartSteam.Name = "btnStartSteam";
-      this.btnStartSteam.Size = new System.Drawing.Size(175, 37);
+      this.btnStartSteam.Size = new System.Drawing.Size(197, 37);
       this.btnStartSteam.TabIndex = 7;
       this.btnStartSteam.Text = "Start Steam";
       this.btnStartSteam.UseVisualStyleBackColor = false;
@@ -436,7 +436,7 @@ namespace ExtraQL
       this.btnStartLauncher.ForeColor = System.Drawing.Color.Gold;
       this.btnStartLauncher.Location = new System.Drawing.Point(12, 134);
       this.btnStartLauncher.Name = "btnStartLauncher";
-      this.btnStartLauncher.Size = new System.Drawing.Size(212, 37);
+      this.btnStartLauncher.Size = new System.Drawing.Size(197, 37);
       this.btnStartLauncher.TabIndex = 6;
       this.btnStartLauncher.Text = "Start Quake Live Launcher";
       this.btnStartLauncher.UseVisualStyleBackColor = false;
