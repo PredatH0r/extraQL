@@ -58,7 +58,7 @@ function log() {
   var args = Array.prototype.slice.call(arguments);
   if (!args.length) return;
   if (console.firebuglite) console.log.apply(console, args);
-  qz_instance.SendGameCommand("echo " + (1 == args.length ? args[0] : JSON.stringify(args)));
+  qz_instance.SendGameCommand("echo \"" + (1 == args.length ? args[0] : JSON.stringify(args)) + "\"");
 }
 
 function debug() {
@@ -718,7 +718,7 @@ HookManager.prototype.loadScripts = function() {
     }
     // ... or pull fresh data
     else {
-      log("^7Requesting userscript ^5" + scriptID + "^7");
+      //log("^7Requesting userscript ^5" + scriptID + "^7");
       self.fetchScript(scriptID);
     }
   });
@@ -847,10 +847,10 @@ HookManager.prototype.toggleUserScript = function(aID, aEnable) {
 
 HookManager.prototype.injectUserScript = function(aScript) {
   log("^7Starting userscript ^5" + aScript._meta.id + "^7: ^3" + cleanupName(aScript.headers.name[0]) + "^7");
-  var closure = ";(function() {" + aScript.content + "\n})();";
+  var closure = ";(function() { try { " + aScript.content + "} catch(ex) { console.log(\"^1" + aScript._meta.id + "^7: \" + ex); }})();";
 
   // inject script file when possible to preserve file name in log and error messages
-  if (aScript._meta.filename && aScript.headers["unwrap"] !== undefined && extraQL && extraQL.isServerRunning()) {
+  if (aScript._meta.filename && aScript.headers.hasOwnProperty("unwrap") && extraQL && extraQL.isServerRunning()) {
     var url = config.EXTRAQL_URL + "scripts/" + aScript._meta.filename;
     $.ajax({ url: url, dataType: "script", timeout: 1000 }).fail(function () { injectScript(closure); });
   }

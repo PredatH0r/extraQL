@@ -101,6 +101,8 @@ Using the Linkify Plus version 2.0.2. as a base.
 *******************************************************************************/
 
 (function() {
+  var document = window.document;
+  var quakelive = window.quakelive;
 
   var notInTags = [ 'a', 'head', 'noscript', 'option', 'script', 'style', 'title', 'textarea' ];
   var textNodeXpath = ".//text()[not(ancestor::" + notInTags.join(') and not(ancestor::') + ")]";

@@ -110,7 +110,7 @@ namespace ExtraQL
     /// </summary>
     private void Version(TcpClient client, Uri uri, string request)
     {
-      HttpOk(client, "{ version: \"" + MainForm.Version + "\", enabled: " + this.EnableScripts.ToString().ToLower() + " }");
+      HttpOk(client, "{ \"version\": \"" + MainForm.Version + "\", \"enabled\": " + this.EnableScripts.ToString().ToLower() + " }");
     }
 
     #endregion
