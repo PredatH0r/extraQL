@@ -264,7 +264,7 @@ HudManager.prototype.injectMenuEntry = function() {
       oldInitNav.apply(nav, arguments);
 
       // QLHM-specific stuff
-      $("#qlhm_nav > a, #qlhm_nav_scriptMgmt > a").click(function() { self.loadRepository.call(self); return false; });
+      $("#qlhm_nav_scriptMgmt > a").click(function() { self.loadRepository.call(self); return false; });
       $(".qlhm_nav_scriptMenuItem").click(function() { self.onMenuItemClicked(this); });
     }
 
