@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name        Quake Live Game Type Picker
-// @version     1.1
+// @version     1.2
 // @author      PredatH0r
 // @description	Select game-type and other server filters without opening the customization area
 // @include     http://*.quakelive.com/*
