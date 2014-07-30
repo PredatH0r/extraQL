@@ -1,6 +1,6 @@
 ﻿/*
 // @name        QUAKE LIVE HOOK MANAGER
-// @version     0.5
+// @version     0.5.1
 // @author      wn
 // @contributor PredatH0r
 // @description	Manages the installation and execution of QuakeLive userscripts
