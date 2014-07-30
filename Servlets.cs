@@ -1,6 +1,4 @@
-﻿//#define ENABLE_HOOK_DOWNLOAD
-
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
@@ -72,9 +70,6 @@ namespace ExtraQL
       RegisterServlet("/log", ScriptLog);
       RegisterServlet("/uso", GetUsoScript);
       RegisterServlet("/qlhmUserscriptRepository.js", RepositoryJson);
-#if ENABLE_HOOK_DOWNLOAD
-      RegisterServlet("/hook", DownloadHookJs);
-#endif
     }
 
     #endregion
@@ -115,7 +110,7 @@ namespace ExtraQL
     /// </summary>
     private void Version(TcpClient client, Uri uri, string request)
     {
-      HttpOk(client, "{ version: " + MainForm.Version + ", enabled: " + this.EnableScripts + " }");
+      HttpOk(client, "{ version: \"" + MainForm.Version + "\", enabled: " + this.EnableScripts.ToString().ToLower() + " }");
     }
 
     #endregion
@@ -398,19 +393,6 @@ namespace ExtraQL
       this.HttpOk(client, text);
     }
     #endregion
-
-    #region DownloadHookJs()
-
-#if ENABLE_HOOK_DOWNLOAD
-    private void DownloadHookJs(TcpClient client, Uri uri, string request)
-    {
-      string text = DownloadText("http://beham.biz/ql/hook.js");
-      this.HttpOk(client, text);
-    }
-#endif
-
-    #endregion
-
 
     // internal methods
 
