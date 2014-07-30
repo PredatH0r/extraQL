@@ -122,7 +122,10 @@ namespace ExtraQL
         return;
       if (IsNewer(remoteMeta["version"][0], localMeta["version"][0]))
       {
-        File.WriteAllText(scriptfile, remoteCode);
+        // remove UTF8 byte-order-mark
+        if (remoteCode.StartsWith("\xEF\xBB\xBF"))
+          remoteCode = remoteCode.Substring(3);
+        File.WriteAllText(scriptfile, remoteCode, Encoding.UTF8);
         Log("Downloaded new version of " + Path.GetFileName(scriptfile));
       }
     }
