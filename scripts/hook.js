@@ -1,6 +1,6 @@
 ﻿/*
 // @name        QUAKE LIVE HOOK MANAGER
-// @version     0.5.1
+// @version     1.0
 // @author      wn
 // @contributor PredatH0r
 // @description	Manages the installation and execution of QuakeLive userscripts
@@ -8,8 +8,8 @@
 
 // called in ql.Init
 function main_hook() {
-  qz_instance.SendGameCommand("echo main_hook called");
-  if (quakelive.mod_legals !== quakelive.activeModule) HOOK_MANAGER.init();
+  if (quakelive.mod_legals !== quakelive.activeModule)
+    HOOK_MANAGER.init();
 }
 
 
@@ -19,9 +19,7 @@ function main_hook() {
 // it is probably only in the config object below.
 // !!!
 var config = {
-    BASE_URL: "http://qlhm.phob.net/"
-  , EXTRAQL_URL: "http://127.0.0.1:27963/"
-  , manual: []
+  BASE_URL: "http://127.0.0.1:27963/"
   , debug: false
   , menuCaption: "Userscripts"
 };
@@ -34,9 +32,6 @@ var config = {
 // This is the service that acts as a proxy to retrieve userscripts.  It also does some extra work,
 // such as pre-parsing of the userscript metadata block.
 var JSONP_PROXY_TEMPLATE = config.BASE_URL + "uso/{{id}}";
-
-// This is used to determine whether `hook.js` and the proxy service are on the same version.
-var VERSION_CHECK_URL = config.BASE_URL + "versioncheck";
 
 // List of userscripts shown in the HOOK console
 var USERSCRIPT_REPOSITORY_URL = config.BASE_URL + "qlhmUserscriptRepository.js";
@@ -618,7 +613,7 @@ HudManager.prototype.handleConsoleClose = function() {
  * Hook Manager
  */
 function HookManager(aProps) {
-  readOnly(this, "name", "Quake Live Hook Manager");
+  readOnly(this, "name", "extraQL");
   readOnly(this, "version", 0.5);
   readOnly(this, "debug", !!aProps.debug);
 }
@@ -636,63 +631,36 @@ HookManager.prototype.init = function() {
 
   readOnly(this, "hud", new HudManager(this));
   storage.init(this.initScripts.bind(this), false);
-  setTimeout(this.versionCheck.bind(this), 5E3);
 }
 
 HookManager.prototype.initScripts = function() {
-  $.ajax({url:config.EXTRAQL_URL + "scripts/extraQL.js", dataType:"script", timeout:1000})
+  $.ajax({ url: config.BASE_URL + "scripts/extraQL.js", dataType: "script", timeout: 1000 })
     .done(this.initExtraQL.bind(this))
-    .fail(function() { log("Using ^3QLHM^7 repository"); })
-    .always(this.loadScripts.bind(this));
+    .fail(function() { log("^1extraQL not running^7. Userscripts are disabled!"); });
 }
 
 HookManager.prototype.initExtraQL = function() {
-  log("Using ^3extraQL^7 script repository");
-  USERSCRIPT_REPOSITORY_URL = config.EXTRAQL_URL + "qlhmUserscriptRepository.js";
-  JSONP_PROXY_TEMPLATE = config.EXTRAQL_URL + "uso/{{id}}";
-
   // after first installation, when no scripts are available yet, activate all scripts
   try {
     var enableAllScripts = true;
     $.each(storage.scripts.available, function() {
       enableAllScripts = false;
     });
-    if (!enableAllScripts)
-      return;
+    if (enableAllScripts) {
 
-    var js = $.ajax({
-      url: USERSCRIPT_REPOSITORY_URL,
-      dataType: "html",
-      async: false
-    });
-    eval(js); // this will set HOOK_MANAGER.userscriptRepository
-    $.each(HOOK_MANAGER.userscriptRepository, function(index, script) {
-      storage.scripts.enabled[script.ID] = true;
-    });
-  } catch(ex) {}
-}
-
-HookManager.prototype.versionCheck = function() {
-  var self = this;
-  $.ajax({
-      url: VERSION_CHECK_URL
-    , data: {currentVersion: self.version}
-    , dataType: "jsonp"
-  }).done(function(data) {
-    if (data.new) {
-      log("New version of " + self.name + " found: " + data.new.version);
-      var out = "A new version (" + data.new.version + ") of " + self.name + " is available @ <a href='"
-              + data.new.url + "' target='_blank'>" + data.new.url + "</a>.<br><br>You will need to manually update your "
-              + "\"hook.js\" file, which is currently at version " + self.version + ".";
-      self.hud.alert({
-          title: self.name + " Update Available"
-        , body: out
+      var js = $.ajax({
+        url: USERSCRIPT_REPOSITORY_URL,
+        dataType: "html",
+        async: false
+      });
+      eval(js); // this will set HOOK_MANAGER.userscriptRepository
+      $.each(HOOK_MANAGER.userscriptRepository, function(index, script) {
+        storage.scripts.enabled[script.ID] = true;
       });
     }
-    else {
-      log("On the latest (or newer) " + self.name + " client release");
-    }
-  });
+  } catch (ex) { }
+
+  this.loadScripts();
 }
 
 HookManager.prototype.loadScripts = function() {
@@ -707,31 +675,7 @@ HookManager.prototype.loadScripts = function() {
 
   // Fire off requests for each script
   $.each(scriptIds, function (i, scriptID) {
-    var script = storage.scripts.cache[scriptID];
-
-    // TODO: re-enable loading from cache once expiration stuff is in place...
-    var USE_CACHE = false;
-
-    // Serve from cache?
-    if (USE_CACHE && script) {
-      self.injectUserScript(script);
-    }
-    // ... or pull fresh data
-    else {
-      //log("^7Requesting userscript ^5" + scriptID + "^7");
-      self.fetchScript(scriptID);
-    }
-  });
-
-  // User-specified scripts
-  $.each(config.manual, function(i, scriptURL) {
-    log("^7Requesting userscript ^5" + scriptURL + "^7");
-    $.ajax({
-      url: scriptURL
-    , dataType: "jsonp"
-    }).done(function(aData) {
-      injectScript(";(function() {" + aData + "})();");
-    });
+    self.fetchScript(scriptID);
   });
 }
 
@@ -851,7 +795,7 @@ HookManager.prototype.injectUserScript = function(aScript) {
 
   // inject script file when possible to preserve file name in log and error messages
   if (aScript._meta.filename && aScript.headers.hasOwnProperty("unwrap") && extraQL && extraQL.isServerRunning()) {
-    var url = config.EXTRAQL_URL + "scripts/" + aScript._meta.filename;
+    var url = config.BASE_URL + "scripts/" + aScript._meta.filename;
     $.ajax({ url: url, dataType: "script", timeout: 1000 }).fail(function () { injectScript(closure); });
   }
   else {

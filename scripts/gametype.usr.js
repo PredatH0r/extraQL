@@ -51,7 +51,7 @@
       gameTypes.push({ index: i, regular: gameType[0], instagib: gameType[1], icon: gameType[2], text: gameType[3], hint: gameType[4] });
     });
     extraQL.addStyle(
-      "#gameTypeSwitcher { color: black; }",
+      "#gameTypeSwitcher { color: black; margin-left: 10px; font-family: Arial; }",
       "#gameTypeSwitcher1 .gametype { display: inline-block; margin-right: 8px; }",
       "#gameTypeSwitcher1 a { color: inherit; text-decoration: none; }",
       "#gameTypeSwitcher1 a.active { color: #CC220B; text-decoration: underline; }",
@@ -69,10 +69,11 @@
     if (!quakelive.activeModule || quakelive.activeModule.GetTitle() != "Home")
       return;
 
-    var $matchlistHeader = $("#matchlist_header");
+    var $matchlistHeader = $("#matchlist_header_text");
     if ($matchlistHeader.length == 0) return;
 
     $matchlistHeader.empty();
+    $matchlistHeader.css({"width": "auto", "height": "auto"});
     var html1 = "";
     $.each(gameTypes, function(i, gameType) {
       html1 += "<div class='gametype' title='" + gameType.hint + "'><a href='javascript:void(0);' data-index='" + i + "'>"
@@ -83,14 +84,14 @@
       + "<input type='checkbox' id='quickPrem'><label for='quickPrem'>Premium only</label>"
       + "<input type='radio' name='quickPrivate' id='quickPublic' value='0'><label for='quickPublic'>Public</label>"
       + "<input type='radio' name='quickPrivate' id='quickPrivate' value='1'><label for='quickPrivate'>Private</label>"
-      + "<input type='radio' name='quickPrivate' id='quickInvited' value='2'><label for='quickInvited'>Invited</label>"
-      + "<a onclick='quakelive.mod_home.ToggleFilterBar(); return false'>Open filter panel</a>";
+      + "<input type='radio' name='quickPrivate' id='quickInvited' value='2'><label for='quickInvited'>Invited</label>";
     $matchlistHeader.append(
       "<div id='gameTypeSwitcher'>"
       + "<div id='gameTypeSwitcher1'>" + html1 + "</div>"
       + "<div id='gameTypeSwitcher2'>" + html2 + "</div>"
       +"</div>"
       );
+    $("#matchlist_header_controls").css({ "width": "auto", "float": "right" });
 
     $("#gameTypeSwitcher1 a").click(function () {
       currentGameTypeIndex = $(this).data("index");

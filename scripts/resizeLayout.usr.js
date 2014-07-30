@@ -83,7 +83,7 @@ CVARS:
     modifyChatStyles();
 
     if (quakelive.cvars.Get(CVAR_chatOverlapIndent).value == "")
-      quakelive.cvars.Set(CVAR_chatOverlapIndent, 115);
+      quakelive.cvars.Set(CVAR_chatOverlapIndent, 140);
 
     oldOnResize = window.onresize;
     window.onresize = onResize;
@@ -213,7 +213,7 @@ CVARS:
 
     height -= 3 + 27 + 14; // height of top border + title bar + bottom bar
 
-    var topOffset = 115; // leave header and menu visible when chat is overlapping the content area
+    var topOffset = 140; // leave header and menu visible when chat is overlapping the content area
     if (width < minExpandedWidth - 7) {
       try {
         topOffset = parseInt(quakelive.cvars.Get(CVAR_chatOverlapIndent).value);
