@@ -56,7 +56,8 @@
       "#gameTypeSwitcher1 span { vertical-align: middle; }",
       "#gameTypeSwitcher2 { margin: 3px 0; color: black; }",
       "#gameTypeSwitcher2 input { vertical-align: middle; }",
-      "#gameTypeSwitcher2 label { margin: 0 20px 0 3px; vertical-align: middle; }"
+      "#gameTypeSwitcher2 label { margin: 0 20px 0 3px; vertical-align: middle; }",
+      "#gameTypeSwitcher2 a { margin-left: 100px; color: black; text-decoration: underline; cursor: pointer; }"
     );
     quakelive.AddHook("OnContentLoaded", onContentLoaded);
   }
@@ -79,7 +80,8 @@
       + "<input type='checkbox' id='quickPrem'><label for='quickPrem'>Premium only</label>"
       + "<input type='radio' name='quickPrivate' id='quickPublic' value='0'><label for='quickPublic'>Public</label>"
       + "<input type='radio' name='quickPrivate' id='quickPrivate' value='1'><label for='quickPrivate'>Private</label>"
-      + "<input type='radio' name='quickPrivate' id='quickInvited' value='2'><label for='quickInvited'>Invited</label>";
+      + "<input type='radio' name='quickPrivate' id='quickInvited' value='2'><label for='quickInvited'>Invited</label>"
+      + "<a onclick='quakelive.mod_home.ToggleFilterBar(); return false'>Open filter panel</a>";
     $matchlistHeader.append(
       "<div id='gameTypeSwitcher'>"
       + "<div id='gameTypeSwitcher1'>" + html1 + "</div>"
