@@ -51,8 +51,8 @@
       gameTypes.push({ index: i, regular: gameType[0], instagib: gameType[1], icon: gameType[2], text: gameType[3], hint: gameType[4] });
     });
     extraQL.addStyle(
-      "#gameTypeSwitcher { color: black; margin-left: 10px; font-family: Arial; }",
-      "#gameTypeSwitcher1 .gametype { display: inline-block; margin-right: 8px; }",
+      "#gameTypeSwitcher { color: black; margin-left: 12px; font-family: Arial; display: inline-block; }",
+      "#gameTypeSwitcher1 .gametype { display: inline-block; margin-right: 16px; }",
       "#gameTypeSwitcher1 a { color: inherit; text-decoration: none; }",
       "#gameTypeSwitcher1 a.active { color: #CC220B; text-decoration: underline; }",
       "#gameTypeSwitcher1 img { float: left; margin-right: 3px; width: 16px; height: 16px; }",
@@ -60,7 +60,8 @@
       "#gameTypeSwitcher2 { margin: 3px 0; color: black; }",
       "#gameTypeSwitcher2 input { vertical-align: middle; }",
       "#gameTypeSwitcher2 label { margin: 0 20px 0 3px; vertical-align: middle; }",
-      "#gameTypeSwitcher2 a { margin-left: 100px; color: black; text-decoration: underline; cursor: pointer; }"
+      "#gameTypeSwitcher2 a { margin-left: 100px; color: black; text-decoration: underline; cursor: pointer; }",
+      "#quickPublic { margin-left: 50px; }"
     );
     quakelive.AddHook("OnContentLoaded", onContentLoaded);
   }
@@ -71,9 +72,11 @@
 
     var $matchlistHeader = $("#matchlist_header_text");
     if ($matchlistHeader.length == 0) return;
-
     $matchlistHeader.empty();
-    $matchlistHeader.css({"width": "auto", "height": "auto"});
+    $matchlistHeader.css({ "display": "none", "height": "auto" });
+
+    $matchlistHeader = $("#matchlist_header");
+
     var html1 = "";
     $.each(gameTypes, function(i, gameType) {
       html1 += "<div class='gametype' title='" + gameType.hint + "'><a href='javascript:void(0);' data-index='" + i + "'>"
@@ -85,7 +88,7 @@
       + "<input type='radio' name='quickPrivate' id='quickPublic' value='0'><label for='quickPublic'>Public</label>"
       + "<input type='radio' name='quickPrivate' id='quickPrivate' value='1'><label for='quickPrivate'>Private</label>"
       + "<input type='radio' name='quickPrivate' id='quickInvited' value='2'><label for='quickInvited'>Invited</label>";
-    $matchlistHeader.append(
+    $matchlistHeader.prepend(
       "<div id='gameTypeSwitcher'>"
       + "<div id='gameTypeSwitcher1'>" + html1 + "</div>"
       + "<div id='gameTypeSwitcher2'>" + html2 + "</div>"
