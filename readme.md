@@ -18,6 +18,12 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 0.99
+---
+
+- fixed downloading of updated scripts (double UTF-8 byte-order-mark)
+- modified hook.js and gametype script to work with latest QL UI changes
+
 Version 0.98
 ---
 
