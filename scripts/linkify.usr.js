@@ -1,11 +1,9 @@
 ﻿// ==UserScript==
 // @id          187258
-// @name        Quake Live Linkify (QLHM Edition)
-// @version     1.3
+// @name        Linkify
+// @version     1.4
 // @author      PredatH0r
 // @description	Turn plain text URLs into links
-// @include     http://*.quakelive.com/*
-// @exclude     http://*.quakelive.com/forum*
 // @unwrap
 // ==/UserScript==
 
@@ -13,6 +11,9 @@
 
 Linkify Plus modified by PredatH0r, based on modified version from kry.
 This version is tailored to work with Quake Live standalone client and QLHM.
+
+Version 1.4
+- fixed cannot call getElementById of undefined
 
 Version 1.3
 - compatibility with redesigned QL UI
@@ -98,8 +99,6 @@ Linkify Plus Red Links Version history:
 Using the Linkify Plus version 2.0.2. as a base.
 
 *******************************************************************************/
-
-var document;
 
 (function() {
 
