@@ -46,6 +46,9 @@ Version 1.0
     onContentLoaded();
     quakelive.AddHook("OnContentLoaded", onContentLoaded);
     quakelive.AddHook("OnGameModeEnded", updateStreams);
+    // the resizeLayout script's event handler will resize the <div> for us
+    if (typeof (window.onresize) == "function")
+      window.onresize();
   }
 
   function onContentLoaded() {

@@ -29,6 +29,10 @@ Version 1.0
   function delayedInit() {
     onContentLoaded();
     quakelive.AddHook("OnContentLoaded", onContentLoaded);
+
+    // the resizeLayout script's event handler will resize the <div> for us
+    if (typeof (window.onresize) == "function")
+      window.onresize();
   }
 
   function onContentLoaded() {
