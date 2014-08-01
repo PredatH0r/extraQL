@@ -14,7 +14,7 @@ namespace ExtraQL
 {
   internal class Servlets
   {
-    private const string ScriptJsonRoute = "/scriptjson";
+    private const string AddScriptRoute = "/addScript";
     private static Servlets instance;
     private readonly HttpServer server = new HttpServer();
     private readonly StringBuilder indexBuilder = new StringBuilder();
@@ -70,7 +70,7 @@ namespace ExtraQL
       RegisterServlet("/toggleFullscreen", ToggleFullscreen);
       RegisterServlet("/dockWindow", DockWindow);
       RegisterServlet("/log", ScriptLog);
-      RegisterServlet(ScriptJsonRoute, GetScript);
+      RegisterServlet(AddScriptRoute, AddScript);
       RegisterServlet("/repository.json", RepositoryJson);
     }
 
@@ -322,16 +322,16 @@ namespace ExtraQL
 
     #endregion
 
-    #region GetScript()
+    #region AddScript()
     /// <summary>
-    /// The returned object contains meta information in .id, .filename and .headers[fieldname][]
-    /// and the actual script code in .content
+    /// Download a script from an external URL and return a JSON with the meta information
     /// </summary>
-    private void GetScript(TcpClient client, Uri uri, string request)
+    private void AddScript(TcpClient client, Uri uri, string request)
     {
+#if false
       var args = HttpUtility.ParseQueryString(uri.Query);
       string text = "";
-      string scriptId = uri.AbsolutePath.StartsWith(ScriptJsonRoute+"/") ? uri.AbsolutePath.Substring(ScriptJsonRoute.Length+1) : null;
+      string scriptId = uri.AbsolutePath.StartsWith(AddScriptRoute+"/") ? uri.AbsolutePath.Substring(AddScriptRoute.Length+1) : null;
       
       var scriptInfo = string.IsNullOrEmpty(scriptId) ? null : this.scriptRepository.GetScriptByIdOrUrl(scriptId);
       if (scriptInfo == null)
@@ -369,6 +369,14 @@ namespace ExtraQL
         text = args.Get("callback") + "(" + text + ");";
 
       this.HttpOk(client, text);
+#else
+      var writer = new StreamWriter(client.GetStream());
+      writer.WriteLine("HTTP/1.1 501 Not Implemented");
+      writer.WriteLine("Access-Control-Allow-Origin: *");
+      writer.WriteLine();
+      writer.WriteLine("This function is not implemented yet");
+      writer.Flush();
+#endif
     }
     #endregion
 

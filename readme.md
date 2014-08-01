@@ -18,6 +18,11 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 0.101
+---
+
+- more simplifications to hook.js and the HTTP servlet for script retrieval
+
 Version 0.100
 ---
 

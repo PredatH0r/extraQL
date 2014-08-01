@@ -91,6 +91,7 @@ var nav = window.nav;
 * Hook Manager
 */
   function HookManager() {
+    this.repo = [];
   }
 
   HookManager.prototype.init = function() {
@@ -107,27 +108,18 @@ var nav = window.nav;
   };
 
   HookManager.prototype.initScripts = function() {
-    // activate all scripts after first init or reset
-    try {
-      var self = this;
-      if (storage.reset) {
-        $.ajax({
-            url: config.BASE_URL + "repository.json",
-            dataType: "json",
-          })
-          .done(function(scriptList) {
-            $.each(scriptList, function(index, script) {
-              storage.scripts.enabled[script.id] = true;
-            });
-            self.loadScripts();
+    var self = this;
+    $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 1000 })
+      .done(function(scriptList) {
+        self.repo = scriptList;
+        if (storage.reset) {
+          // activate all scripts after first init or reset
+          $.each(scriptList, function(index, script) {
+            storage.scripts.enabled[script.id] = true;
           });
-        return;
-      }
-    } catch (ex) {
-      log(ex);
-    }
-
-    this.loadScripts();
+        }
+        self.loadScripts();
+      });
   };
 
   HookManager.prototype.loadScripts = function() {
@@ -143,35 +135,42 @@ var nav = window.nav;
 
     // Fire off requests for each script
     $.each(scriptIds, function(index, id) {
-      self.fetchScript(id);
+      self.loadScript(id);
     });
   };
 
-  HookManager.prototype.fetchScript = function(id, callback) {
-    var self = this;
+  HookManager.prototype.loadScript = function (id) {
+    var repoScript = $.grep(this.repo, function(item) { return item.id == id; })[0];
 
-    $.ajax({
-        url: config.BASE_URL + "scriptjson/" + id,
-        dataType: "json"
-      })
-      .done(function(aData) {
-        self.addUserScript(aData);
-        if (callback)
-          setTimeout(function() { callback.call(null, aData); }, 0);
-      })
-      .fail(self.handleScriptError.bind(self, id));
-  };
+    if (!repoScript) {
+      log("Deactivating userscript with unknown ID ^1" + id + "^7");
+      storage.scripts.enabled[id] = false;
+      storage.save();
+      return;
+    }
 
-  HookManager.prototype.handleScriptError = function(id, jqXHR, settings, err) {
-    log("^1Failed to retrieve script with ID ^5" + id + "^1 : ^7" + err);
-    storage.scripts.enabled[id] = false;
-    storage.save();
-  };
+    log("^7Starting userscript ^5" + id + "^7: ^3" + repoScript.name + "^7");
+    var url = config.BASE_URL + "scripts/" + repoScript.filename;
 
-  HookManager.prototype.addUserScript = function(script) {
-    storage.scripts.enabled[script.id] = true;
-    storage.save();
-    this.injectUserScript(script);
+    if (repoScript.hasOwnProperty("unwrap")) {
+      // scripts marked with @unwrap can be executed directly to preserve file name info for error messages. They must not contain global "return" statements.
+      $.ajax({ url: url, dataType: "script", timeout: 1000, async: false })
+        .fail(function(d1, d2, d3, err) {
+          log("^1Failed to retrieve script with ID ^5" + id + "^1 : ^7" + err);
+      });
+    }
+    else {
+      // scripts not marked with @unwrap are put into a closure
+      var code;
+      $.ajax({ url: url, dataType: "html", timeout: 1000, async: false })
+        .done(function (html) { code = html; })
+        .fail(function (d1, d2, d3, err) {
+          log("^1Failed to retrieve script with ID ^5" + id + "^1 : ^7" + err);
+        });
+
+      var closure = ";(function() { try { " + code + "} catch(ex) { console.log(\"^1" + id + "^7: \" + ex); }})();";    
+      $.globalEval(closure);
+    }
   };
 
   HookManager.prototype.toggleUserScript = function(id, enable) {
@@ -180,7 +179,7 @@ var nav = window.nav;
     if (enable && !storage.scripts.enabled[id]) {
       storage.scripts.enabled[id] = true;
       storage.save();
-      this.fetchScript(id);
+      this.loadScript(id);
       return false;
     } else if (!enable && storage.scripts.enabled[id]) {
       storage.scripts.enabled[id] = false;
@@ -189,19 +188,6 @@ var nav = window.nav;
       return true;
     }
     return false;
-  };
-
-  HookManager.prototype.injectUserScript = function (scriptObj) {
-    log("^7Starting userscript ^5" + scriptObj.id + "^7: ^3" + scriptObj.headers.name[0] + "^7");
-    var closure = ";(function() { try { " + scriptObj.content + "} catch(ex) { console.log(\"^1" + scriptObj.id + "^7: \" + ex); }})();";
-
-    // inject script file when possible to preserve file name in log and error messages
-    if (scriptObj.filename && scriptObj.headers.hasOwnProperty("unwrap") && extraQL && extraQL.isServerRunning()) {
-      var url = config.BASE_URL + "scripts/" + scriptObj.filename;
-      $.ajax({ url: url, dataType: "script", timeout: 1000 }).fail(function() { $.globalEval(closure); });
-    } else {
-      $.globalEval(closure);
-    }
   };
 
   HookManager.prototype.addMenuItem = function(aCaption, aHandler) {
@@ -217,7 +203,6 @@ var nav = window.nav;
     this.width = 900;
     this.selectedScriptElement = null;
     this.rebuildNavBarTimer = undefined;
-    this.repo = [];
 
     quakelive.AddHook("OnLayoutLoaded", this.OnLayoutLoaded.bind(this));
 
@@ -298,7 +283,7 @@ var nav = window.nav;
 
         // QLHM-specific stuff
         $("#qlhm_nav_scriptMgmt > a").click(function() {
-          self.loadRepository.call(self);
+          self.showConsole.call(self);
           return false;
         });
         $(".qlhm_nav_scriptMenuItem").click(function() { self.onMenuItemClicked(this); });
@@ -317,22 +302,13 @@ var nav = window.nav;
     }
   };
 
-  HudManager.prototype.loadRepository = function() {
-    var self = this;
-    $.getJSON(config.BASE_URL + "repository.json")
-      .always(function(data) {
-        self.repo = data;
-        self.showConsole();
-      });
-  };
-
   HudManager.prototype.showConsole = function() {
     var self = this;
 
     webReloadRequired = false;
 
     // sort all scripts
-    var scripts = this.repo.slice(0);
+    var scripts = this.hm.repo.slice(0);
     scripts.sort(function(a, b) {
       var x = a.name;
       var y = b.name;
@@ -410,7 +386,7 @@ var nav = window.nav;
   HudManager.prototype.scriptRowFromScriptRepository = function(script) {
     var id = script.id;
     return "<li id='userscript" + id + "' data-id='" + id + "'>"
-      + "<input type='checkbox' class='userscript-state'" +  (storage.scripts.enabled[id] ? "checked" : "") + ">"
+      + "<input type='checkbox' class='userscript-state'" + (storage.scripts.enabled[id] ? "checked" : "") + ">"
       + " <label for='userscript" + id + "'>" + "<a href='javascript:void(0)' target='_empty'>" + e(script.name) + "</a></label>"
       + "</li>";
   };
@@ -433,7 +409,7 @@ var nav = window.nav;
 
     var $elem = $(elem);
     var id = $elem.closest("li").data("id");
-    var repoScript = $.grep(this.repo, function(item) { return item.id == id; })[0];
+    var repoScript = $.grep(this.hm.repo, function(item) { return item.id == id; })[0];
 
     self.selectedScriptElement = elem;
     $elem.addClass("selected");
@@ -489,8 +465,7 @@ var nav = window.nav;
   };
 
 
-
-  // Make init and addMenuItem available
+// Make init and addMenuItem available
   var hm = new HookManager();
   aWin.HOOK_MANAGER = {
     init: hm.init.bind(hm),
