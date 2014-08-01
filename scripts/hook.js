@@ -197,7 +197,7 @@ var nav = window.nav;
 
     // inject script file when possible to preserve file name in log and error messages
     if (scriptObj.filename && scriptObj.headers.hasOwnProperty("unwrap") && extraQL && extraQL.isServerRunning()) {
-      var url = config.BASE_URL + "scriptjson/" + scriptObj.filename;
+      var url = config.BASE_URL + "scripts/" + scriptObj.filename;
       $.ajax({ url: url, dataType: "script", timeout: 1000 }).fail(function() { $.globalEval(closure); });
     } else {
       $.globalEval(closure);
