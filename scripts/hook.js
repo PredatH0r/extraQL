@@ -1,6 +1,6 @@
 ﻿/*
 // @name        extraQL Script Manager
-// @version     1.1
+// @version     0.100
 // @author      PredatH0r
 // @credits     wn
 // @description	Manages the installation and execution of QuakeLive userscripts
@@ -29,7 +29,7 @@ var nav = window.nav;
 // it is probably only in the config object below.
 // !!!
   var config = {
-    consoleCaption: "extraQL v1.1",
+    consoleCaption: "extraQL v0.100",
     menuCaption: "Userscripts",
     BASE_URL: "http://127.0.0.1:27963/",
     reset: false
