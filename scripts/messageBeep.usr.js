@@ -1,10 +1,7 @@
 ﻿// ==UserScript==
 // @id             134614
 // @name           Quake Live Message Beep
-// @namespace      http://userscripts.org/users/469998
 // @description    Generates a beep when you get a web message on Quake Live
-// @include        http://*.quakelive.com/*
-// @exclude        http://*.quakelive.com/forum/*
 // ==/UserScript==
 
 var beep = 'data:audio/ogg;base64,T2dnUwACAAAAAAAAAACAGnIsAAAAALKNi%2BYBHgF2b3JiaXMAAAAAAUSsAAAAAAAAAHcBAAAAAAC4AU9nZ1M\

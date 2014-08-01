@@ -18,6 +18,13 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 0.100
+---
+
+- rewritten and simplified hook.js
+- works now under Linux Wine/.NET 2.0
+- removed more references to userscripts.org
+
 Version 0.99
 ---
 

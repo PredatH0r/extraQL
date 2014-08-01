@@ -10,7 +10,7 @@ namespace ExtraQL
 {
   public class ScriptRepository
   {
-    private const string DEFAULT_UPDATE_BASE_URL = "https://sourceforge.net/p/extraql/source/ci/master/tree/scripts/{0}?format=raw";
+    private const string DEFAULT_UPDATE_BASE_URL = "http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/{0}?format=raw";
     private readonly Dictionary<string, ScriptInfo> scriptById = new Dictionary<string, ScriptInfo>();
 
     public ScriptRepository()
@@ -18,9 +18,9 @@ namespace ExtraQL
       this.Log = txt => { };
 
       this.ScriptDir = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
-      if (this.ScriptDir.EndsWith("\\bin\\Debug"))
+      if (this.ScriptDir.Replace('\\','/').EndsWith("/bin/Debug"))
         this.ScriptDir = Path.GetDirectoryName(Path.GetDirectoryName(ScriptDir));
-      this.ScriptDir += "\\scripts";
+      this.ScriptDir += "/scripts";
     }
 
     public Action<string> Log { get; set; }
@@ -87,11 +87,27 @@ namespace ExtraQL
           var value = match.Groups[2].Value;
           if (!metadata.ContainsKey(key))
             metadata[key] = new List<string>();
+
+          if (key == "name")
+            value = this.CleanupName(value);
           metadata[key].Add(value);
         }
       }
       return metadata;
     }
+
+    private string CleanupName(string value)
+    {
+      var prefixes = new [] {"ql ", "quakelive ", "quake live "};
+      var lower = value.ToLower();
+      foreach (var prefix in prefixes)
+      {
+        if (lower.StartsWith(prefix))
+          return value.Substring(prefix.Length);
+      }
+      return value;
+    }
+
     #endregion
 
     #region StripAllExtenstions()
@@ -112,7 +128,7 @@ namespace ExtraQL
       var localMeta = (Dictionary<string, List<String>>) ((object[]) e.UserState)[1];
       if (e.Error != null)
       {
-        Log("Failed to check version of " + Path.GetFileName(scriptfile));
+        Log("Failed to check version of " + Path.GetFileName(scriptfile) + ": " + e.Error);
         return;
       }
 
@@ -184,11 +200,11 @@ namespace ExtraQL
         return script;
       }
 
+      // download script from external URL
       using (var webRequest = new WebClient())
       {
         webRequest.Encoding = Encoding.UTF8;
-        bool isUsoId = Regex.IsMatch(scriptIdOrUrl, "\\d+");
-        string url = isUsoId ? "http://userscripts.org/scripts/source/" + scriptIdOrUrl + ".user.js" : scriptIdOrUrl;
+        string url = scriptIdOrUrl;
         try
         {
           string filename = Path.GetFileName(new Uri(url).AbsolutePath);

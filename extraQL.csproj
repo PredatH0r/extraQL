@@ -102,7 +102,7 @@
     <None Include="images\left.png" />
     <None Include="images\maxsize.png" />
     <None Include="images\minsize.png" />
-    <None Include="scripts\toolTip.usr.js" />
+    <None Include="scripts\attic\toolTip.usr.js" />
     <None Include="scripts\autoExec.usr.js" />
     <None Include="scripts\twitter.usr.js" />
     <None Include="scripts\resizeLayout.usr.js" />

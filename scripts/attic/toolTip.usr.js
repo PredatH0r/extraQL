@@ -1,11 +1,9 @@
 ﻿// ==UserScript==
 // @id             395655
-// @name           Quake Live ToolTip Fix (QLHM)
+// @name           Quake Live ToolTip Fix
 // @description    Shows a ToolTip popup when hovering the mouse over a UI element with additional information. E.g. QLranks Elo information, weapon accuracy, ...
 // @author         PredatH0r
 // @version        1.3
-// @include        http://*.quakelive.com/*
-// @exclude        http://*.quakelive.com/forum*
 // @unwrap
 // ==/UserScript==
 

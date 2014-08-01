@@ -5,10 +5,7 @@
 // @namespace      phob.net
 // @author         wn
 // @description    Keeps your current Profile tab when using "Jump to profile..."
-// @include        http://*.quakelive.com/*
-// @exclude        http://*.quakelive.com/forum*
 // @run-at         document-end
-// @updateURL      https://userscripts.org/scripts/source/113249.meta.js
 // ==/UserScript==
 
 

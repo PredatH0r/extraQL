@@ -156,7 +156,7 @@ script also acts as the boot strapper to load the locally installed scripts.
     if (msg instanceof Error && msg.fileName)
       msg = msg.fileName + "," + msg.lineNumber + ": " + msg.name + ": " + msg.message;
     if (quakelive.IsGameRunning())
-      qz_instance.SendGameCommand("echo \"" + msg + "\"");
+      qz_instance.SendGameCommand("echo \"" + msg.replace('"', "'") + "\"");
     else
       console.log(msg);
   }
@@ -168,7 +168,10 @@ script also acts as the boot strapper to load the locally installed scripts.
 
   // public: escape special HTML characters in the provided string
   function escapeHtml(text) {
-    return $("<div/>").text(text).html();
+    // originally from mustache.js MIT ( https://raw.github.com/janl/mustache.js/master/LICENSE )
+    var entityMap = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "/": "&#x2F;" };
+    return String(text).replace(/[&<>"'\/]/g, function (s) { return entityMap[s]; });
+    //return $("<div/>").text(text).html();
   }
 
   // public: store a text file in extraQL.exe's "data" directory

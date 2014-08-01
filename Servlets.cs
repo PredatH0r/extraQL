@@ -14,11 +14,13 @@ namespace ExtraQL
 {
   internal class Servlets
   {
+    private const string ScriptJsonRoute = "/scriptjson";
     private static Servlets instance;
     private readonly HttpServer server = new HttpServer();
     private readonly StringBuilder indexBuilder = new StringBuilder();
     private string _fileBaseDir;
     private readonly ScriptRepository scriptRepository;
+
     public Action<string> Log;
     
     #region static Startup(), Shutdown()
@@ -68,8 +70,8 @@ namespace ExtraQL
       RegisterServlet("/toggleFullscreen", ToggleFullscreen);
       RegisterServlet("/dockWindow", DockWindow);
       RegisterServlet("/log", ScriptLog);
-      RegisterServlet("/uso", GetUsoScript);
-      RegisterServlet("/qlhmUserscriptRepository.js", RepositoryJson);
+      RegisterServlet(ScriptJsonRoute, GetScript);
+      RegisterServlet("/repository.json", RepositoryJson);
     }
 
     #endregion
@@ -320,28 +322,31 @@ namespace ExtraQL
 
     #endregion
 
-    #region GetUsoScript()
+    #region GetScript()
     /// <summary>
-    ///   Locally serve QLHM's JSONP calls, which are normally handled via http://qlhm.phob.net/uso/:id
-    ///   The returned object contains the script ID in ._meta.id, the metadata in .headers[fieldname][]
-    ///   and the actual script code in .content
+    /// The returned object contains meta information in .id, .filename and .headers[fieldname][]
+    /// and the actual script code in .content
     /// </summary>
-    private void GetUsoScript(TcpClient client, Uri uri, string request)
+    private void GetScript(TcpClient client, Uri uri, string request)
     {
       var args = HttpUtility.ParseQueryString(uri.Query);
       string text = "";
-      string scriptId = uri.AbsolutePath.StartsWith("/uso/") ? uri.AbsolutePath.Substring(5) : null;
+      string scriptId = uri.AbsolutePath.StartsWith(ScriptJsonRoute+"/") ? uri.AbsolutePath.Substring(ScriptJsonRoute.Length+1) : null;
       
       var scriptInfo = string.IsNullOrEmpty(scriptId) ? null : this.scriptRepository.GetScriptByIdOrUrl(scriptId);
       if (scriptInfo == null)
       {
         var writer = new StreamWriter(client.GetStream());
-        writer.WriteLine("HTTP/1.1 400 Not Found\r\n\r\nScript with ID " + scriptId + " not found");
+        writer.WriteLine("HTTP/1.1 400 Not Found");
+        writer.WriteLine("Access-Control-Allow-Origin: *");
+        writer.WriteLine();
+        writer.WriteLine("Script with ID " + scriptId + " not found");
         writer.Flush();
         return;
       }
 
-      text += "{\"_meta\":{\"id\":\"" + scriptId + "\",\"filename\":\"" + Path.GetFileName(scriptInfo.Filepath) + "\"}";
+      text += "{\"id\":\"" + scriptId + "\"";
+      text += ",\"filename\":\"" + Path.GetFileName(scriptInfo.Filepath) + "\"";
       text += ",\"headers\":{";
       var sep1 = "";
       foreach (var entry in scriptInfo.Metadata)
@@ -375,21 +380,22 @@ namespace ExtraQL
     /// </summary>
     private void RepositoryJson(TcpClient client, Uri uri, string request)
     {
-      string text = "HOOK_MANAGER.userscriptRepository = [";
+      string text = "[";
       string sep = "";
       foreach (var info in this.scriptRepository.GetScriptIds())
       {
-        text += sep + "\n{id:\"" + info.Id + "\"";
+        text += sep + "\n{\"id\":\"" + info.Id + "\"";
+        text += ",\"filename\":\"" + Path.GetFileName(info.Filepath) + "\"";
         foreach (var entry in info.Metadata)
         {
           if (entry.Key == "id")
             continue;
-          text += "," + entry.Key + ":\"" + entry.Value[0].Replace("\\","\\\\").Replace("\"", "\\\"") + "\"";
+          text += ",\"" + entry.Key + "\":\"" + entry.Value[0].Replace("\\","\\\\").Replace("\"", "\\\"") + "\"";
         }
         text += "}";
         sep = ",";
       }
-      text += "\n];";
+      text += "\n]";
       this.HttpOk(client, text);
     }
     #endregion

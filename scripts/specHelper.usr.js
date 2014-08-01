@@ -7,10 +7,6 @@
 // @homepage       http://esreality.com
 // @author         simonov
 // @contributor    wn
-// @include        http://*.quakelive.com/*
-// @exclude        http://*.quakelive.com/forum*
-// @run-at         document-end
-// @updateURL      https://userscripts.org/scripts/source/153714.meta.js
 // ==/UserScript==
 
 // Don't bother if Quake Live is down for maintenance

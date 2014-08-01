@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display
-// @version        1.90 enhanced
+// @version        1.91
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (bind o "qlrdChangeOutput", bind r "qlrdAnnounce")
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -9,10 +9,7 @@
 // @contributor    szr
 // @contributor    syncore
 // @contributor    simonov
-// @include        http://*.quakelive.com/*
-// @exclude        http://*.quakelive.com/forum*
-// @run-at         document-end
-// @updateURL      https://userscripts.org/scripts/source/111519.meta.js
+// @contributor    PredatH0r
 // ==/UserScript==
 
 

@@ -15,7 +15,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.99";
+    public const string Version = "0.100";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -307,33 +307,40 @@ namespace ExtraQL
     #region SaveSettings()
     private void SaveSettings()
     {
-      if (!this.comboEmail.Items.Contains(this.comboEmail.Text))
-        this.comboEmail.Items.Add(this.comboEmail.Text);
-      this.passwordByEmail[this.comboEmail.Text] = this.txtPassword.Text;
-
-      string emails = "";
-      string pwds = "";
-      foreach (string email in this.comboEmail.Items)
+      try
       {
-        emails += "\t" + email;
-        pwds += "\t" + this.passwordByEmail[email];
+        if (!this.comboEmail.Items.Contains(this.comboEmail.Text))
+          this.comboEmail.Items.Add(this.comboEmail.Text);
+        this.passwordByEmail[this.comboEmail.Text] = this.txtPassword.Text;
+
+        string emails = "";
+        string pwds = "";
+        foreach (string email in this.comboEmail.Items)
+        {
+          emails += "\t" + email;
+          pwds += "\t" + this.passwordByEmail[email];
+        }
+
+        string realmHistory = "";
+        string realmUrl = this.comboRealm.Text.Trim();
+        if (!this.comboRealm.Items.Contains(realmUrl))
+          this.comboRealm.Items.Add(realmUrl);
+        foreach (var realm in this.comboRealm.Items)
+          realmHistory += realm + "\t";
+
+        Settings.Default.Email = emails.Length == 0 ? "" : emails.Substring(1);
+        Settings.Default.Password = Cypher.EncryptString(pwds.Length == 0 ? "" : pwds.Substring(1));
+        Settings.Default.Focus = this.cbFocus.Checked;
+        Settings.Default.Advanced = this.cbAdvanced.Checked;
+        Settings.Default.Realm = this.comboRealm.Text;
+        Settings.Default.RealmHistory = realmHistory.Trim();
+        Settings.Default.LauncherExe = this.txtLauncherExe.Text;
+        Settings.Default.Save();
       }
-
-      string realmHistory = "";
-      string realmUrl = this.comboRealm.Text.Trim();
-      if (!this.comboRealm.Items.Contains(realmUrl))
-        this.comboRealm.Items.Add(realmUrl);
-      foreach (var realm in this.comboRealm.Items)
-        realmHistory += realm + "\t";
-
-      Settings.Default.Email = emails.Length == 0 ? "" : emails.Substring(1);     
-      Settings.Default.Password = Cypher.EncryptString(pwds.Length == 0 ? "" : pwds.Substring(1));
-      Settings.Default.Focus = this.cbFocus.Checked;
-      Settings.Default.Advanced = this.cbAdvanced.Checked;
-      Settings.Default.Realm = this.comboRealm.Text;
-      Settings.Default.RealmHistory = realmHistory.Trim();
-      Settings.Default.LauncherExe = this.txtLauncherExe.Text;
-      Settings.Default.Save();
+      catch (Exception ex)
+      {
+        MessageBox.Show(this, "An error occured while saving your settings:\n" + ex, "Saving settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      }
     }
     #endregion
     
@@ -401,7 +408,7 @@ namespace ExtraQL
       var bundledHook = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
       if (bundledHook.EndsWith("\\bin\\Debug"))
         bundledHook = Path.GetDirectoryName(Path.GetDirectoryName(bundledHook));
-      bundledHook += "\\scripts\\hook.js";
+      bundledHook += "/scripts/hook.js";
 
       if (force || new FileInfo(targetHook).LastWriteTimeUtc < new FileInfo(bundledHook).LastWriteTimeUtc)
         File.Delete(targetHook);

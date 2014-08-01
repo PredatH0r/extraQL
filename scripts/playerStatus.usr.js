@@ -1,11 +1,9 @@
 ﻿// ==UserScript==
 // @id              187322
-// @name            Quake Live Player Status (QLHM Edition)
+// @name            Quake Live Player Status
 // @version         1.1
-// @description     Extends QuakeLive chat area
+// @description     Shows match information in your friend list
 // @author          PredatH0r, rahzei
-// @include         http://*.quakelive.com/*
-// @exclude         http://*.quakelive.com/forum*
 // @unwrap
 // ==/UserScript==
 

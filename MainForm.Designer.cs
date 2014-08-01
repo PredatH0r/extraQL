@@ -90,6 +90,7 @@ namespace ExtraQL
       // 
       this.txtLauncherExe.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.txtLauncherExe.ForeColor = System.Drawing.Color.Black;
       this.txtLauncherExe.Location = new System.Drawing.Point(10, 37);
       this.txtLauncherExe.Name = "txtLauncherExe";
       this.txtLauncherExe.Size = new System.Drawing.Size(359, 21);
@@ -177,6 +178,7 @@ namespace ExtraQL
       this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.txtLog.ForeColor = System.Drawing.Color.Black;
       this.txtLog.Location = new System.Drawing.Point(10, 125);
       this.txtLog.Multiline = true;
       this.txtLog.Name = "txtLog";
@@ -235,6 +237,7 @@ namespace ExtraQL
       // 
       this.comboRealm.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.comboRealm.ForeColor = System.Drawing.Color.Black;
       this.comboRealm.FormattingEnabled = true;
       this.comboRealm.Location = new System.Drawing.Point(53, 24);
       this.comboRealm.Name = "comboRealm";
@@ -330,6 +333,7 @@ namespace ExtraQL
       // 
       this.comboEmail.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.comboEmail.ForeColor = System.Drawing.Color.Black;
       this.comboEmail.FormattingEnabled = true;
       this.comboEmail.Location = new System.Drawing.Point(12, 100);
       this.comboEmail.Name = "comboEmail";
@@ -363,6 +367,7 @@ namespace ExtraQL
       this.linkAbout.TabIndex = 10;
       this.linkAbout.TabStop = true;
       this.linkAbout.Text = "visit the extraQL website";
+      this.linkAbout.TextAlign = System.Drawing.ContentAlignment.TopRight;
       this.linkAbout.UseCompatibleTextRendering = true;
       this.linkAbout.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkAbout_LinkClicked);
       // 
@@ -382,6 +387,7 @@ namespace ExtraQL
       // txtPassword
       // 
       this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.txtPassword.ForeColor = System.Drawing.Color.Black;
       this.txtPassword.Location = new System.Drawing.Point(221, 100);
       this.txtPassword.Name = "txtPassword";
       this.txtPassword.PasswordChar = '☺';
