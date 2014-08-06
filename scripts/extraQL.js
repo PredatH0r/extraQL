@@ -88,7 +88,7 @@ Version 0.102
       "#collapsableChat.bottomDockBar { position: fixed; bottom: 0; right: 0px; width: 294px; background-color: rgba(114, 24, 8, 0.80); z-index: 2; }",
       "#collapsableChat.bottomDockBar.active { background-color: #B5260D; }"
     );
-    if ($("#chatContainer").length == 0) {
+    if (extraQL.isOldUi) {
       addStyle(
         "#chatContainer { position: fixed; bottom: 0px; right: 0px; width: 306px; z-index: 1; }",
         "#chatContainer.expanded { border-left: 3px solid #444; border-top: 3px solid #444; border-right: 3px solid #444; margin: 0px -3px; }"

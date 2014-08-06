@@ -177,15 +177,14 @@ var nav = window.nav;
     }
     else {
       // scripts not marked with @unwrap are put into a closure
-      var code;
       $.ajax({ url: url, dataType: "html", timeout: config.async ? 5000 : 1000, async: config.async })
-        .done(function (html) { code = html; })
+        .done(function(code) {
+          var closure = ";(function() { try { " + code + "} catch(ex) { console.log(\"^1" + id + "^7: \" + ex); }})();";
+          $.globalEval(closure);
+        })
         .fail(function (d1, d2, d3, err) {
           log("^1Failed to retrieve script with ID ^5" + id + "^1 : ^7" + err);
         });
-
-      var closure = ";(function() { try { " + code + "} catch(ex) { console.log(\"^1" + id + "^7: \" + ex); }})();";    
-      $.globalEval(closure);
     }
   };
 
