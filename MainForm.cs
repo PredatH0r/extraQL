@@ -19,6 +19,9 @@ namespace ExtraQL
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
+    private readonly HttpServer server;
+    private readonly Servlets servlets;
+    private readonly ScriptRepository scriptRepository;
 
     private Size windowDragOffset;
 
@@ -32,6 +35,14 @@ namespace ExtraQL
       this.lblVersion.Text = Version;
       this.lblExtra.Parent = this.picLogo;
       this.lblVersion.Parent = this.picLogo;
+
+      this.server = new HttpServer();
+      this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
+
+      this.scriptRepository = new ScriptRepository();
+      this.scriptRepository.Log = this.Log;
+
+      this.servlets = new Servlets(this.server, this.scriptRepository, this.Log);
     }
     #endregion
 
@@ -41,14 +52,8 @@ namespace ExtraQL
     {
       base.OnShown(e);
 
-      var updater = new ScriptRepository();
-      updater.Log = this.Log;
-      updater.UpdateScripts();
-
-      if (Servlets.Startup(this.Log, updater))
-        this.Log("extraQL server listening on http://127.0.0.1:27963/");
-      else
-        this.Log("extraQL server failed to start. Scripts are disabled.");
+      this.scriptRepository.UpdateScripts();
+      this.RestartServer();
     }
     #endregion
 
@@ -56,7 +61,7 @@ namespace ExtraQL
     protected override void OnClosed(EventArgs e)
     {
       this.SaveSettings();
-      Servlets.ShutDown();
+      this.server.Stop();
       base.OnClosed(e);
     }
     #endregion
@@ -186,7 +191,7 @@ namespace ExtraQL
     #region cbDisableScripts_CheckedChanged
     private void cbDisableScripts_CheckedChanged(object sender, EventArgs e)
     {
-      Servlets.Instance.EnableScripts = !this.cbDisableScripts.Checked;
+      this.servlets.EnableScripts = !this.cbDisableScripts.Checked;
     }
     #endregion
 
@@ -260,6 +265,13 @@ namespace ExtraQL
 
       this.launcherDetectionTimer.Stop();
       this.FillLaucherWithEmailAndPassword(handle);
+    }
+    #endregion
+
+    #region cbBindAll_CheckedChanged
+    private void cbBindAll_CheckedChanged(object sender, EventArgs e)
+    {
+      this.RestartServer();
     }
     #endregion
 
@@ -357,6 +369,18 @@ namespace ExtraQL
         this.BeginInvoke((Action) (() => this.Log(msg)));
       else
         this.txtLog.Text += "[" + DateTime.Now.ToString("T") + "] " + msg + "\r\n";
+    }
+    #endregion
+
+    #region RestartServer()
+    private void RestartServer()
+    {
+      this.server.Stop();
+      this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
+      if (this.server.Start())
+        this.Log("extraQL server listening on http://" + this.server.Endpoint);
+      else
+        this.Log("extraQL server failed to start on http://" + this.server.Endpoint +". Scripts are disabled!");
     }
     #endregion
 
@@ -547,6 +571,5 @@ document.loginform.submit();";
       }
     }
     #endregion
-
   }
 }

@@ -16,13 +16,27 @@ namespace ExtraQL
 
     public HttpServer()
     {
-      servicePort = new IPEndPoint(IPAddress.Loopback, PortNumber);
+      this.BindToAllInterfaces = false;
     }
 
+    #region BindToAllAddresses
+    public bool BindToAllInterfaces
+    {
+      set
+      {
+        if (this.IsRunning)
+          throw new InvalidOperationException("Cannot change BindToAllIpAddresses while server is running");
+        this.servicePort = new IPEndPoint(value ? IPAddress.Any : IPAddress.Loopback, PortNumber);
+      }
+    }
+    #endregion
+
+    #region RegisterServlet()
     public void RegisterServlet(string relativUrl, Servlet servlet)
     {
       servlets[relativUrl] = servlet;
     }
+    #endregion
 
     #region HandleClientConnection()
 
@@ -112,5 +126,7 @@ namespace ExtraQL
     }
 
     #endregion
+
+    public string Endpoint { get { return this.servicePort.ToString(); } }
   }
 }

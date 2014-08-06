@@ -15,39 +15,22 @@ namespace ExtraQL
   internal class Servlets
   {
     private const string AddScriptRoute = "/addScript";
-    private static Servlets instance;
-    private readonly HttpServer server = new HttpServer();
+    private readonly HttpServer server;
     private readonly StringBuilder indexBuilder = new StringBuilder();
     private string _fileBaseDir;
     private readonly ScriptRepository scriptRepository;
 
     public Action<string> Log;
     
-    #region static Startup(), Shutdown()
-
-    internal static bool Startup(Action<string> logger, ScriptRepository scriptRepository)
-    {
-      instance = new Servlets(logger, scriptRepository);
-      return instance.server.Start();
-    }
-
-    internal static void ShutDown()
-    {
-      instance.Dispose();
-    }
-
-    public static Servlets Instance { get { return instance; } }
-
-    #endregion
-
     #region ctor()
 
-    private Servlets(Action<string> logger, ScriptRepository scriptRepository)
+    public Servlets(HttpServer server, ScriptRepository scriptRepository, Action<string> logger)
     {
+      this.server = server;
+      this.scriptRepository = scriptRepository;
       this.EnableScripts = true;
       server.Log = logger;
       this.Log = server.Log;
-      this.scriptRepository = scriptRepository;
 
       RegisterServlets();
     }
@@ -534,15 +517,6 @@ namespace ExtraQL
       }
 
       return _fileBaseDir + "\\" + basePath + "\\" + relPath;
-    }
-
-    #endregion
-
-    #region Dispose()
-
-    private void Dispose()
-    {
-      server.Dispose();
     }
 
     #endregion

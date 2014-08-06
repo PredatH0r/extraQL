@@ -39,6 +39,9 @@ namespace ExtraQL
     {
       if (this.shutdownInProgress)
         return false;
+      if (this.started)
+        return true;
+      this.startupComplete.Reset();
       Thread acceptLoop = new Thread(AcceptLoop);
       acceptLoop.Name = "AcceptLoop";
       acceptLoop.Start();
@@ -50,10 +53,11 @@ namespace ExtraQL
     #region Stop()
     public void Stop()
     {
-      if (!this.started)
+      if (!this.started || this.shutdownInProgress)
         return;
       this.shutdownInProgress = true;
       this.shutdownComplete.Reset();
+      // connect to the service port so that the AcceptLoop thread unblocks and can terminate
       using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
       {
         IPEndPoint localServiceEndPoint = this.servicePort.Address.ToString()  == "0.0.0.0" ? 
@@ -63,7 +67,12 @@ namespace ExtraQL
       }
       this.shutdownComplete.WaitOne();
       this.shutdownInProgress = false;
+      this.started = false;
     }
+    #endregion
+
+    #region Started
+    public bool IsRunning { get { return this.started; } }
     #endregion
 
     #region AcceptLoop()

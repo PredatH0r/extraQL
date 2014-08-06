@@ -67,6 +67,7 @@ namespace ExtraQL
       this.btnStartLauncher = new System.Windows.Forms.Button();
       this.panelFocus = new System.Windows.Forms.Panel();
       this.grpFocus = new System.Windows.Forms.GroupBox();
+      this.cbBindToAll = new System.Windows.Forms.CheckBox();
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -150,7 +151,7 @@ namespace ExtraQL
       this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
       this.panelAdvanced.Location = new System.Drawing.Point(0, 337);
       this.panelAdvanced.Name = "panelAdvanced";
-      this.panelAdvanced.Size = new System.Drawing.Size(430, 297);
+      this.panelAdvanced.Size = new System.Drawing.Size(430, 311);
       this.panelAdvanced.TabIndex = 2;
       // 
       // grpAdvanced
@@ -158,6 +159,7 @@ namespace ExtraQL
       this.grpAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpAdvanced.Controls.Add(this.cbBindToAll);
       this.grpAdvanced.Controls.Add(this.txtLauncherExe);
       this.grpAdvanced.Controls.Add(this.txtLog);
       this.grpAdvanced.Controls.Add(this.label1);
@@ -168,7 +170,7 @@ namespace ExtraQL
       this.grpAdvanced.ForeColor = System.Drawing.Color.White;
       this.grpAdvanced.Location = new System.Drawing.Point(12, 7);
       this.grpAdvanced.Name = "grpAdvanced";
-      this.grpAdvanced.Size = new System.Drawing.Size(406, 274);
+      this.grpAdvanced.Size = new System.Drawing.Size(406, 288);
       this.grpAdvanced.TabIndex = 0;
       this.grpAdvanced.TabStop = false;
       this.grpAdvanced.Text = "Advanced";
@@ -179,21 +181,21 @@ namespace ExtraQL
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.txtLog.ForeColor = System.Drawing.Color.Black;
-      this.txtLog.Location = new System.Drawing.Point(10, 125);
+      this.txtLog.Location = new System.Drawing.Point(10, 144);
       this.txtLog.Multiline = true;
       this.txtLog.Name = "txtLog";
       this.txtLog.ReadOnly = true;
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.txtLog.Size = new System.Drawing.Size(388, 143);
-      this.txtLog.TabIndex = 6;
+      this.txtLog.Size = new System.Drawing.Size(388, 138);
+      this.txtLog.TabIndex = 7;
       // 
       // label2
       // 
       this.label2.AutoSize = true;
-      this.label2.Location = new System.Drawing.Point(10, 109);
+      this.label2.Location = new System.Drawing.Point(10, 128);
       this.label2.Name = "label2";
       this.label2.Size = new System.Drawing.Size(28, 13);
-      this.label2.TabIndex = 5;
+      this.label2.TabIndex = 6;
       this.label2.Text = "Log:";
       // 
       // cbDisableScripts
@@ -475,12 +477,23 @@ namespace ExtraQL
       this.grpFocus.TabStop = false;
       this.grpFocus.Text = "QL Focus Members (Beta Testers)";
       // 
+      // cbBindToAll
+      // 
+      this.cbBindToAll.AutoSize = true;
+      this.cbBindToAll.Location = new System.Drawing.Point(10, 100);
+      this.cbBindToAll.Name = "cbBindToAll";
+      this.cbBindToAll.Size = new System.Drawing.Size(310, 17);
+      this.cbBindToAll.TabIndex = 5;
+      this.cbBindToAll.Text = "Allow other computers to access your extraQL HTTP server";
+      this.cbBindToAll.UseVisualStyleBackColor = true;
+      this.cbBindToAll.CheckedChanged += new System.EventHandler(this.cbBindAll_CheckedChanged);
+      // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-      this.ClientSize = new System.Drawing.Size(430, 634);
+      this.ClientSize = new System.Drawing.Size(430, 648);
       this.Controls.Add(this.panelAdvanced);
       this.Controls.Add(this.panelFocus);
       this.Controls.Add(this.panelTop);
@@ -542,6 +555,7 @@ namespace ExtraQL
     private Label lblExtra;
     private PictureBox picClose;
     private PictureBox picMinimize;
+    private CheckBox cbBindToAll;
   }
 }
 
