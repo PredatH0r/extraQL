@@ -1,12 +1,15 @@
 ﻿/*
 // @name        extraQL Script Manager
-// @version     0.102
+// @version     0.103
 // @author      PredatH0r
 // @credits     wn
 // @description	Manages the installation and execution of QuakeLive userscripts
 
 This script is a stripped down version of wn's QuakeLive Hook Manager (QLHM),
 which is designed to work with a local extraQL.exe script server.
+
+Version 0.103
+- fixed async loading and execution of scripts without @unwrap
 
 Version 0.102
 - fallback to remote script server when there is no local server running
@@ -33,7 +36,7 @@ var nav = window.nav;
 // it is probably only in the config object below.
 // !!!
   var config = {
-    consoleCaption: "extraQL v0.102",
+    consoleCaption: "extraQL v0.103",
     menuCaption: "Userscripts",
     BASE_URL: "http://127.0.0.1:27963/",
     REMOTE_URL: "http://ql.beham.biz:27963/",
