@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @id          esreality
 // @name        ESReality.com Integration
-// @version     0.9
+// @version     1.0
 // @author      PredatH0r
 // @description	Shows a list of esreality.com Quake Live forum posts
 // @unwrap
@@ -137,5 +137,5 @@ Version 1.0
   if (extraQL)
     init();
   else
-    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
+    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
 })();

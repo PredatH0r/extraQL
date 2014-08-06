@@ -15,7 +15,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.101";
+    public const string Version = "0.102";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -53,15 +53,16 @@ namespace ExtraQL
       base.OnShown(e);
 
       this.scriptRepository.UpdateScripts();
-      this.RestartServer();
+      this.RestartHttpServer();
     }
     #endregion
 
     #region OnClosed()
     protected override void OnClosed(EventArgs e)
     {
-      this.SaveSettings();
-      this.server.Stop();
+      // make sure the window can be closed even if there are exceptions
+      try { this.SaveSettings(); } catch { }
+      try { this.server.Stop(); } catch { }
       base.OnClosed(e);
     }
     #endregion
@@ -271,7 +272,7 @@ namespace ExtraQL
     #region cbBindAll_CheckedChanged
     private void cbBindAll_CheckedChanged(object sender, EventArgs e)
     {
-      this.RestartServer();
+      this.RestartHttpServer();
     }
     #endregion
 
@@ -311,6 +312,7 @@ namespace ExtraQL
 
       this.cbAdvanced.Checked = Settings.Default.Advanced;
       this.cbFocus.Checked = Settings.Default.Focus;
+      this.cbBindToAll.Checked = Settings.Default.BindToAll;
       this.ActiveControl = this.comboEmail;
     }
 
@@ -347,6 +349,7 @@ namespace ExtraQL
         Settings.Default.Realm = this.comboRealm.Text;
         Settings.Default.RealmHistory = realmHistory.Trim();
         Settings.Default.LauncherExe = this.txtLauncherExe.Text;
+        Settings.Default.BindToAll = this.cbBindToAll.Checked;
         Settings.Default.Save();
       }
       catch (Exception ex)
@@ -372,15 +375,18 @@ namespace ExtraQL
     }
     #endregion
 
-    #region RestartServer()
-    private void RestartServer()
+    #region RestartHttpServer()
+    private void RestartHttpServer()
     {
+      if (this.server == null)
+        return;
       this.server.Stop();
       this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
+      this.servlets.EnablePrivateServlets = !this.cbBindToAll.Checked;
       if (this.server.Start())
-        this.Log("extraQL server listening on http://" + this.server.Endpoint);
+        this.Log("extraQL server listening on http://" + this.server.EndPoint);
       else
-        this.Log("extraQL server failed to start on http://" + this.server.Endpoint +". Scripts are disabled!");
+        this.Log("extraQL server failed to start on http://" + this.server.EndPoint +". Scripts are disabled!");
     }
     #endregion
 

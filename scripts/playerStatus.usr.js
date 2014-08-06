@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @id              187322
 // @name            Quake Live Player Status
-// @version         1.1
+// @version         1.2
 // @description     Shows match information in your friend list
 // @author          PredatH0r, rahzei
 // @unwrap
@@ -10,6 +10,9 @@
 /*
 This script is modified version of rahzei's http://userscripts.org/scripts/review/96328 version 0.4
 It is now compatible with the QL standalone launcher and QLHM
+
+Version 1.2
+- fixed "cannot read property game_type of undefined" error message, when there's an invalid game in the friend list
 
 Version 1.1
 - fixed "Uncaught TypeError: Cannot read property 'ADDRESS' of null" error messges
@@ -186,7 +189,7 @@ Version 1.1
             port: "joinserver",
             cache: false,
             success: function (x) {
-              if ($.isArray(x) || x.length > 0) {
+              if (($.isArray(x) || x.length > 0) && x[0]) {
                 var gametype = (typeof GameTypes[x[0].game_type] != 'undefined') ? GameTypes[x[0].game_type] : x[0].game_type_title;
 
                 if (prehtml.indexOf("<br") > 0)

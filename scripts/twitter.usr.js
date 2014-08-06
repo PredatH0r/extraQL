@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name        QL Twitter integration
-// @version     1.0
+// @version     1.1
 // @author      PredatH0r
 // @description	Show @quakelive tweets in chat bar
 // @unwrap
@@ -11,8 +11,11 @@
 This script integrates the official "@quakelive" Twitter channel as a separate tab in the QL chat window.
 If the "QL Chat Dock" script is also installed, the Twitter popup will automatically adjust to the QL window's size.
 
+Version 1.1
+- updated extraQL script url to sourceforge
+
 Version 1.0
-  - first public release
+- first public release
 
 */
 
@@ -57,5 +60,5 @@ Version 1.0
   if (extraQL)
     init();
   else
-    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
+    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
 })();

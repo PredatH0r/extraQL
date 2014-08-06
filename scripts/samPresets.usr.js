@@ -2,11 +2,18 @@
 // @name           Quake Live Start-a-Match quick preset access
 // @description    Adds links to load your saved presets directly from the start-a-match screen
 // @author         PredatH0r
-// @version        1.0
+// @version        1.1
 // @include        http://*.quakelive.com/*
 // @exclude        http://*.quakelive.com/forum*
 // @unwrap
 // ==/UserScript==
+
+/*
+
+Version 1.1
+- updated extraQL script url to sourceforge
+
+*/
 
 (function() {
   var amplify = window.amplify;
@@ -44,6 +51,6 @@
   if (extraQL)
     init();
   else
-    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
+    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
 })(window);
 

@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @id             152168
-// @name           Quake Live ingame friend commands
+// @name           Quake Live In-Game Friend Commands
 // @version        0.104
 // @author         https://github.com/rulex/
 // @description    List online friends in console. Show info about friend who are ingame. Use /join <friend> to join friends game
@@ -8,6 +8,12 @@
 // @unwrap
 // ==/UserScript==
 
+/*
+
+Version 0.104
+- adjusted header fields to work with extraQL
+
+*/
 
 (function () {
   function init() {

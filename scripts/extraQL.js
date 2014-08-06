@@ -2,12 +2,15 @@
 // @name        extraQL
 // @description Quake Live userscript utilities
 // @author      PredatH0r
-// @version     0.96
+// @version     0.102
 
 This script provides common functions to various Quake Live user scripts.
 
 In bundle with extraQL.exe and the modified version of QLHM/hook.js, this
 script also acts as the boot strapper to load the locally installed scripts.
+
+Version 0.102
+- added support for distributed client/server setup
 
 */
 
@@ -27,11 +30,11 @@ script also acts as the boot strapper to load the locally installed scripts.
   }
 
   // public: test if the local extraQL HTTP server is running
-  function isServerRunning() {
+  function isLocalServerRunning() {
     if (new Date().getTime() - lastServerCheckTimestamp < 5000)
       return lastServerCheckResult;
     $.ajax({
-      url: BASE_URL + "version",
+      url: "http://127.0.0.1:27963/version",
       async: false,
       dataType: "json",
       success: function (version) {
@@ -166,6 +169,10 @@ script also acts as the boot strapper to load the locally installed scripts.
     $.post(BASE_URL + "log", text);
   }
 
+  function echo(text) {
+    qz_instance.SendGameCommand("echo \"" + text.replace("\"", "'") + "\"");
+  }
+
   // public: escape special HTML characters in the provided string
   function escapeHtml(text) {
     // originally from mustache.js MIT ( https://raw.github.com/janl/mustache.js/master/LICENSE )
@@ -201,9 +208,10 @@ script also acts as the boot strapper to load the locally installed scripts.
   // export public functions
   window.extraQL = {
     BASE_URL: BASE_URL,
-    isServerRunning: isServerRunning,
+    isLocalServerRunning: isLocalServerRunning,
     log: log,
     rlog: rlog,
+    echo: echo,
     addStyle: addStyle,
     escapeHtml: escapeHtml,
     store: store,

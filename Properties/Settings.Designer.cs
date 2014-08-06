@@ -118,5 +118,17 @@ namespace ExtraQL.Properties {
                 this["RealmHistory"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool BindToAll {
+            get {
+                return ((bool)(this["BindToAll"]));
+            }
+            set {
+                this["BindToAll"] = value;
+            }
+        }
     }
 }

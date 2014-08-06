@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name        Quake Live Layout Resizer
-// @version     0.5
+// @version     0.6
 // @author      PredatH0r
 // @description	
 // @include     http://*.quakelive.com/*
@@ -17,6 +17,9 @@ but leaves some space on the top (configurable by web_chatOverlapIndent, default
 so you can access the navigation menus and "Customize" in the server browser.
 
 If the window is wider, the chat will be shown full-height outside the content area.
+
+Version 0.6
+- updated extraQL script url to sourceforge
 
 Version 0.5
 - fixed z-index to work with standard content, chat window, drop-down menus and dialog boxes
@@ -261,5 +264,5 @@ CVARS:
   if (extraQL)
     init();
   else
-    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
+    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
 })();

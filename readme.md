@@ -18,6 +18,12 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 0.102
+---
+
+- "hook.js" will now load the scripts from a remote extraQL.exe server if no local server is running 
+- updated some more stale github references to sourceforge
+
 Version 0.101
 ---
 

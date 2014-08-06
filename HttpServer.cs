@@ -11,22 +11,22 @@ namespace ExtraQL
     public delegate void Servlet(TcpClient client, Uri uri, string request);
 
     private const int PortNumber = 27963;
+    private bool bindToAllInterfaces;
+    private IPEndPoint endPoint;
 
     public IDictionary<string, Servlet> servlets = new Dictionary<string, Servlet>();
-
-    public HttpServer()
-    {
-      this.BindToAllInterfaces = false;
-    }
 
     #region BindToAllAddresses
     public bool BindToAllInterfaces
     {
       set
       {
+        if (value == this.bindToAllInterfaces)
+          return;
         if (this.IsRunning)
-          throw new InvalidOperationException("Cannot change BindToAllIpAddresses while server is running");
-        this.servicePort = new IPEndPoint(value ? IPAddress.Any : IPAddress.Loopback, PortNumber);
+          throw new InvalidOperationException("Cannot change BindToAllInterfaces while server is running");
+        this.bindToAllInterfaces = value;
+        this.endPoint = null;
       }
     }
     #endregion
@@ -35,6 +35,18 @@ namespace ExtraQL
     public void RegisterServlet(string relativUrl, Servlet servlet)
     {
       servlets[relativUrl] = servlet;
+    }
+    #endregion
+
+    #region EndPoint
+    public override IPEndPoint EndPoint
+    {
+      get
+      {
+        if (this.endPoint == null)
+          this.endPoint = new IPEndPoint(this.bindToAllInterfaces ? IPAddress.Any : IPAddress.Loopback, PortNumber);
+        return this.endPoint;
+      }
     }
     #endregion
 
@@ -126,7 +138,5 @@ namespace ExtraQL
     }
 
     #endregion
-
-    public string Endpoint { get { return this.servicePort.ToString(); } }
   }
 }

@@ -44,6 +44,10 @@
   function init() {
     if (extraQL.isOldUi)
       return;
+    if (!extraQL.isLocalServerRunning()) {
+      extraQL.echo("^1docker^7: extraQL.exe is not running. Script is disabled.");
+      return;
+    }
 
     extraQL.addStyle(
       "#winposControl { float: right; padding: 0px 30px; }",
@@ -127,5 +131,5 @@
   if (extraQL)
     init();
   else
-    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
+    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
 })();

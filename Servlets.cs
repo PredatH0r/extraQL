@@ -29,6 +29,7 @@ namespace ExtraQL
       this.server = server;
       this.scriptRepository = scriptRepository;
       this.EnableScripts = true;
+      this.EnablePrivateServlets = true;
       server.Log = logger;
       this.Log = server.Log;
 
@@ -36,6 +37,8 @@ namespace ExtraQL
     }
 
     #endregion
+
+    public bool EnablePrivateServlets { get; set; }
 
     #region RegisterServlets()
 
@@ -134,6 +137,12 @@ namespace ExtraQL
     /// </summary>
     private void DataStorage(TcpClient client, Uri uri, string request)
     {
+      if (!this.EnablePrivateServlets)
+      {
+        HttpForbidden(client);
+        return;
+      }
+
       string path = GetFilePath(uri, "data");
       if (path == null)
         return;
@@ -187,6 +196,11 @@ namespace ExtraQL
     /// </summary>
     private void ToggleFullscreen(TcpClient client, Uri uri, string request)
     {
+      if (!this.EnablePrivateServlets)
+      {
+        HttpForbidden(client);
+        return;
+      }
       Win32.PostMessage(QLWindowHandle, Win32.WM_SYSKEYDOWN, (int) Keys.Enter, 0);
       HttpOk(client, "Ok");
     }
@@ -210,6 +224,12 @@ namespace ExtraQL
     /// </summary>
     private void DockWindow(TcpClient client, Uri uri, string request)
     {
+      if (!this.EnablePrivateServlets)
+      {
+        HttpForbidden(client);
+        return;
+      }
+
       NameValueCollection args = HttpUtility.ParseQueryString(uri.Query);
       int sides, w, h;
       if (!int.TryParse(args.Get("sides"), out sides))
@@ -292,6 +312,12 @@ namespace ExtraQL
     /// </summary>
     private void ScriptLog(TcpClient client, Uri uri, string request)
     {
+      if (!this.EnablePrivateServlets)
+      {
+        HttpForbidden(client);
+        return;
+      }
+
       int idx = request.IndexOf("\r\n\r\n", StringComparison.Ordinal);
       string msg = idx < 0 ? "" : request.Substring(idx + 4);
       if (!request.StartsWith("POST"))
@@ -353,12 +379,7 @@ namespace ExtraQL
 
       this.HttpOk(client, text);
 #else
-      var writer = new StreamWriter(client.GetStream());
-      writer.WriteLine("HTTP/1.1 501 Not Implemented");
-      writer.WriteLine("Access-Control-Allow-Origin: *");
-      writer.WriteLine();
-      writer.WriteLine("This function is not implemented yet");
-      writer.Flush();
+      HttpNotImplemented(client);
 #endif
     }
     #endregion
@@ -521,6 +542,7 @@ namespace ExtraQL
 
     #endregion
 
+
     #region HttpOk()
 
     /// <summary>
@@ -549,6 +571,30 @@ namespace ExtraQL
       }
     }
 
+    #endregion
+
+    #region HttpForbidden()
+    private void HttpForbidden(TcpClient client)
+    {
+      var writer = new StreamWriter(client.GetStream());
+      writer.WriteLine("HTTP/1.1 403 Forbidden");
+      writer.WriteLine("Access-Control-Allow-Origin: *");
+      writer.WriteLine();
+      writer.WriteLine("This function is not available from a remote extraQL.exe server");
+      writer.Flush();
+    }
+    #endregion
+
+    #region HttpNotImplemented()
+    private static void HttpNotImplemented(TcpClient client)
+    {
+      var writer = new StreamWriter(client.GetStream());
+      writer.WriteLine("HTTP/1.1 501 Not Implemented");
+      writer.WriteLine("Access-Control-Allow-Origin: *");
+      writer.WriteLine();
+      writer.WriteLine("This function is not implemented yet");
+      writer.Flush();
+    }
     #endregion
   }
 }

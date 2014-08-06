@@ -1,12 +1,15 @@
 ﻿// ==UserScript==
 // @name        Quake Live Twich.tv Streams and VODs
-// @version     1.1
+// @version     1.2
 // @author      PredatH0r
 // @description	Shows a list of twitch.tv QL live streams and videos
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.2
+- updated extraQL script url to sourceforge
 
 Version 1.1
 - show videos grouped by channel
@@ -334,5 +337,5 @@ Version 1.0
   if (extraQL)
     init();
   else
-    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
+    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
 })();

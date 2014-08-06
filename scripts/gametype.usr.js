@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name        Quake Live Game Type Picker
-// @version     1.2
+// @version     1.3
 // @author      PredatH0r
 // @description	Select game-type and other server filters without opening the customization area
 // @include     http://*.quakelive.com/*
@@ -11,6 +11,9 @@
 /*
   This script replaces the large "Public Matches" caption on the server browser page 
   with quick customization items for gametype and match visibility
+
+  Version 1.3
+  - updated extraQL script url to sourceforge
 
   Version 1.1
   - added "Show filter panel" link
@@ -159,5 +162,5 @@
   if (extraQL)
     init();
   else
-    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
+    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
 })();

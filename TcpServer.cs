@@ -8,7 +8,6 @@ namespace ExtraQL
 {
   public abstract class TcpServer : IDisposable
   {
-    protected IPEndPoint servicePort;
     protected readonly Encoding enc = Encoding.ASCII;
 
     private volatile bool started;
@@ -60,9 +59,9 @@ namespace ExtraQL
       // connect to the service port so that the AcceptLoop thread unblocks and can terminate
       using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
       {
-        IPEndPoint localServiceEndPoint = this.servicePort.Address.ToString()  == "0.0.0.0" ? 
-          new IPEndPoint(IPAddress.Loopback, this.servicePort.Port) : 
-          this.servicePort;
+        IPEndPoint localServiceEndPoint = this.EndPoint.Address.ToString()  == "0.0.0.0" ? 
+          new IPEndPoint(IPAddress.Loopback, this.EndPoint.Port) : 
+          this.EndPoint;
         client.Connect(localServiceEndPoint);
       }
       this.shutdownComplete.WaitOne();
@@ -81,7 +80,7 @@ namespace ExtraQL
       TcpListener server;
       try
       {
-        server = new TcpListener(this.servicePort);
+        server = new TcpListener(this.EndPoint);
         server.Start(100);
         this.started = true;
       }
@@ -89,7 +88,7 @@ namespace ExtraQL
       {
         this.startupComplete.Set();
         this.shutdownComplete.Set();
-        Log("Unable to open TCP port " + this.servicePort.Address + ":" + this.servicePort.Port + "\n"
+        Log("Unable to open TCP port " + this.EndPoint.Address + ":" + this.EndPoint.Port + "\n"
             + "Is there another extraQL running?\n\nError: " + ex.Message);
         return;
       }
@@ -139,6 +138,8 @@ namespace ExtraQL
       }
     }
     #endregion
+
+    public abstract IPEndPoint EndPoint { get; }
 
     protected abstract void HandleClientConnection(TcpClient client);
 

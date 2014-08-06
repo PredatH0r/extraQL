@@ -1,12 +1,16 @@
 ﻿/*
 // @name        extraQL Script Manager
-// @version     0.100
+// @version     0.102
 // @author      PredatH0r
 // @credits     wn
 // @description	Manages the installation and execution of QuakeLive userscripts
 
 This script is a stripped down version of wn's QuakeLive Hook Manager (QLHM),
 which is designed to work with a local extraQL.exe script server.
+
+Version 0.102
+- fallback to remote script server when there is no local server running
+
 */
 
 // called in ql.Init
@@ -29,11 +33,13 @@ var nav = window.nav;
 // it is probably only in the config object below.
 // !!!
   var config = {
-    consoleCaption: "extraQL v0.100",
+    consoleCaption: "extraQL v0.102",
     menuCaption: "Userscripts",
     BASE_URL: "http://127.0.0.1:27963/",
-    reset: false
-  };
+    REMOTE_URL: "http://ql.beham.biz:27963/",
+    reset: false,
+    async: true
+};
 
 
 // This is used to indicate if /web_reload is required (e.g. scripts were enabled or disabled)
@@ -50,7 +56,6 @@ var nav = window.nav;
   function log() {
     var args = Array.prototype.slice.call(arguments);
     if (!args.length) return;
-    if (console.firebuglite) console.log.apply(console, args);
     qz_instance.SendGameCommand("echo \"" + (1 == args.length ? args[0] : JSON.stringify(args)) + "\"");
   }
 
@@ -101,14 +106,25 @@ var nav = window.nav;
     this.initExtraQL();
   };
 
-  HookManager.prototype.initExtraQL = function() {
+  HookManager.prototype.initExtraQL = function () {
+    // first try with a local extraQL HTTP server
     $.ajax({ url: config.BASE_URL + "scripts/extraQL.js", dataType: "script", timeout: 1000 })
       .done(this.initScripts.bind(this))
-      .fail(function() { log("^1extraQL not running^7. Userscripts are disabled!"); });
+      .fail(this.tryRemoteRepository.bind(this));
   };
+
+  HookManager.prototype.tryRemoteRepository = function () {
+    // try remote extraQL HTTP server
+    config.BASE_URL = config.REMOTE_URL;
+    $.ajax({ url: config.BASE_URL + "scripts/extraQL.js", dataType: "script", timeout: 1000 })
+      .done(this.initScripts.bind(this))
+      .fail(function () { log("^1Failed^7 to connect to extraQL script server. Scripts are disabled."); });
+  }
 
   HookManager.prototype.initScripts = function() {
     var self = this;
+    log("Loading userscripts from ^2" + config.BASE_URL + "^7");
+    window.extraQL.BASE_URL = config.BASE_URL;
     $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 1000 })
       .done(function(scriptList) {
         self.repo = scriptList;
@@ -154,7 +170,7 @@ var nav = window.nav;
 
     if (repoScript.hasOwnProperty("unwrap")) {
       // scripts marked with @unwrap can be executed directly to preserve file name info for error messages. They must not contain global "return" statements.
-      $.ajax({ url: url, dataType: "script", timeout: 1000, async: false })
+      $.ajax({ url: url, dataType: "script", timeout: config.async ? 5000 : 1000, async: config.async })
         .fail(function(d1, d2, d3, err) {
           log("^1Failed to retrieve script with ID ^5" + id + "^1 : ^7" + err);
       });
@@ -162,7 +178,7 @@ var nav = window.nav;
     else {
       // scripts not marked with @unwrap are put into a closure
       var code;
-      $.ajax({ url: url, dataType: "html", timeout: 1000, async: false })
+      $.ajax({ url: url, dataType: "html", timeout: config.async ? 5000 : 1000, async: config.async })
         .done(function (html) { code = html; })
         .fail(function (d1, d2, d3, err) {
           log("^1Failed to retrieve script with ID ^5" + id + "^1 : ^7" + err);
@@ -261,7 +277,7 @@ var nav = window.nav;
 
   HudManager.prototype.injectMenuEntry = function() {
     var self = this;
-    if (!extraQL)
+    if (!window.extraQL)
       return;
 
     extraQL.addStyle(

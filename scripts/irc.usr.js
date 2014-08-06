@@ -1,11 +1,18 @@
 ﻿// ==UserScript==
 // @id             186820
 // @name           Quake Live IRC Link
-// @version        1.0
+// @version        1.1
 // @author         PredatH0r
 // @description    Adds a link to the QuakeNet.org IRC Web Chat to your chat window
 // @unwrap
 // ==/UserScript==
+
+/*
+
+Version 1.1
+- updated extraQL script url to sourceforge
+
+*/
 
 (function () {
   // external global variables
@@ -37,5 +44,5 @@
   if (extraQL)
     init();
   else
-    $.getScript("https://raw.githubusercontent.com/PredatH0r/extraQL/master/scripts/extraQL.js", init);
+    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
 })();
