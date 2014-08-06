@@ -18,46 +18,43 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 0.103
+---
+- fixed downloading of updated scripts (character encoding issue)
+
 Version 0.102
 ---
-
 - "hook.js" will now load the scripts from a remote extraQL.exe server if no local server is running 
 - updated some more stale github references to sourceforge
 
 Version 0.101
 ---
-
 - more simplifications to hook.js and the HTTP servlet for script retrieval
 
 Version 0.100
 ---
-
 - rewritten and simplified hook.js
 - works now under Linux Wine/.NET 2.0
 - removed more references to userscripts.org
 
 Version 0.99
 ---
-
 - fixed downloading of updated scripts (double UTF-8 byte-order-mark)
 - modified hook.js and gametype script to work with latest QL UI changes
 
 Version 0.98
 ---
-
 - disabling userscripts now deletes hook.js
 - fixed broken @downloadUrl in some scripts that still pointed to GitHub
 - fixed default script update URL to use SourceForge
 
 Version 0.97
 ---
-
 - moved Git repository from GitHub to SourceForge
 - moved changelog into readme.md
 
 Version 0.96
 ---
-
 - replaced logo
 - after first installation, all userscripts are enabled by default
 - updated meta-information about the userscripts
@@ -65,13 +62,11 @@ Version 0.96
 
 Version 0.95
 ---
-
 - added support to start QuakeLive via Steam
 - always copy hook.js to target directory if it's file timestamp is older
 
 Version 0.94
 ---
-
 - UI design similar to Quake Live Launcher
 - allow multiple email/password combinations
 - allow arbitrary URLs as realms
@@ -79,7 +74,6 @@ Version 0.94
 
 Version 0.93
 ---
-
 - fixed exception when installing hook.js or starting QL
 - added QuakeCon channel to twitch script
 
@@ -90,49 +84,40 @@ Version 0.92
 
 Version 0.91
 ---
-
 - showing more user friendly names instead of realm URLs
 - added links for QL beta testers to login to QL Focus and open QL Focus forum
 
 Version 0.90
 ---
-
 - using new version of QLHM hook.js which supports selecting and loading scripts from local extraQL HTTP server
 
 Version 0.18
 ---
-
 - improved raceboard.js to show leader name and score in all-maps view
 
 Version 0.17
 ---
-
 - added raceboard.js, which shows alternative race leader boards from QLStats database
 
 Version 0.16
 ---
-
 - fixed raceTop10, which caused other scripts to not work properly
 
 Version 0.15
 ---
-
 - added "friendCommands.js" with rulex' ingame-friend-commands script (userscript.org ID 152168)
 
 Version 0.14
 ---
-
 - added "bugfixes.js" with fixes for issues in the official QL source
 - added "samPreset.js" with quick access to saved start-a-match presets
 
 Version 0.13
 ---
-
 - added support for new chat bar (number of friends online, flashing when there are unread messages)
 
 Version 0.12
 ---
-
 - added header bar on top of chat / twitch / twitter / ESR popup
 - removed number of streams from game caption in "twitch" popup
 - chat "send" button will no longer re-appear after entering+leaving a game
@@ -140,6 +125,5 @@ Version 0.12
 
 Version 0.11
 ---
-
 - HTTP POST to /data now writes files without a UTF-8 BOM
 - crawler.js script now creates an !ndex.json file which maps game-ids to maps.

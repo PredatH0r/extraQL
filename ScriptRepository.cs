@@ -12,6 +12,7 @@ namespace ExtraQL
   {
     private const string DEFAULT_UPDATE_BASE_URL = "http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/{0}?format=raw";
     private readonly Dictionary<string, ScriptInfo> scriptById = new Dictionary<string, ScriptInfo>();
+    private readonly Encoding utf8withoutBom = new UTF8Encoding(false);
 
     public ScriptRepository()
     {
@@ -55,8 +56,8 @@ namespace ExtraQL
         try
         {
           WebClient client = new WebClient();
-          client.DownloadStringCompleted += Client_DownloadStringCompleted;
-          client.DownloadStringAsync(new Uri(url), new object[] { scriptfile, localMeta });
+          client.DownloadDataCompleted += Client_DownloadDataCompleted;
+          client.DownloadDataAsync(new Uri(url), new object[] { scriptfile, localMeta });
         }
         catch (WebException) { }
       }
@@ -120,7 +121,7 @@ namespace ExtraQL
     #endregion
 
     #region Client_DownloadStringCompleted
-    private void Client_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+    private void Client_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
     {
       ((WebClient)sender).Dispose();
 
@@ -132,16 +133,14 @@ namespace ExtraQL
         return;
       }
 
-      var remoteCode = e.Result;
+      var remoteCode = utf8withoutBom.GetString(e.Result);
       var remoteMeta = GetMetadata(remoteCode);
       if (!remoteMeta.ContainsKey("version"))
         return;
       if (IsNewer(remoteMeta["version"][0], localMeta["version"][0]))
       {
-        // remove UTF8 byte-order-mark
-        if (remoteCode.StartsWith("\xEF\xBB\xBF"))
-          remoteCode = remoteCode.Substring(3);
-        File.WriteAllText(scriptfile, remoteCode, Encoding.UTF8);
+        remoteCode = remoteCode.Replace("\n", Environment.NewLine);
+        File.WriteAllText(scriptfile, remoteCode, utf8withoutBom);
         Log("Downloaded new version of " + Path.GetFileName(scriptfile));
       }
     }
