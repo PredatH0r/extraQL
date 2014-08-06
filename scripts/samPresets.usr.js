@@ -2,13 +2,16 @@
 // @name           Quake Live Start-a-Match quick preset access
 // @description    Adds links to load your saved presets directly from the start-a-match screen
 // @author         PredatH0r
-// @version        1.1
+// @version        1.2
 // @include        http://*.quakelive.com/*
 // @exclude        http://*.quakelive.com/forum*
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.2
+- updated to work with latest UI changes
 
 Version 1.1
 - updated extraQL script url to sourceforge
@@ -29,7 +32,7 @@ Version 1.1
   }
 
   function onContentLoaded() {
-    if (!quakelive.activeModule || quakelive.activeModule.GetTitle() != "Start a Match")
+    if (!quakelive.activeModule || quakelive.activeModule.GetTitle() != "Create Match")
       return;
     if ($("#quickSamPresets").length > 0)
       return;
