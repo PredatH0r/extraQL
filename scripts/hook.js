@@ -273,7 +273,8 @@ var nav = window.nav;
       return;
 
     // Generate script command submenu
-    for (var caption in scriptMenuItems)
+    var sortedMenus = keys(scriptMenuItems).sort();
+    for (var caption in sortedMenus)
       nav.navbar[config.menuCaption].submenu[caption] = { "class": "qlhm_nav_scriptMenuItem", callback: "" };
 
     // Rebuild the navbar
@@ -440,8 +441,8 @@ var nav = window.nav;
     $elem.addClass("selected");
 
     var author = e(repoScript.author);
-    var version = e(repoScript.version) || "<i>not installed</i>";
-    var descr = e(repoScript.description) || "";
+    var version = e(repoScript.version || "<i>not installed</i>");
+    var descr = e(repoScript.description || "");
 
     if (repoScript && repoScript.note)
       descr = descr + (!descr ? "" : "<br><br>") + "<b>NOTE:</b><br>" + repoScript.note;
