@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display
-// @version        1.92
+// @version        1.93
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (bind o "qlrdChangeOutput", bind r "qlrdAnnounce")
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -13,6 +13,9 @@
 // ==/UserScript==
 
 /*
+
+Version 1.93
+- the score in the match browser details is now a link that opens the QLranks.com player profile in your browser
 
 Version 1.92
 - fixed exception when page is filted for ANY game type
@@ -1235,7 +1238,7 @@ $("body").on("mouseover", "a", function() {
           var $node = $(elem);
           var player = QLRD.PLAYERS[name];
           var score = player && player[gt] && player[gt].elo ? player[gt].elo : "???";
-          $node.append("<div class='elo'>" + score + "</div>");
+          $node.append("<div class='elo'><a href='http://www.qlranks.com/" + gt + "/player/" + name + "' target='_blank'>" + score + "</a></div>");
         });
       });
     } catch (e) {
