@@ -61,6 +61,7 @@
     <Compile Include="HttpServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="scripts\startpage.usr.js" />
     <Compile Include="Servlets.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TcpServer.cs" />
