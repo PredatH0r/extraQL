@@ -1,12 +1,15 @@
 ﻿/*
 // @name        extraQL Script Manager
-// @version     0.104
+// @version     0.105
 // @author      PredatH0r
 // @credits     wn
 // @description	Manages the installation and execution of QuakeLive userscripts
 
 This script is a stripped down version of wn's QuakeLive Hook Manager (QLHM),
-which is designed to work with a local extraQL.exe script server.
+which is designed to work with a local or remote extraQL.exe script server.
+
+Version 0.105
+- sorts menu items under "Userscripts" alphabetically
 
 Version 0.104
 - fixed: on 2nd run all scripts were deactivated again
@@ -39,7 +42,7 @@ var nav = window.nav;
 // it is probably only in the config object below.
 // !!!
   var config = {
-    consoleCaption: "extraQL v0.104",
+    consoleCaption: "extraQL v0.105",
     menuCaption: "Userscripts",
     BASE_URL: "http://127.0.0.1:27963/",
     REMOTE_URL: "http://ql.beham.biz:27963/",
@@ -273,9 +276,11 @@ var nav = window.nav;
       return;
 
     // Generate script command submenu
-    var sortedMenus = keys(scriptMenuItems).sort();
-    for (var caption in sortedMenus)
+    var sortedMenuItems = Object.keys(scriptMenuItems).sort();
+    for (var idx in sortedMenuItems) {
+      var caption = sortedMenuItems[idx];
       nav.navbar[config.menuCaption].submenu[caption] = { "class": "qlhm_nav_scriptMenuItem", callback: "" };
+    }
 
     // Rebuild the navbar
     nav.initNav({
