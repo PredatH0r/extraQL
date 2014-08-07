@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name        Quake Live Layout Resizer
-// @version     0.7
+// @version     0.8
 // @author      PredatH0r
 // @description	
 // @include     http://*.quakelive.com/*
@@ -17,6 +17,9 @@ but leaves some space on the top (configurable by web_chatOverlapIndent, default
 so you can access the navigation menus and "Customize" in the server browser.
 
 If the window is wider, the chat will be shown full-height outside the content area.
+
+Version 0.8
+- restored most of the original functions that got lost due to cross-domain CSS loading
 
 Version 0.7
 - hotfix to prevent endless-loop when loading QL
@@ -61,12 +64,10 @@ CVARS:
   var styleImChatInput;
   var styleImChatSend;
   var styleBrowserDetailsPlayers;
+  var compiledCss;
 
 
   function init() {
-    if (extraQL.isOldUi)
-      return;
-
     extraQL.addStyle(".chatBox { " +
       "border-left: 3px solid #444; " +
       "border-top: 3px solid #444; " +
@@ -77,7 +78,8 @@ CVARS:
       "}");
     extraQL.addStyle(
       "#chatContainer.expanded #collapsableChat { background-color: rgb(114,24,8); }",
-      "#chatContainer .fullHeight { height: 550px; }"
+      "#chatContainer .fullHeight { height: 550px; }",
+      "#browser_details ul.players.miniscroll { max-height: auto }"
     );
     
     findCssRules();
@@ -99,33 +101,12 @@ CVARS:
     updateChatAndContentLayout();
   }
 
-  function modifyChatStyles() {
-    if (styleImChat) {
-      styleImChat.setProperty("background-clip", "content-box");
-    }
-
-    if (styleImChatBody) {
-      styleImChatBody.setProperty("left", "0px");
-      styleImChatBody.setProperty("top", "13px");
-      styleImChatBody.setProperty("width", "284px");
-      styleImChatBody.setProperty("background-color", "white");
-    }
-
-    if (styleImChatInput) {
-      styleImChatInput.setProperty("width", "282px");
-      styleImChatInput.setProperty("left", "0px");
-      styleImChatInput.setProperty("top", "auto");
-      styleImChatInput.setProperty("bottom", "7px");
-    }
-
-    if (styleImChatSend)
-      styleImChatSend.setProperty("display", "none");    
-  }
-
   function findCssRules() {
     var i, j;
     for (i = 0; i < document.styleSheets.length; i++) {
       var sheet = document.styleSheets[i];
+      if (sheet.href && sheet.href.indexOf("/compiled_v") > 0)
+        compiledCss = sheet;
       if (!sheet.cssRules) continue;
       for (j = 0; j < sheet.cssRules.length; j++) {
         try {
@@ -158,12 +139,53 @@ CVARS:
             styleImChatInput = rule.style;
           else if (rule.cssText.indexOf("#im-chat-send {") == 0)
             styleImChatSend = rule.style;
-          else if (rule.cssText.indexOf("#browser_details ul.players {") == 0)
+          else if (rule.cssText.indexOf("#browser_details ul.players.miniscroll {") == 0)
             styleBrowserDetailsPlayers = rule.style;
         }
-        catch (e) {}
+        catch (e) { }
       }
     }
+
+    if (!styleQlvContainer) {
+      $("#qlv_chatControl").css("height", "auto");
+      $("#im-overlay-body").css("background-color", "#fff");
+      $("#im").css("height", "auto");
+      $("div#qlv_content").css("z-index", "auto");
+      $("#newnav_top").css("z-index", "2103");
+      $("ul.sf-menu *").css("z-index", "2102");
+      $("#lgi_cli").css("z-index", "10003");
+    }
+  }
+
+  function modifyChatStyles() {
+    if (styleImChat) {
+      styleImChat.setProperty("background-clip", "content-box");
+    } else {
+      $("#im-chat").css("background-clip", "content-box");
+    }
+
+    if (styleImChatBody) {
+      styleImChatBody.setProperty("left", "0px");
+      styleImChatBody.setProperty("top", "13px");
+      styleImChatBody.setProperty("width", "284px");
+      styleImChatBody.setProperty("background-color", "white");
+    } else {
+      $("#im-chat-body").css({ left: 0, top: "13px", width: "284px", "background-color": "white" });
+    }
+
+    if (styleImChatInput) {
+      styleImChatInput.setProperty("width", "282px");
+      styleImChatInput.setProperty("left", "0px");
+      styleImChatInput.setProperty("top", "auto");
+      styleImChatInput.setProperty("bottom", "7px");
+    } else {
+      $("#im-chat-input").css({ width: "282px", left: 0, top: "auto", bottom: "7px" });
+    }
+
+    if (styleImChatSend)
+      styleImChatSend.setProperty("display", "none");
+    else
+      $("#im-chat-send").css("display", "none");
   }
 
   function onResize(event) {
@@ -203,6 +225,8 @@ CVARS:
       }
       if (styleQlvContainer)
         styleQlvContainer.setProperty("margin", margin); // directly modify CSS to avoid "jumps" when page reloads
+      else
+        $("div#qlv_container").css("margin", margin);
 
       // modify height of elements that support it
       var height = $window.height();
@@ -235,9 +259,6 @@ CVARS:
         height -= 7; // leave some gap from top edge
       }
 
-      if (extraQL.isOldUi)
-        return;
-
       // create more space for "Active Chat"
       var footerHeight = 400; // 210 by default
       if (height - footerHeight < 300)
@@ -247,8 +268,13 @@ CVARS:
       $("#im-footer").height(footerHeight).css({ "background": "#222", "padding": "0 5px" });
       if (styleImChat)
         styleImChat.setProperty("height", (footerHeight - 8) + "px");
+      else
+        $("#im-chat").css("height", (footerHeight - 8) + "px");
+
       if (styleImChatBody)
         styleImChatBody.setProperty("height", (footerHeight - 8 - 13 - 6 - 33 - 6) + "px");
+      else
+        $("#im-chat-body").css("height", (footerHeight - 8 - 13 - 6 - 33 - 6) + "px");
       $("#im-chat-send").css("display", "none");
 
       // resize elements which support a dynamic height
@@ -262,9 +288,15 @@ CVARS:
       // resize server browser details
       if (styleBrowserDetailsPlayers)
         styleBrowserDetailsPlayers.setProperty("max-height", ($window.height() - 372) + "px");
+    
 
       // modify z-index to deal with drop-down-menus
       $("#qlv_content").css("z-index", topOffset >= 110 ? "" : "1"); // #chatContainer has z-index 999
+      $("div#qlv_content").css("z-index", "auto");
+      $("#newnav_top").css("z-index", "2103");
+      $("ul.sf-menu *").css("z-index", "2102");
+      $("#lgi_cli").css("z-index", "10003");
+
     } catch (ex) {
       extraQL.log(ex);
     }
