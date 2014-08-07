@@ -3,6 +3,7 @@
 // @name         Start Page
 // @description  Opens QL with your preferred start page. Set any page as your start page with "Userscripts / Set Start Page"
 // @author       PredatH0r
+// @version      1.0
 // ==/UserScript==
 
 (function () {
