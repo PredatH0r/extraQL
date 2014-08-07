@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name        Quake Live Layout Resizer
-// @version     0.8
+// @version     0.9
 // @author      PredatH0r
 // @description	
 // @include     http://*.quakelive.com/*
@@ -17,6 +17,11 @@ but leaves some space on the top (configurable by web_chatOverlapIndent, default
 so you can access the navigation menus and "Customize" in the server browser.
 
 If the window is wider, the chat will be shown full-height outside the content area.
+
+Version 0.9
+- chat is now correctly resizing
+- server browser detail window is now correctly resizing
+- centered pages are pushed to the left if they would be hidden by the chat window
 
 Version 0.8
 - restored most of the original functions that got lost due to cross-domain CSS loading
@@ -46,7 +51,6 @@ CVARS:
 (function () {
   // external variables
   var quakelive = window.quakelive;
-  var document = window.document;
   var extraQL = window.extraQL;
 
   // constants
@@ -56,15 +60,9 @@ CVARS:
   // variables
   var oldOnResize;
   var oldOnCvarChanged;
-  var styleQlvContainer;
-  var styleTwocolLeft;
+  var oldSelectContact;
+  var oldRenderMatchDetails;
   var styleFullHeight;
-  var styleImChat;
-  var styleImChatBody;
-  var styleImChatInput;
-  var styleImChatSend;
-  var styleBrowserDetailsPlayers;
-  var compiledCss;
 
 
   function init() {
@@ -78,17 +76,20 @@ CVARS:
       "}");
     extraQL.addStyle(
       "#chatContainer.expanded #collapsableChat { background-color: rgb(114,24,8); }",
-      "#chatContainer .fullHeight { height: 550px; }",
-      "#browser_details ul.players.miniscroll { max-height: auto }"
+      "#chatContainer .fullHeight { height: 550px; }"
     );
     
-    findCssRules();
+    // z-index adjustments
+    $("#qlv_content").css("z-index", "auto"); // will be toggled between 1/auto to bring the chat in front/behind the drop down menus
+    $("#newnav_top").css("z-index", "2103");
+    $("ul.sf-menu *").css("z-index", "2102");
+    $("#lgi_cli").css("z-index", "10003");    // has 1003 and would be overlapped by menu bar items in #newnav_top
 
+    // chat
     $("#chatContainer").width(3 + 300 + 3).css("right", RIGHT_MARGIN + "px");
     $("#collapsableChat").addClass("bottomDockBar");
+    $("#qlv_chatControl").css("height", "auto");
     $("#qlv_chatControl").addClass("chatBox");
-    $("#im-overlay-body").css("background-color", "white");
-    modifyChatStyles();
 
     if (quakelive.cvars.Get(CVAR_chatOverlapIndent).value == "")
       quakelive.cvars.Set(CVAR_chatOverlapIndent, 140);
@@ -98,94 +99,19 @@ CVARS:
     oldOnCvarChanged = window.OnCvarChanged;
     window.OnCvarChanged = onCvarChanged;
     quakelive.mod_friends.FitToParent = updateChatAndContentLayout;
+
+    oldSelectContact = quakelive.mod_friends.roster.SelectContact.bind(quakelive.mod_friends.roster);
+    quakelive.mod_friends.roster.SelectContact = function(contact) {
+      oldSelectContact(contact);
+      updateChatAndContentLayout();
+    };
+
+    oldRenderMatchDetails = quakelive.matchcolumn.RenderMatchDetails;
+    quakelive.matchcolumn.RenderMatchDetails = function () {
+      oldRenderMatchDetails.apply(quakelive.matchcolumn, arguments);
+      resizeBrowserDetails();      
+    }
     updateChatAndContentLayout();
-  }
-
-  function findCssRules() {
-    var i, j;
-    for (i = 0; i < document.styleSheets.length; i++) {
-      var sheet = document.styleSheets[i];
-      if (sheet.href && sheet.href.indexOf("/compiled_v") > 0)
-        compiledCss = sheet;
-      if (!sheet.cssRules) continue;
-      for (j = 0; j < sheet.cssRules.length; j++) {
-        try {
-          var rule = sheet.rules[j];
-          if (rule.cssText.indexOf("div#qlv_container") == 0)
-            styleQlvContainer = rule.style;
-          else if (rule.cssText.indexOf("#qlv_chatControl") == 0)
-            rule.style.removeProperty("height");
-          else if (rule.cssText.indexOf("#im-overlay-body") == 0)
-            rule.style.setProperty("background-color", "#fff");
-          else if (rule.cssText.indexOf(".twocol_left") == 0)
-            styleTwocolLeft = rule.style;
-          else if (rule.cssText.indexOf("div#qlv_content") == 0)
-            rule.style.removeProperty("z-index"); // will be set/unset to bring the chat in front/behind the drop down menus
-          else if (rule.cssText.indexOf("#newnav_top") == 0)
-            rule.style.setProperty("z-index", 2103);
-          else if (rule.cssText.indexOf("ul.sf-menu *") == 0)
-            rule.style.setProperty("z-index", 2102);
-          else if (rule.cssText.indexOf("#lgi_cli ") == 0)
-            rule.style.setProperty("z-index", 10003); // has 1003 and would be overlapped by menu bar items in #newnav_top
-          else if (rule.cssText.indexOf("#chatContainer .fullHeight") == 0)
-            styleFullHeight = rule.style;
-          else if (rule.cssText.indexOf("#im {") == 0)
-            rule.style.removeProperty("height");
-          else if (rule.cssText.indexOf("#im-chat {") == 0)
-            styleImChat = rule.style;
-          else if (rule.cssText.indexOf("#im-chat-body {") == 0)
-            styleImChatBody = rule.style;
-          else if (rule.cssText.indexOf("#im-chat input {") == 0)
-            styleImChatInput = rule.style;
-          else if (rule.cssText.indexOf("#im-chat-send {") == 0)
-            styleImChatSend = rule.style;
-          else if (rule.cssText.indexOf("#browser_details ul.players.miniscroll {") == 0)
-            styleBrowserDetailsPlayers = rule.style;
-        }
-        catch (e) { }
-      }
-    }
-
-    if (!styleQlvContainer) {
-      $("#qlv_chatControl").css("height", "auto");
-      $("#im-overlay-body").css("background-color", "#fff");
-      $("#im").css("height", "auto");
-      $("div#qlv_content").css("z-index", "auto");
-      $("#newnav_top").css("z-index", "2103");
-      $("ul.sf-menu *").css("z-index", "2102");
-      $("#lgi_cli").css("z-index", "10003");
-    }
-  }
-
-  function modifyChatStyles() {
-    if (styleImChat) {
-      styleImChat.setProperty("background-clip", "content-box");
-    } else {
-      $("#im-chat").css("background-clip", "content-box");
-    }
-
-    if (styleImChatBody) {
-      styleImChatBody.setProperty("left", "0px");
-      styleImChatBody.setProperty("top", "13px");
-      styleImChatBody.setProperty("width", "284px");
-      styleImChatBody.setProperty("background-color", "white");
-    } else {
-      $("#im-chat-body").css({ left: 0, top: "13px", width: "284px", "background-color": "white" });
-    }
-
-    if (styleImChatInput) {
-      styleImChatInput.setProperty("width", "282px");
-      styleImChatInput.setProperty("left", "0px");
-      styleImChatInput.setProperty("top", "auto");
-      styleImChatInput.setProperty("bottom", "7px");
-    } else {
-      $("#im-chat-input").css({ width: "282px", left: 0, top: "auto", bottom: "7px" });
-    }
-
-    if (styleImChatSend)
-      styleImChatSend.setProperty("display", "none");
-    else
-      $("#im-chat-send").css("display", "none");
   }
 
   function onResize(event) {
@@ -223,10 +149,10 @@ CVARS:
         $("body").css("background-position", "center top");
         margin = "0 auto";
       }
-      if (styleQlvContainer)
-        styleQlvContainer.setProperty("margin", margin); // directly modify CSS to avoid "jumps" when page reloads
-      else
-        $("div#qlv_container").css("margin", margin);
+      $("#qlv_container").css("margin", margin);
+
+      // push profile page and others to the left so they are not hidden by the chat
+      $("#qlv_contentBody.twocol_left").css("left", Math.min(155, (155 - (minExpandedWidth - 150 - 7 - width))) + "px");
 
       // modify height of elements that support it
       var height = $window.height();
@@ -237,10 +163,10 @@ CVARS:
 
       // modify height of chat
       if (quakelive.IsGameRunning()) {
-        $("#collapsableChat").css("display", "none");
+        $("#collapsableChat").css("display", "none"); // hide in-game chat bar
         height = Math.floor(height) * 0.9 - 35; // 10% clock, 35px buttons
       } else
-        $("#collapsableChat").css("display", ""); // hide in-game chat bar
+        $("#collapsableChat").css("display", ""); 
 
       height -= 3 + 27 + 14; // height of top border + title bar + bottom bar
 
@@ -251,11 +177,8 @@ CVARS:
         } catch (e) {
         }
         height -= topOffset;
-        if (styleTwocolLeft)
-          styleTwocolLeft.setProperty("left", "15px");
+
       } else {
-        if (styleTwocolLeft)
-          styleTwocolLeft.setProperty("left", "155px");
         height -= 7; // leave some gap from top edge
       }
 
@@ -263,19 +186,14 @@ CVARS:
       var footerHeight = 400; // 210 by default
       if (height - footerHeight < 300)
         footerHeight = height - 300;
-      $("#im-overlay-body").height(height - 87);
+      $("#im").css("height", "auto");
       $("#im-body").height(height - footerHeight);
-      $("#im-footer").height(footerHeight).css({ "background": "#222", "padding": "0 5px" });
-      if (styleImChat)
-        styleImChat.setProperty("height", (footerHeight - 8) + "px");
-      else
-        $("#im-chat").css("height", (footerHeight - 8) + "px");
-
-      if (styleImChatBody)
-        styleImChatBody.setProperty("height", (footerHeight - 8 - 13 - 6 - 33 - 6) + "px");
-      else
-        $("#im-chat-body").css("height", (footerHeight - 8 - 13 - 6 - 33 - 6) + "px");
+      $("#im-footer").css({ "background": "#222", "padding": "0 5px", height: footerHeight + "px" });
+      $("#im-chat").css({ "background-clip": "content-box", "height": (footerHeight - 8) + "px" });
+      $("#im-chat-body").css({ left: 0, top: "13px", width: "284px", "background-color": "white", height: (footerHeight - 8 - 13 - 6 - 33 - 6) + "px" });
+      $("#im-chat input").css({ width: "282px", left: 0, top: "auto", bottom: "7px" });
       $("#im-chat-send").css("display", "none");
+      $("#im-overlay-body").css({ "background-color": "white", height: (height - 87) + "px" });
 
       // resize elements which support a dynamic height
       if (styleFullHeight)
@@ -284,22 +202,23 @@ CVARS:
         var $this = $(this);
         $this.height(height - parseInt($this.data("fill")));
       });
-
-      // resize server browser details
-      if (styleBrowserDetailsPlayers)
-        styleBrowserDetailsPlayers.setProperty("max-height", ($window.height() - 372) + "px");
     
 
       // modify z-index to deal with drop-down-menus
-      $("#qlv_content").css("z-index", topOffset >= 110 ? "" : "1"); // #chatContainer has z-index 999
-      $("div#qlv_content").css("z-index", "auto");
+      $("#qlv_content").css("z-index", topOffset >= 110 ? "auto" : "1"); // #chatContainer has z-index 999
       $("#newnav_top").css("z-index", "2103");
       $("ul.sf-menu *").css("z-index", "2102");
       $("#lgi_cli").css("z-index", "10003");
 
+      resizeBrowserDetails();
+
     } catch (ex) {
       extraQL.log(ex);
     }
+  }
+
+  function resizeBrowserDetails() {
+    $("#browser_details ul.players.miniscroll").css("max-height", ($(window).height() - 496) + "px");
   }
 
   if (extraQL)
