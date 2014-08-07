@@ -1,12 +1,15 @@
 ﻿/*
 // @name        extraQL Script Manager
-// @version     0.103
+// @version     0.104
 // @author      PredatH0r
 // @credits     wn
 // @description	Manages the installation and execution of QuakeLive userscripts
 
 This script is a stripped down version of wn's QuakeLive Hook Manager (QLHM),
 which is designed to work with a local extraQL.exe script server.
+
+Version 0.104
+- fixed: on 2nd run all scripts were deactivated again
 
 Version 0.103
 - fixed async loading and execution of scripts without @unwrap
@@ -36,11 +39,12 @@ var nav = window.nav;
 // it is probably only in the config object below.
 // !!!
   var config = {
-    consoleCaption: "extraQL v0.103",
+    consoleCaption: "extraQL v0.104",
     menuCaption: "Userscripts",
     BASE_URL: "http://127.0.0.1:27963/",
     REMOTE_URL: "http://ql.beham.biz:27963/",
     reset: false,
+    autoEnableAllScripts: true,
     async: true
 };
 
@@ -71,23 +75,25 @@ var nav = window.nav;
 * localStorage Manager
 */
 
-  var storage = { reset: config.reset };
+  var storage = { };
   storage.init = function() {
     var STORAGE_TEMPLATE = { scripts: { enabled: { /* [id] */  } } };
 
-    if (!storage.reset && localStorage && localStorage.extraQL) {
-      try {
-        var tmp = JSON.parse(localStorage.extraQL);
-        storage.scripts = tmp.scripts;
-      } catch (ex) {
+    if (localStorage && localStorage.extraQL) {
+      config.autoEnableAllScripts = false;
+      if (!config.reset) {
+        try {
+          var tmp = JSON.parse(localStorage.extraQL);
+          storage.scripts = tmp.scripts;
+        } catch (ex) {
+        }
       }
     }
 
-    if (!$.isPlainObject(storage.scripts)) {
+    if (!$.isPlainObject(storage.scripts))
       storage.scripts = STORAGE_TEMPLATE.scripts;
-      storage.reset = true;
-      storage.save();
-    }
+
+    storage.save();
   };
 
   storage.save = function() {
@@ -131,11 +137,12 @@ var nav = window.nav;
     $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 1000 })
       .done(function(scriptList) {
         self.repo = scriptList;
-        if (storage.reset) {
-          // activate all scripts after first init or reset
+        if (config.autoEnableAllScripts) {
+          // activate all scripts after first run
           $.each(scriptList, function(index, script) {
             storage.scripts.enabled[script.id] = true;
           });
+          storage.save();
         }
         self.loadScripts();
       });
