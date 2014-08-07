@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display
-// @version        1.91
+// @version        1.92
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (bind o "qlrdChangeOutput", bind r "qlrdAnnounce")
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -12,6 +12,12 @@
 // @contributor    PredatH0r
 // ==/UserScript==
 
+/*
+
+Version 1.92
+- fixed exception when page is filted for ANY game type
+
+*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // RUN OR NOT
@@ -283,8 +289,9 @@ var QLRD = {
 
       // Fill in the Elo+rank values for the current gametype.
       for (var i = 0, e = players.length; i < e; ++i) {
-        players[i]["elo"] = QLRD.PLAYERS[players[i].name][QLRD.GAMETYPES[gt]].elo;
-        players[i]["rank"] = QLRD.PLAYERS[players[i].name][QLRD.GAMETYPES[gt]].rank;
+        var info = QLRD.PLAYERS[players[i].name][QLRD.GAMETYPES[gt]] || { elo: "", rank: ""};
+        players[i]["elo"] = info.elo;
+        players[i]["rank"] = info.rank;
       }
 
       cb.call(null, false, players, gt);
