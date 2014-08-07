@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @id             186527
 // @name           Quake Live Left-Hand-Side Playerlist Popup
-// @version        1.5
+// @version        1.6
 // @description    Displays a QuakeLive server's player list on the left side of the cursor
 // @author         PredatH0r
 // @include        http://*.quakelive.com/*
@@ -10,6 +10,10 @@
 // ==/UserScript==
 
 /*
+
+Version 1.6
+- fixed interference with server browser details no longer scrolling
+- code cleanup
 
 Version 1.5
 - compatibility with "join URL" and fixed location "chat"
@@ -31,24 +35,20 @@ Version 1.2:
   var quakelive = win.quakelive;
   var oldShowTooltip;
   var oldDisplayMatchPlayers;
-  var hasReposition = typeof quakelive.matchtip.RepositionTip == "function";
 
   function init() {
     oldShowTooltip = quakelive.matchtip.ShowTooltip;
     oldDisplayMatchPlayers = quakelive.matchtip.DisplayMatchPlayers;
 
-    $(window).off("scroll", quakelive.matchtip.RepositionTip);
+    quakelive.matchtip.ShowTooltip = function (tip, node, content, footer, showArrow) {
+      this.reposnode = node;
+      this.repostip = tip;
+      this.reposshowArrow = showArrow;
 
-    quakelive.matchtip.ShowTooltip = function(tip, node, content, footer, showArrow) {
-      this.reposnode = node; // NG0 code doesn't set this yet, while FOCUS does. Can be removed later.
-      this.repostip = tip; // NG0 code doesn't set this yet, while FOCUS does. Can be removed later.
-      this.reposshowArrow = showArrow; // NG0 code doesn't set this yet, while FOCUS does. Can be removed later.
       this.reposForChat = node.parents(".rosteritem").length > 0;
 
-      var ret = oldShowTooltip.call(this, tip, node, content, footer, showArrow); // FOCUS code calls this.RepositionTip()
-      $(window).off("scroll", this.RepositionTip); // disable the FOCUS scroll code
-      if (!hasReposition)
-        this.RepositionTip(); // NG0 code doesn't call this yet
+      var ret = oldShowTooltip.call(this, tip, node, content, footer, showArrow);
+      this.RepositionTip();
       return ret;
     }
 
@@ -69,7 +69,7 @@ Version 1.2:
           left = node.offset().left;
           top = nodeCenter - tip.outerHeight() / 2 - deltaY;
           if (top < 0) top = 0;
-          tip.css({ "position": extraQL.isOldUi ? "absolute" : "fixed", "left": (left - 21 - tip.outerWidth()) + "px", "top": top + "px" });
+          tip.css({ "position": "fixed", "left": (left - 21 - tip.outerWidth()) + "px", "top": top + "px" });
 
           // position the arrow
           $("#lgi_arrow_left").remove();
@@ -79,13 +79,8 @@ Version 1.2:
               $arrow = $("<div id='lgi_arrow_right'></div>");
               $("#lgi_srv_fill").append($arrow);
             }
-            if (extraQL.isOldUi) {
-              top = nodeCenter - ARROW_HEIGHT / 2 - deltaY - top;
-              $arrow.css({ "position": "absolute", "left": (tip.outerWidth() - 4) + "px", "top": top + "px" });
-            } else {
-              top = nodeCenter - ARROW_HEIGHT / 2 - deltaY;
-              $arrow.css({ "position": "fixed", "left": (left - 25) + "px", "top": top + "px" });
-            }
+            top = nodeCenter - ARROW_HEIGHT / 2 - deltaY;
+            $arrow.css({ "position": "fixed", "left": (left - 25) + "px", "top": top + "px" });
           }
         }
         else {
@@ -125,7 +120,7 @@ Version 1.2:
         var top = parseInt($tip.css("top")) + 3;
         var $cli = $("#lgi_cli");
         if (this.reposForChat)
-          $cli.css({ "position": extraQL.isOldUi ? "absolute" : "fixed", "left": ($tip.offset().left - $cli.outerWidth() + 4) + "px", "top": top + "px", "z-index": 22000 });
+          $cli.css({ "position": "fixed", "left": ($tip.offset().left - $cli.outerWidth() + 4) + "px", "top": top + "px", "z-index": 22000 });
         else {
           var left = $tip.offset().left + $tip.outerWidth();
           $cli.css({ "position": "absolute", "left": left + "px", "right": "auto", "top": top + "px", "z-index": 22000 });
@@ -136,7 +131,5 @@ Version 1.2:
     };
   }
 
-  // New Alt Browser script (http://userscripts.org/scripts/review/73076) overwrites quakelive.DisplayMatchPlayer
-  // without calling the base implementation. So we delay the init a bit and hope other scripts are done by then.
-  win.setTimeout(init, 7000);
+  init();
 })(window);
