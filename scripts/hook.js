@@ -1,12 +1,17 @@
 ﻿/*
 // @name        extraQL Script Manager
-// @version     0.105
+// @version     0.106
 // @author      PredatH0r
 // @credits     wn
 // @description	Manages the installation and execution of QuakeLive userscripts
 
 This script is a stripped down version of wn's QuakeLive Hook Manager (QLHM),
 which is designed to work with a local or remote extraQL.exe script server.
+
+Version 0.106
+- added local script cache (HTML5 local storage)
+- added hook.js version check against sourceforge
+- merged extraQL.js into hook.js
 
 Version 0.105
 - sorts menu items under "Userscripts" alphabetically
@@ -24,8 +29,11 @@ Version 0.102
 
 // called in ql.Init
 function main_hook() {
-  if (quakelive.mod_legals !== quakelive.activeModule)
-    HOOK_MANAGER.init();
+  if (quakelive.mod_legals === quakelive.activeModule)
+    return;
+
+  ExtraQL();
+  HOOK_MANAGER.init();
 }
 
 // referenced globals
@@ -34,34 +42,37 @@ var qz_instance = window.qz_instance;
 var quakelive = window.quakelive;
 var qlPrompt = window.qlPrompt;
 var nav = window.nav;
+var console = window.console;
 
-
-(function(aWin, undefined) {
-// !!!
-// IMPORTANT:  It is unlikely that you'll need to change anything in this file.  If you actually do,
-// it is probably only in the config object below.
-// !!!
+(function (aWin, undefined) {
+  // !!!
+  // IMPORTANT:  It is unlikely that you'll need to change anything in this file.  If you actually do,
+  // it is probably only in the config object below.
+  // !!!
   var config = {
-    consoleCaption: "extraQL v0.105",
+    version: "0.106",
+    consoleCaption: "extraQL v",
     menuCaption: "Userscripts",
     BASE_URL: "http://127.0.0.1:27963/",
     REMOTE_URL: "http://ql.beham.biz:27963/",
+    SOURCE_URL: "http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/hook.js?format=raw",
     reset: false,
     autoEnableAllScripts: true,
-    async: true
-};
+    async: true,
+    enableUnwrap: false // can be overruled by cvar eql_unwrap
+  };
 
 
-// This is used to indicate if /web_reload is required (e.g. scripts were enabled or disabled)
+  // This is used to indicate if /web_reload is required (e.g. scripts were enabled or disabled)
   var webReloadRequired = false;
 
-// Holds the caption->handler pairs for script menu items added through HOOK_MANAGER.addMenuItem(...) 
+  // Holds the caption->handler pairs for script menu items added through HOOK_MANAGER.addMenuItem(...) 
   var scriptMenuItems = {};
 
 
-/*
-* Helpers
-*/
+  /*
+  * Helpers
+  */
 
   function log() {
     var args = Array.prototype.slice.call(arguments);
@@ -74,102 +85,152 @@ var nav = window.nav;
   }
 
 
-/*
-* localStorage Manager
-*/
+  /*
+  * localStorage Manager
+  */
 
-  var storage = { };
-  storage.init = function() {
-    var STORAGE_TEMPLATE = { scripts: { enabled: { /* [id] */  } } };
+  var storage = {};
+  storage.init = function () {
+    var STORAGE_TEMPLATE = { repository: undefined, scripts: { enabled: { /* [id] */ }, code: { /* id */ } } };
+    storage.repository = STORAGE_TEMPLATE.repository;
+    storage.scripts = STORAGE_TEMPLATE.scripts;
 
     if (localStorage && localStorage.extraQL) {
       config.autoEnableAllScripts = false;
       if (!config.reset) {
         try {
+          // copy values from storage into new template to allow migration between versions
           var tmp = JSON.parse(localStorage.extraQL);
-          storage.scripts = tmp.scripts;
+          if (tmp.repository)
+            storage.repository = tmp.repository;
+          if (tmp.scripts && tmp.scripts.enabled)
+            storage.scripts.enabled = tmp.scripts.enabled;
+          if (tmp.scripts && tmp.scripts.code)
+            storage.scripts.code = tmp.scripts.code;
         } catch (ex) {
         }
       }
     }
 
-    if (!$.isPlainObject(storage.scripts))
-      storage.scripts = STORAGE_TEMPLATE.scripts;
-
     storage.save();
   };
 
-  storage.save = function() {
+  storage.save = function () {
     localStorage.extraQL = JSON.stringify(storage);
   };
 
 
-/*
-* Hook Manager
-*/
+  /*
+  * Hook Manager
+  */
   function HookManager() {
-    this.repo = [];
   }
 
-  HookManager.prototype.init = function() {
-    log("^2Initializing " + config.consoleCaption);
+  HookManager.prototype.init = function () {
+    log("^2Initializing " + config.consoleCaption + config.version);
     storage.init();
     this.hud = new HudManager(this);
-    this.initExtraQL();
+    this.loadRepository();
   };
 
-  HookManager.prototype.initExtraQL = function () {
-    // first try with a local extraQL HTTP server
-    $.ajax({ url: config.BASE_URL + "scripts/extraQL.js", dataType: "script", timeout: 1000 })
-      .done(this.initScripts.bind(this))
+  HookManager.prototype.loadRepository = function () {
+    // try a local extraQL HTTP server
+    var self = this;
+    $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 1000 })
+      .done(function(repo) { self.initRepository(repo); })
       .fail(this.tryRemoteRepository.bind(this));
   };
 
   HookManager.prototype.tryRemoteRepository = function () {
     // try remote extraQL HTTP server
+    var self = this;
     config.BASE_URL = config.REMOTE_URL;
-    $.ajax({ url: config.BASE_URL + "scripts/extraQL.js", dataType: "script", timeout: 1000 })
-      .done(this.initScripts.bind(this))
-      .fail(function () { log("^1Failed^7 to connect to extraQL script server. Scripts are disabled."); });
+    extraQL.BASE_URL = config.REMOTE_URL;
+    $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 1000 })
+      .done(function(repo) { self.initRepository(repo); })
+      .fail(this.tryLocalScriptCache.bind(this));
   }
 
-  HookManager.prototype.initScripts = function() {
-    var self = this;
+  HookManager.prototype.tryLocalScriptCache = function () {
+    // try local script cache
+    if (!storage.repository) {
+      log("^1Failed to load scripts from extraQL server or local cache.^7 1Scripts are unavailable!");
+      return;     
+    }
+    config.BASE_URL = null;
+    extraQL.BASE_URL = null;
+    log("^1Could not connected to an extraQL server^7, some cached scripts will not work.");
+    this.loadScripts();
+  }
+
+  HookManager.prototype.initRepository = function (repo) {
     log("Loading userscripts from ^2" + config.BASE_URL + "^7");
-    window.extraQL.BASE_URL = config.BASE_URL;
-    $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 1000 })
-      .done(function(scriptList) {
-        self.repo = scriptList;
-        if (config.autoEnableAllScripts) {
-          // activate all scripts after first run
-          $.each(scriptList, function(index, script) {
-            storage.scripts.enabled[script.id] = true;
-          });
-          storage.save();
-        }
-        self.loadScripts();
+
+    this.checkForUpdatedHookJs();
+
+    storage.repository = repo;
+    if (config.autoEnableAllScripts) {
+      // activate all scripts after first run
+      $.each(repo, function (index, script) {
+        storage.scripts.enabled[script.id] = true;
       });
+    }
+    storage.save();
+    this.loadScripts();
   };
 
-  HookManager.prototype.loadScripts = function() {
+  HookManager.prototype.checkForUpdatedHookJs = function () {
+    $.ajax({ url: config.BASE_URL + "proxy?url=" + encodeURI(config.SOURCE_URL), dataType: "html", timeout: 10000 })
+      .done(function (code) {
+        var match = /@version\s*(\S+)/.exec(code);
+        if (match.length < 2) return;
+        var localVersion = config.version.split(".");
+        var remoteVersion = match[1].split(".");
+        var needUpdate = false;
+        for (var i = 0; i < Math.min(localVersion.length, remoteVersion.length) ; i++) {
+          if (localVersion[i] > remoteVersion[i])
+            break;
+          needUpdate |= localVersion[i] < remoteVersion[i];
+        }
+        if (needUpdate) {
+          qlPrompt({
+            id: "qlhmUpdate",
+            title: "hook.js v" + config.version,
+            customWidth: 500,
+            okLabel: "Close",
+            cancelLabel: "Reload",
+            cancel: function () { qz_instance.SendGameCommand("web_reload"); },
+            body: "<b>A newer version of hook.js is available.</b>" +
+              "<br>" +
+              "<br>To install the update, either restart extraQL.exe" +
+              "<br>or <a href='" + config.SOURCE_URL + "' target='_blank'>download hook.js " + match[1] + "</a> manually." +
+              "<br>After the update you need to reload the UI."
+          });
+        }
+      })
+    .fail(function (x, y, err) { console.log("update check failed: " + err); });
+  }
+
+  HookManager.prototype.loadScripts = function () {
     var self = this;
 
     // get sorted list of enabled script IDs (to make execution order a bit less random)
     var scriptIds = [];
-    $.each(storage.scripts.enabled, function(id, enabled) {
+    $.each(storage.scripts.enabled, function (id, enabled) {
       if (enabled)
         scriptIds.push(id);
     });
     scriptIds.sort();
 
     // Fire off requests for each script
-    $.each(scriptIds, function(index, id) {
+    $.each(scriptIds, function (index, id) {
       self.loadScript(id);
     });
   };
 
-  HookManager.prototype.loadScript = function (id) {
-    var repoScript = $.grep(this.repo, function(item) { return item.id == id; })[0];
+  HookManager.prototype.loadScript = function(id) {
+    var self = this;
+    var repoScript = $.grep(storage.repository, function(item) { return item.id == id; })[0];
 
     if (!repoScript) {
       log("Deactivating userscript with unknown ID ^1" + id + "^7");
@@ -179,29 +240,37 @@ var nav = window.nav;
     }
 
     log("^7Starting userscript ^5" + id + "^7: ^3" + repoScript.name + "^7");
-    var url = config.BASE_URL + "scripts/" + repoScript.filename;
 
-    if (repoScript.hasOwnProperty("unwrap")) {
-      // scripts marked with @unwrap can be executed directly to preserve file name info for error messages. They must not contain global "return" statements.
-      $.ajax({ url: url, dataType: "script", timeout: config.async ? 5000 : 1000, async: config.async })
-        .fail(function(d1, d2, d3, err) {
-          log("^1Failed to retrieve script with ID ^5" + id + "^1 : ^7" + err);
-      });
-    }
-    else {
-      // scripts not marked with @unwrap are put into a closure
-      $.ajax({ url: url, dataType: "html", timeout: config.async ? 5000 : 1000, async: config.async })
-        .done(function(code) {
-          var closure = ";(function() { try { " + code + "} catch(ex) { console.log(\"^1" + id + "^7: \" + ex); }})();";
-          $.globalEval(closure);
-        })
-        .fail(function (d1, d2, d3, err) {
-          log("^1Failed to retrieve script with ID ^5" + id + "^1 : ^7" + err);
+    if (config.BASE_URL) {
+      var url = config.BASE_URL + "scripts/" + repoScript.filename;
+      $.ajax({ url: url, dataType: "text", timeout: config.async ? 5000 : 1000, async: config.async })
+        .done(function(remotecode) {
+          storage.scripts.code[id] = remotecode;
+          storage.save();
+          if (repoScript.hasOwnProperty("unwrap") && config.enableUnwrap) {
+            // scripts marked with @unwrap can be injected without a closure. This preserves file name info for error messages. Such scripts must not contain global "return" statements.
+            $.ajax({ url: url, dataType: "script", timeout: config.async ? 5000 : 1000, async: config.async })
+              .fail(function(a, b, err) { self.runScriptFromCache(id, err); });            
+          }
+          else
+            self.runScriptFromCache(id, false);
         });
+    } else {
+      this.runScriptFromCache(id, false);
+    }
+  }
+
+  HookManager.prototype.runScriptFromCache = function (id, err) {
+    var code = storage.scripts.code[id];
+    if (err !== false || !code)
+      log("^1Failed to retrieve script with ID ^5" + id + "^1 : ^7" + err);
+    else {
+      var closure = ";(function() { try { " + code + "} catch(ex) { console.log(\"^1" + id + "^7: \" + ex); }})();";
+      $.globalEval(closure);
     }
   };
 
-  HookManager.prototype.toggleUserScript = function(id, enable) {
+  HookManager.prototype.toggleUserScript = function (id, enable) {
     // return true if web_reload is required to make the change take effect
 
     if (enable && !storage.scripts.enabled[id]) {
@@ -218,14 +287,14 @@ var nav = window.nav;
     return false;
   };
 
-  HookManager.prototype.addMenuItem = function(aCaption, aHandler) {
+  HookManager.prototype.addMenuItem = function (aCaption, aHandler) {
     this.hud.addMenuItem(aCaption, aHandler);
   };
 
 
-/**
-* HUD Manager
-*/
+  /**
+  * HUD Manager
+  */
   function HudManager(aHookManager) {
     this.hm = aHookManager;
     this.width = 900;
@@ -237,17 +306,17 @@ var nav = window.nav;
     // window.alert is currently unhandled... remove this if a better option is enabled.
     if ("function alert() { [native code] }" === (aWin.alert + "")) {
       var self = this;
-      aWin.alert = function(aMsg) { self.alert.call(self, { title: "ALERT!", body: aMsg }); };
+      aWin.alert = function (aMsg) { self.alert.call(self, { title: "ALERT!", body: aMsg }); };
     }
   }
 
-  HudManager.prototype.alert = function(aOptions) {
+  HudManager.prototype.alert = function (aOptions) {
     var self = this;
     var opts = $.extend({ title: self.hm.name }, aOptions, { alert: true });
     qlPrompt(opts);
   };
 
-  HudManager.prototype.OnLayoutLoaded = function() {
+  HudManager.prototype.OnLayoutLoaded = function () {
     var layout = quakelive.activeModule ? quakelive.activeModule.GetLayout() : "";
     // Proper layout and no existing menu?
     if ("bare" !== layout && "postlogin_bare" !== layout && !$("#qlhm_nav, #hooka").length) {
@@ -255,21 +324,21 @@ var nav = window.nav;
     }
   };
 
-  HudManager.prototype.addMenuItem = function(aCaption, aHandler) {
+  HudManager.prototype.addMenuItem = function (aCaption, aHandler) {
     scriptMenuItems[aCaption] = aHandler;
     if (this.rebuildNavBarTimer)
       window.clearTimeout(this.rebuildNavBarTimer);
-    this.rebuildNavBarTimer = window.setTimeout(function() { this.rebuildNav(); }.bind(this), 200);
+    this.rebuildNavBarTimer = window.setTimeout(function () { this.rebuildNav(); }.bind(this), 200);
   };
 
-  HudManager.prototype.onMenuItemClicked = function(aItem) {
+  HudManager.prototype.onMenuItemClicked = function (aItem) {
     var caption = $(aItem).text();
     var handler = scriptMenuItems[caption];
     if (handler)
       handler();
   };
 
-  HudManager.prototype.rebuildNav = function() {
+  HudManager.prototype.rebuildNav = function () {
     // method could have been called by the timer before the menu was created
     this.rebuildNavBarTimer = undefined;
     if (!nav.navbar[config.menuCaption])
@@ -290,7 +359,7 @@ var nav = window.nav;
     });
   };
 
-  HudManager.prototype.injectMenuEntry = function() {
+  HudManager.prototype.injectMenuEntry = function () {
     var self = this;
     if (!window.extraQL)
       return;
@@ -309,38 +378,38 @@ var nav = window.nav;
         }
       }; // Override nav.initNav to do post-init stuff for QLHM
       var oldInitNav = nav.initNav;
-      nav.initNav = function() {
+      nav.initNav = function () {
         oldInitNav.apply(nav, arguments);
 
         // QLHM-specific stuff
-        $("#qlhm_nav_scriptMgmt > a").click(function() {
+        $("#qlhm_nav_scriptMgmt > a").click(function () {
           self.showConsole.call(self);
           return false;
         });
-        $(".qlhm_nav_scriptMenuItem").click(function() { self.onMenuItemClicked(this); });
+        $(".qlhm_nav_scriptMenuItem").click(function () { self.onMenuItemClicked(this); });
       };
       self.rebuildNav();
     }
-    // ... or old? (TODO: remove eventually)
+      // ... or old? (TODO: remove eventually)
     else {
       extraQL.addStyle(
         "#hooka { position: relative; bottom: 20px; left: 10px; z-index: 99999; font-weight: bold; padding: 2px; text-shadow: 0 0 10px #000; }", "#hooka:hover { cursor: pointer; text-shadow: 0 0 10px yellow; }"
       );
-      $("#qlv_mainLogo").append($("<a id='hooka'>HOOK</a>").click(function() {
+      $("#qlv_mainLogo").append($("<a id='hooka'>HOOK</a>").click(function () {
         self.loadRepository.call(self);
         return false;
       }));
     }
   };
 
-  HudManager.prototype.showConsole = function() {
+  HudManager.prototype.showConsole = function () {
     var self = this;
 
     webReloadRequired = false;
 
     // sort all scripts
-    var scripts = this.hm.repo.slice(0);
-    scripts.sort(function(a, b) {
+    var scripts = storage.repository.slice(0);
+    scripts.sort(function (a, b) {
       var x = a.name;
       var y = b.name;
       x = x.toLowerCase(), y = y.toLowerCase();
@@ -369,7 +438,7 @@ var nav = window.nav;
     out.push(" - <a class='unselectall' href='javascript:void(0)'>unselect all</a>");
     out.push(")");
     out.push("<ul id='userscripts'>");
-    $.each(scripts, function(i, script) {
+    $.each(scripts, function (i, script) {
       out.push(self.scriptRowFromScriptRepository(script));
     });
     out.push("</ul>");
@@ -381,7 +450,7 @@ var nav = window.nav;
     // Inject the console
     qlPrompt({
       id: "qlhmPrompt",
-      title: config.consoleCaption,
+      title: config.consoleCaption + config.version,
       customWidth: self.width,
       ok: self.handleConsoleOk.bind(self),
       okLabel: "Apply",
@@ -391,19 +460,19 @@ var nav = window.nav;
     });
 
     // Wait for the prompt to get inserted then do stuff...
-    setTimeout(function() {
+    setTimeout(function () {
       $("#modal-cancel").focus();
 
       var $ui = $("#qlhm_console");
-      $ui.on("keydown", function(ev) {
-          // Suppress backtick (99.999% intended for the QL console)
-          if (192 == ev.keyCode) ev.preventDefault();
-        })
-        .on("click", "#userscripts li", function() { self.showDetails(this); })
-        .on("click", ".selectall", function() { $ui.find(":checkbox").prop("checked", true); })
-        .on("click", ".unselectall", function() { $ui.find(":checkbox").prop("checked", false); })
-        .on("click", ".deleteunsel", function() {
-          $ui.find(":checkbox").each(function(index, item) {
+      $ui.on("keydown", function (ev) {
+        // Suppress backtick (99.999% intended for the QL console)
+        if (192 == ev.keyCode) ev.preventDefault();
+      })
+        .on("click", "#userscripts li", function () { self.showDetails(this); })
+        .on("click", ".selectall", function () { $ui.find(":checkbox").prop("checked", true); })
+        .on("click", ".unselectall", function () { $ui.find(":checkbox").prop("checked", false); })
+        .on("click", ".deleteunsel", function () {
+          $ui.find(":checkbox").each(function (index, item) {
             var $item = $(item);
             if (!$item.prop("checked") && !$item.parent().find("a").hasClass("notInstalled")) {
               $item.closest("li").data("toDelete", true).find("label").addClass("strike");
@@ -414,7 +483,7 @@ var nav = window.nav;
     }, 0);
   };
 
-  HudManager.prototype.scriptRowFromScriptRepository = function(script) {
+  HudManager.prototype.scriptRowFromScriptRepository = function (script) {
     var id = script.id;
     return "<li id='userscript" + id + "' data-id='" + id + "'>"
       + "<input type='checkbox' class='userscript-state'" + (storage.scripts.enabled[id] ? "checked" : "") + ">"
@@ -422,7 +491,7 @@ var nav = window.nav;
       + "</li>";
   };
 
-  HudManager.prototype.showDetails = function(elem) {
+  HudManager.prototype.showDetails = function (elem) {
     var self = this, $details = $("#scriptDetails");
 
     $("#userscripts li").removeClass("selected");
@@ -440,7 +509,7 @@ var nav = window.nav;
 
     var $elem = $(elem);
     var id = $elem.closest("li").data("id");
-    var repoScript = $.grep(this.hm.repo, function(item) { return item.id == id; })[0];
+    var repoScript = $.grep(storage.repository, function (item) { return item.id == id; })[0];
 
     self.selectedScriptElement = elem;
     $elem.addClass("selected");
@@ -464,13 +533,13 @@ var nav = window.nav;
     );
   };
 
-  HudManager.prototype.handleConsoleOk = function() {
+  HudManager.prototype.handleConsoleOk = function () {
     var self = this;
     var $con = $("#qlhm_console");
     var $uNew = $con.find("input.userscript-new");
 
     // enable/disable scripts
-    $con.find("input.userscript-state").each(function() {
+    $con.find("input.userscript-state").each(function () {
       var $input = $(this);
       var $item = $input.closest("li");
       var id = $item.data("id");
@@ -488,7 +557,7 @@ var nav = window.nav;
     self.showDetails();
   };
 
-  HudManager.prototype.handleConsoleClose = function() {
+  HudManager.prototype.handleConsoleClose = function () {
     if (webReloadRequired)
       qz_instance.SendGameCommand("web_reload");
     else
@@ -496,7 +565,7 @@ var nav = window.nav;
   };
 
 
-// Make init and addMenuItem available
+  // Make init and addMenuItem available
   var hm = new HookManager();
   aWin.HOOK_MANAGER = {
     init: hm.init.bind(hm),
@@ -504,3 +573,224 @@ var nav = window.nav;
   };
 
 })(window);
+
+
+
+/*
+// @name        extraQL
+// @description Quake Live userscript utilities
+// @author      PredatH0r
+// @version     0.102
+
+This script provides common functions to various Quake Live user scripts.
+
+In bundle with extraQL.exe and the modified version of QLHM/hook.js, this
+script also acts as the boot strapper to load the locally installed scripts.
+
+Version 0.102
+- added support for distributed client/server setup
+
+*/
+function ExtraQL() {
+  var BASE_URL = "http://127.0.0.1:27963/";
+  var tabClickHandlers = {};
+  var chatBarTabified = false;
+  var lastServerCheckTimestamp = 0;
+  var lastServerCheckResult = false;
+
+  function init() {
+    addStyle("#chatContainer .fullHeight { height:550px; }");
+  }
+
+  // public: test if the local extraQL HTTP server is running
+  function isLocalServerRunning() {
+    if (!this.BASE_URL)
+      return false;
+    if (new Date().getTime() - lastServerCheckTimestamp < 5000)
+      return lastServerCheckResult;
+    $.ajax({
+      url: "http://127.0.0.1:27963/version",
+      async: false,
+      dataType: "json",
+      success: function (version) {
+        lastServerCheckResult = true;
+        extraQL.serverVersion = version;
+      },
+      error: function () { lastServerCheckResult = false; }
+    });
+    lastServerCheckTimestamp = new Date().getTime();
+    return lastServerCheckResult;
+  }
+
+  // public: add CSS rules
+  // params: string...
+  function addStyle(/*...*/) {
+    var css = "";
+    for (var i = 0; i < arguments.length; i++)
+      css += "\n" + arguments[i];
+    $("head").append("<style>" + css + "\n</style>");
+  }
+
+  // public: add a tab page to the chat bar/area
+  function addTabPage(id, caption, content, onClick) {
+    tabifyChat();
+
+    if (!onClick)
+      onClick = function () { showTabPage(id); };
+    //$("#chatContainer").append(content);
+    if (content)
+      $($("#chatContainer").prepend(content).children()[0]).prepend("<div class='chatTitleBar'>" + caption + "<div class='close'>X</div></div>");
+    $("#collapsableChat").append("<div class='tab' id='tab_" + id + "'>" + caption + "</div>");
+    tabClickHandlers[id] = onClick;
+
+    restoreTabPageClickHandlers();
+  }
+
+  // private: helper function
+  function tabifyChat() {
+    if (chatBarTabified)
+      return;
+
+    addStyle(
+      "#chatContainer.expanded > .active { display: block; }",
+      "#chatContainer .chatTitleBar { background-color: #444; color: white; width: 280px; height: 14px; font-size: 11px; padding: 0 10px; cursor: pointer; }",
+      "#chatContainer .chatTitleBar .close { display: inline-block; font-size: 11px; float: right; }",
+      "#collapsableChat { height: 28px; padding: 0px 6px !important; background-color: #721808; cursor: pointer; }", // + 2*6px border-top/-bottom
+      "#collapsableChat div { display: inline-block; padding: 6px 10px; }",
+      "#collapsableChat .tab:hover { background-color: #A0220B; }",
+      "#collapsableChat .tab.active { background-color: #A0220B; padding: 6px 9px; border: 1px solid white; border-bottom: none; }",
+      "#collapsableChat.bottomDockBar .tab.active { border-top: none; border-bottom: 1px solid white; }",
+      "#collapsableChat.bottomDockBar { position: fixed; bottom: 0; right: 0px; width: 294px; background-color: rgba(114, 24, 8, 0.80); z-index: 2; }",
+      "#collapsableChat.bottomDockBar.active { background-color: #B5260D; }"
+    );
+    $("#collapsableChat").empty().append("<div class='tab' id='tab_qlv_chatControl'>Chat</div>");
+
+    $("#qlv_chatControl").prepend("<div class='chatTitleBar'>Chat<div class='close'>X</div></div>");
+
+    quakelive.mod_friends.roster.UI_OnRosterUpdated = function () {
+      var numOnline = this.GetNumOnlineContacts();
+      $('#tab_qlv_chatControl').text('Chat (' + numOnline + ')');
+      this.UI_Show();
+    }.bind(quakelive.mod_friends.roster);
+    quakelive.mod_friends.UI_SetChatTitle = function () {
+      var numOnline = this.roster.GetNumOnlineContacts();
+      $('#tab_qlv_chatControl').text('Chat (' + numOnline + ')');
+    }.bind(quakelive.mod_friends);
+
+    chatBarTabified = true;
+  }
+
+  // public: show a tab page
+  function showTabPage(contentId) {
+    var $cc = $("#chatContainer");
+    var $popup = $("#" + contentId);
+    if ($cc.hasClass("expanded") && $popup.hasClass("active"))
+      closeTabPage();
+    else {
+      $("#qlv_chatControl").css("display", contentId == "qlv_chatControl" ? "" : "none"); // hack for default chat
+      $popup.addClass("active");
+      $cc.children().not("#collapsableChat").not($popup).removeClass("active");
+      $cc.addClass("expanded");
+
+      var $tab = $("#tab_" + contentId);
+      $("#collapsableChat .tab").not($tab).removeClass("active");
+      $tab.addClass("active");
+    }
+    event.stopPropagation();
+  }
+
+  // public: closes any open tab page
+  function closeTabPage() {
+    $("#chatContainer").removeClass("expanded");
+    $("#collapsableChat .tab").removeClass("active");
+  }
+
+  // private: helper function
+  function restoreTabPageClickHandlers() {
+    $("#collapsableChat").unbind("click").click(closeTabPage);
+    $("#collapsableChat .tab").unbind("click");
+
+    $("#tab_qlv_chatControl").unbind("click").click(function () {
+      showTabPage("qlv_chatControl");
+      quakelive.mod_friends.UI_ClearMessageAlert();
+    });
+    for (var id in tabClickHandlers)
+      $("#tab_" + id).unbind("click").click(tabClickHandlers[id]);
+
+    $("#chatContainer .chatTitleBar").unbind("click").click(closeTabPage);
+  }
+
+  // public: write a message to the QL console or the in-game chat
+  function log(msg) {
+    if (msg instanceof Error && msg.fileName)
+      msg = msg.fileName + "," + msg.lineNumber + ": " + msg.name + ": " + msg.message;
+    if (quakelive.IsGameRunning())
+      qz_instance.SendGameCommand("echo \"" + msg.replace('"', "'") + "\"");
+    else
+      console.log(msg);
+  }
+
+  // public: write a message the the extraQL.exe HTTP server log window
+  function rlog(text) {
+    if (isLocalServerRunning())
+      $.post(BASE_URL + "log", text);
+  }
+
+  function echo(text) {
+    qz_instance.SendGameCommand("echo \"" + text.replace("\"", "'") + "\"");
+  }
+
+  // public: escape special HTML characters in the provided string
+  function escapeHtml(text) {
+    // originally from mustache.js MIT ( https://raw.github.com/janl/mustache.js/master/LICENSE )
+    var entityMap = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "/": "&#x2F;" };
+    return String(text).replace(/[&<>"'\/]/g, function (s) { return entityMap[s]; });
+    //return $("<div/>").text(text).html();
+  }
+
+  // public: store a text file in extraQL.exe's "data" directory
+  function store(filename, text) {
+    if (isLocalServerRunning())
+      $.post(BASE_URL + "data/" + filename, text);
+  }
+
+  // public: load a text file from extraQL.exe's "data" directory
+  function load(filename, callback) {
+    if (isLocalServerRunning())
+      $.get(BASE_URL + "data/" + filename, callback, "text");
+    else
+      callback();
+  }
+
+  var REGEX_FORMAT = new RegExp("(^|[^{])((?:{{)*){([0-9]+)}", "g");
+
+  // public: .NET-like string.Format() which allows positional placeholders like {0} ... to be replaced with parameter values
+  function format(template /*, ... */) {
+    var args = arguments;
+    return template.replace(REGEX_FORMAT, function (item, p1, p2, p3) {
+      var intVal = parseInt(p3);
+      var replace = intVal >= 0 ? args[1 + intVal] : "";
+      return p1 + p2 + replace;
+    }).replace("{{", "{").replace("}}", "}");
+  };
+
+  init();
+
+  // export public functions
+  window.extraQL = {
+    BASE_URL: BASE_URL,
+    isLocalServerRunning: isLocalServerRunning,
+    log: log,
+    rlog: rlog,
+    echo: echo,
+    addStyle: addStyle,
+    escapeHtml: escapeHtml,
+    store: store,
+    load: load,
+    format: format,
+
+    addTabPage: addTabPage,
+    showTabPage: showTabPage,
+    closeTabPage: closeTabPage
+  };
+}

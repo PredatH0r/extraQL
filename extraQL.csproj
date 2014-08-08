@@ -131,7 +131,6 @@
     <Content Include="scripts\autoInvite.usr.js" />
     <Content Include="scripts\escaper.usr.js" />
     <Content Include="scripts\attic\extGraphHist.usr.js" />
-    <Content Include="scripts\extraQL.js" />
     <Content Include="scripts\extStats.usr.js" />
     <Content Include="scripts\friendCommands.usr.js" />
     <Content Include="scripts\gametype.usr.js" />
