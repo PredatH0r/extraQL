@@ -55,9 +55,10 @@ namespace ExtraQL
         string localCode = "";
         Dictionary<string, List<string>> localMeta;
 
-        if (File.Exists(ScriptDir + "/" + scriptfile))
+        var path = ScriptDir + "/" + scriptfile;
+        if (File.Exists(path))
         {
-          localCode = File.ReadAllText(scriptfile);
+          localCode = File.ReadAllText(path);
           localMeta = GetMetadata(localCode);
         }
         else
@@ -81,13 +82,13 @@ namespace ExtraQL
         if (localMeta.ContainsKey("downloadUrl"))
           url = localMeta["downloadUrl"][0];
         else
-          url = string.Format(DEFAULT_UPDATE_BASE_URL, Path.GetFileName(scriptfile));
+          url = string.Format(DEFAULT_UPDATE_BASE_URL, scriptfile);
 
         try
         {
           WebClient client = new WebClient();
           client.DownloadDataCompleted += Client_DownloadDataCompleted;
-          client.DownloadDataAsync(new Uri(url), new object[] { scriptfile, localMeta });
+          client.DownloadDataAsync(new Uri(url), new object[] { path, localMeta });
         }
         catch (WebException) { }
       }
