@@ -61,6 +61,7 @@
     <Compile Include="HttpServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="scripts\openChat.usr.js" />
     <Content Include="scripts\startpage.usr.js" />
     <Content Include="scripts\extraQL.js" />
     <Compile Include="Servlets.cs" />

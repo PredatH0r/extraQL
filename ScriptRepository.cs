@@ -11,6 +11,7 @@ namespace ExtraQL
   public class ScriptRepository
   {
     private const string DEFAULT_UPDATE_BASE_URL = "http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/{0}?format=raw";
+    private const string INDEX_FILE = "!ndex.txt";
     private readonly Dictionary<string, ScriptInfo> scriptById = new Dictionary<string, ScriptInfo>();
     private readonly Encoding utf8withoutBom = new UTF8Encoding(false);
 
@@ -29,12 +30,41 @@ namespace ExtraQL
     public string ScriptDir { get; private set; }
 
     #region UpdateScripts()
+
     public void UpdateScripts()
     {
-      foreach (var scriptfile in Directory.GetFiles(ScriptDir, "*.js"))
+      var client = new WebClient();
+      client.DownloadStringCompleted += UpdateScripts_IndexDownloadCompleted;
+      client.DownloadStringAsync(new Uri(string.Format(DEFAULT_UPDATE_BASE_URL, INDEX_FILE)));
+    }
+
+    private void UpdateScripts_IndexDownloadCompleted(object sender, DownloadStringCompletedEventArgs e)
+    {
+      if (e.Error != null)
       {
-        var localCode = File.ReadAllText(scriptfile);
-        var localMeta = GetMetadata(localCode);
+        Log("Failed to retrieve list of available userscripts: " + e.Error.Message);
+        return;
+      }
+
+      var files = e.Result.Split('\n', '\r');
+      foreach (var scriptfile in files)
+      {
+        if (string.IsNullOrEmpty(scriptfile))
+          continue;
+
+        string localCode = "";
+        Dictionary<string, List<string>> localMeta;
+
+        if (File.Exists(ScriptDir + "/" + scriptfile))
+        {
+          localCode = File.ReadAllText(scriptfile);
+          localMeta = GetMetadata(localCode);
+        }
+        else
+        {
+          localMeta = new Dictionary<string, List<string>>();
+          localMeta["version"] = new List<string> { "0" };
+        }
 
         if (scriptfile.EndsWith(".usr.js"))
         {
@@ -129,7 +159,7 @@ namespace ExtraQL
       var localMeta = (Dictionary<string, List<String>>) ((object[]) e.UserState)[1];
       if (e.Error != null)
       {
-        Log("Failed to check version of " + Path.GetFileName(scriptfile) + ": " + e.Error);
+        Log("Failed to check version of " + Path.GetFileName(scriptfile) + ": " + e.Error.Message);
         return;
       }
 
@@ -141,14 +171,14 @@ namespace ExtraQL
       {
         remoteCode = remoteCode.Replace("\n", Environment.NewLine);
         File.WriteAllText(scriptfile, remoteCode, utf8withoutBom);
-        Log("Downloaded new version of " + Path.GetFileName(scriptfile));
+        Log("Downloaded version " + remoteMeta["version"][0] + " of " + Path.GetFileName(scriptfile));
       }
     }
 
     #endregion
 
     #region IsNewer()
-    private bool IsNewer(string version1, string version2)
+    internal static bool IsNewer(string version1, string version2)
     {
       var parts1 = version1.Split('.');
       var parts2 = version2.Split('.');

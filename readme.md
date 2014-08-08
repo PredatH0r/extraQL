@@ -18,6 +18,15 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 0.106
+---
+- added version check for extraQL.exe on sourceforge
+- switched to INI file for storing settings (due to reported issues with the standard .NET AppSettings system)
+- added ability to download new scripts
+- added script "Auto-Open chat when starting QL"
+- added script "Start Page" to set a start page and open it after starting QL
+- included latest version of hook.js, which supports offline mode and notification about updates
+
 Version 0.103
 ---
 - fixed downloading of updated scripts (character encoding issue)

@@ -697,6 +697,12 @@ function ExtraQL() {
 
   // public: show a tab page
   function showTabPage(contentId) {
+    if (!chatBarTabified) {
+      if (contentId == "qlv_chatControl")
+        $("#chatContainer").addClass("expanded");
+      return;
+    }
+
     var $cc = $("#chatContainer");
     var $popup = $("#" + contentId);
     if ($cc.hasClass("expanded") && $popup.hasClass("active"))

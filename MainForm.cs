@@ -53,6 +53,7 @@ namespace ExtraQL
 
       this.scriptRepository.UpdateScripts();
       this.RestartHttpServer();
+      this.CheckForUpdate();
     }
     #endregion
 
@@ -422,6 +423,60 @@ namespace ExtraQL
         this.BeginInvoke((Action) (() => this.Log(msg)));
       else
         this.txtLog.Text += "[" + DateTime.Now.ToString("T") + "] " + msg + "\r\n";
+    }
+    #endregion
+
+    #region CheckForUpdate()
+    private void CheckForUpdate()
+    {
+      Log("Checking for update...");
+      try
+      {
+        WebClient client = new WebClient();
+        client.OpenReadCompleted += CheckForUpdate_OpenReadCompleted;
+        client.OpenReadAsync(new Uri("http://sourceforge.net/p/extraql/source/ci/master/tree/MainForm.cs?format=raw"));
+      }
+      catch (Exception ex)
+      {
+        Log("Failed to check for latest extraQL.exe version: " + ex.Message);
+      }
+    }
+
+    private void CheckForUpdate_OpenReadCompleted(object sender, OpenReadCompletedEventArgs e)
+    {
+      Exception error = e.Error;
+      if (error == null)
+      {
+        try
+        {
+          var buffer = new byte[1024];
+          int len = e.Result.Read(buffer, 0, buffer.Length);
+          var code = Encoding.UTF8.GetString(buffer, 0, len);
+          var match = System.Text.RegularExpressions.Regex.Match(code, @".*Version\s*=\s*" + "\"([0-9.a-z]*)\"");
+          if (match.Success)
+          {
+            var remoteVersion = match.Groups[1].Value;
+            if (ScriptRepository.IsNewer(remoteVersion, Version))
+            {
+              if (MessageBox.Show(this, "Version " + remoteVersion + " of extraQL.exe is available!\n\nDo you want to open the download page?",
+                "Update Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+              {
+                Process.Start("http://sourceforge.net/projects/extraql/files/");
+              }
+            }
+            else
+              Log("You are using the latest version.");
+          }
+          ((WebClient) sender).Dispose();
+        }
+        catch (Exception ex)
+        {
+          error = ex;
+        }
+      }
+
+      if (error != null)
+        Log("Failed to check for latest extraQL.exe version: " + error.Message);
     }
     #endregion
 
