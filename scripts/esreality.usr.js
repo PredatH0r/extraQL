@@ -23,6 +23,11 @@ Version 1.0
   var UPDATE_INTERVAL = 60000;
 
   function init() {
+    if (!extraQL.BASE_URL) {
+      extraQL.echo("^1esreality^7 disabled: Not connected to extraQL server");
+      return;
+    }
+
     // delay init so that twitch, twitter, ESR and IRC scripts add items to chat menu bar in a defined order
     setTimeout(delayedInit, 1600);
   }
@@ -134,8 +139,5 @@ Version 1.0
   }
 
 
-  if (extraQL)
-    init();
-  else
-    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
+  init();
 })();

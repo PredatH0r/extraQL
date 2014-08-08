@@ -42,10 +42,8 @@
   var CVAR_DOCKHEIGHT = "web_dockHeight";
 
   function init() {
-    if (extraQL.isOldUi)
-      return;
     if (!extraQL.isLocalServerRunning()) {
-      extraQL.echo("^1docker^7: extraQL.exe is not running. Script is disabled.");
+      extraQL.echo("^1docker^7 disabled: No local extraQL.exe running.");
       return;
     }
 
@@ -66,9 +64,6 @@
 
   function onContentLoaded() {
     if ($("#winposControl").length)
-      return;
-
-    if (extraQL.isOldUi)
       return;
 
     $("#tn_settings").after(
@@ -128,8 +123,5 @@
     window.qlPrompt({ title: 'docker.js', body: "extraQL HTTP server is not responding", fatal: false, alert: true });
   }
 
-  if (extraQL)
-    init();
-  else
-    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
+  init();
 })();
