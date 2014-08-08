@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name        Quake Live Layout Resizer
-// @version     0.9
+// @version     1.0
 // @author      PredatH0r
 // @description	
 // @include     http://*.quakelive.com/*
@@ -17,6 +17,10 @@ but leaves some space on the top (configurable by web_chatOverlapIndent, default
 so you can access the navigation menus and "Customize" in the server browser.
 
 If the window is wider, the chat will be shown full-height outside the content area.
+
+Version 1.0
+- twitter iframe is now also resized to use full screen height
+- fixed in-game chat/friend list
 
 Version 0.9
 - chat is now correctly resizing
@@ -111,7 +115,25 @@ CVARS:
       oldRenderMatchDetails.apply(quakelive.matchcolumn, arguments);
       resizeBrowserDetails();      
     }
+
+    findCssRules();
     updateChatAndContentLayout();
+  }
+
+  function findCssRules() {
+    var i, j;
+    for (i = 0; i < document.styleSheets.length; i++) {
+      var sheet = document.styleSheets[i];
+      if (!sheet.cssRules) continue;
+      for (j = 0; j < sheet.cssRules.length; j++) {
+        try {
+          var rule = sheet.rules[j];
+          if (rule.cssText.indexOf("#chatContainer .fullHeight") == 0)
+            styleFullHeight = rule.style;
+        }
+        catch (e) {}
+      }
+    }
   }
 
   function onResize(event) {
@@ -164,10 +186,12 @@ CVARS:
       // modify height of chat
       if (quakelive.IsGameRunning()) {
         $("#collapsableChat").css("display", "none"); // hide in-game chat bar
+        $("#qlv_chatControl").css("display","none");
         height = Math.floor(height) * 0.9 - 35; // 10% clock, 35px buttons
-      } else
-        $("#collapsableChat").css("display", ""); 
-
+      } else {
+        $("#collapsableChat").css("display", "");
+        $("#qlv_chatControl").css("display", "");
+      }
       height -= 3 + 27 + 14; // height of top border + title bar + bottom bar
 
       var topOffset = 140; // leave header and menu visible when chat is overlapping the content area
