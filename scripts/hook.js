@@ -9,7 +9,7 @@ This script is a stripped down version of wn's QuakeLive Hook Manager (QLHM),
 which is designed to work with a local or remote extraQL.exe script server.
 
 Version 0.106
-- added local script cache (HTML5 local storage)
+- added offline support with local script cache (HTML5 local storage)
 - added hook.js version check against sourceforge
 - merged extraQL.js into hook.js
 
@@ -602,26 +602,6 @@ function ExtraQL() {
     addStyle("#chatContainer .fullHeight { height:550px; }");
   }
 
-  // public: test if the local extraQL HTTP server is running
-  function isLocalServerRunning() {
-    if (!this.BASE_URL)
-      return false;
-    if (new Date().getTime() - lastServerCheckTimestamp < 5000)
-      return lastServerCheckResult;
-    $.ajax({
-      url: "http://127.0.0.1:27963/version",
-      async: false,
-      dataType: "json",
-      success: function (version) {
-        lastServerCheckResult = true;
-        extraQL.serverVersion = version;
-      },
-      error: function () { lastServerCheckResult = false; }
-    });
-    lastServerCheckTimestamp = new Date().getTime();
-    return lastServerCheckResult;
-  }
-
   // public: add CSS rules
   // params: string...
   function addStyle(/*...*/) {
@@ -630,6 +610,41 @@ function ExtraQL() {
       css += "\n" + arguments[i];
     $("head").append("<style>" + css + "\n</style>");
   }
+
+  // public: write a message to the QL console or the in-game chat
+  function log(msg) {
+    if (msg instanceof Error && msg.fileName)
+      msg = msg.fileName + "," + msg.lineNumber + ": " + msg.name + ": " + msg.message;
+    if (quakelive.IsGameRunning())
+      qz_instance.SendGameCommand("echo \"" + msg.replace('"', "'") + "\"");
+    else
+      console.log(msg);
+  }
+
+  function echo(text) {
+    qz_instance.SendGameCommand("echo \"" + text.replace("\"", "'") + "\"");
+  }
+
+  // public: escape special HTML characters in the provided string
+  function escapeHtml(text) {
+    // originally from mustache.js MIT ( https://raw.github.com/janl/mustache.js/master/LICENSE )
+    var entityMap = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "/": "&#x2F;" };
+    return String(text).replace(/[&<>"'\/]/g, function (s) { return entityMap[s]; });
+    //return $("<div/>").text(text).html();
+  }
+
+
+  var REGEX_FORMAT = new RegExp("(^|[^{])((?:{{)*){([0-9]+)}", "g");
+
+  // public: .NET-like string.Format() which allows positional placeholders like {0} ... to be replaced with parameter values
+  function format(template /*, ... */) {
+    var args = arguments;
+    return template.replace(REGEX_FORMAT, function (item, p1, p2, p3) {
+      var intVal = parseInt(p3);
+      var replace = intVal >= 0 ? args[1 + intVal] : "";
+      return p1 + p2 + replace;
+    }).replace("{{", "{").replace("}}", "}");
+  };
 
   // public: add a tab page to the chat bar/area
   function addTabPage(id, caption, content, onClick) {
@@ -720,34 +735,37 @@ function ExtraQL() {
     $("#chatContainer .chatTitleBar").unbind("click").click(closeTabPage);
   }
 
-  // public: write a message to the QL console or the in-game chat
-  function log(msg) {
-    if (msg instanceof Error && msg.fileName)
-      msg = msg.fileName + "," + msg.lineNumber + ": " + msg.name + ": " + msg.message;
-    if (quakelive.IsGameRunning())
-      qz_instance.SendGameCommand("echo \"" + msg.replace('"', "'") + "\"");
-    else
-      console.log(msg);
+  //
+  // functions to communicate with extraQL server
+  //
+
+  // public: test if the local extraQL HTTP server is running
+  function isLocalServerRunning() {
+    if (!this.BASE_URL)
+      return false;
+    if (new Date().getTime() - lastServerCheckTimestamp < 5000)
+      return lastServerCheckResult;
+    $.ajax({
+      url: "http://127.0.0.1:27963/version",
+      async: false,
+      dataType: "json",
+      success: function (version) {
+        lastServerCheckResult = true;
+        extraQL.serverVersion = version;
+      },
+      error: function () { lastServerCheckResult = false; }
+    });
+    lastServerCheckTimestamp = new Date().getTime();
+    return lastServerCheckResult;
   }
+
 
   // public: write a message the the extraQL.exe HTTP server log window
   function rlog(text) {
     if (isLocalServerRunning())
       $.post(BASE_URL + "log", text);
   }
-
-  function echo(text) {
-    qz_instance.SendGameCommand("echo \"" + text.replace("\"", "'") + "\"");
-  }
-
-  // public: escape special HTML characters in the provided string
-  function escapeHtml(text) {
-    // originally from mustache.js MIT ( https://raw.github.com/janl/mustache.js/master/LICENSE )
-    var entityMap = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "/": "&#x2F;" };
-    return String(text).replace(/[&<>"'\/]/g, function (s) { return entityMap[s]; });
-    //return $("<div/>").text(text).html();
-  }
-
+  
   // public: store a text file in extraQL.exe's "data" directory
   function store(filename, text) {
     if (isLocalServerRunning())
@@ -762,17 +780,7 @@ function ExtraQL() {
       callback();
   }
 
-  var REGEX_FORMAT = new RegExp("(^|[^{])((?:{{)*){([0-9]+)}", "g");
 
-  // public: .NET-like string.Format() which allows positional placeholders like {0} ... to be replaced with parameter values
-  function format(template /*, ... */) {
-    var args = arguments;
-    return template.replace(REGEX_FORMAT, function (item, p1, p2, p3) {
-      var intVal = parseInt(p3);
-      var replace = intVal >= 0 ? args[1 + intVal] : "";
-      return p1 + p2 + replace;
-    }).replace("{{", "{").replace("}}", "}");
-  };
 
   init();
 
