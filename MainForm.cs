@@ -8,14 +8,13 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
-using ExtraQL.Properties;
 using Microsoft.Win32;
 
 namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.103";
+    public const string Version = "0.106";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -277,42 +276,90 @@ namespace ExtraQL
     #endregion
 
 
- 
+
+    #region ConfigFile
+    private string ConfigFile
+    {
+      get
+      {
+        var path = Path.GetDirectoryName(Application.ExecutablePath);
+        if (path.EndsWith(("Debug")))
+          path = Path.GetDirectoryName(Path.GetDirectoryName(path));
+        return Path.Combine(path, "extraQL.ini");
+      }
+    }
+    #endregion
+
     #region LoadSettings()
     private void LoadSettings()
     {
-      var pwds = Cypher.DecryptString(Settings.Default.Password).Split('\t');
+      string email = "";
+      string pwd = "";
+      string lastEmail = "";
+      string launcherExe = "";
+      string realmHistory = "";
+      string lastRealm = "";
+      bool advanced = false;
+      bool focus = false;
+      bool bindToAll = false;
+
+      var configFile = this.ConfigFile;
+      if (File.Exists(configFile))
+      {
+        var lines = File.ReadAllLines(configFile);
+        foreach (var line in lines)
+        {
+          var parts = line.Split(new[] {'='}, 2);
+          if (parts.Length < 2) continue;
+          var value = parts[1].Trim();
+          switch (parts[0].Trim())
+          {
+            case "email": email = value; break;
+            case "password": pwd = value; break;
+            case "lastEmail": lastEmail = value; break;
+            case "launcherExe": launcherExe = value; break;
+            case "realmHistory": realmHistory = value; break;
+            case "realm": lastRealm = value; break;
+            case "advanced": advanced = value == "1"; break;
+            case "focus": focus = value == "1"; break;
+            case "bindToAll": bindToAll = value == "1"; break;
+          }
+        }
+      }
+
+
+      var pwds = string.IsNullOrEmpty(pwd) ? new string[0] : Cypher.DecryptString(pwd).Split('\t');
       int i;
 
-      if (!String.IsNullOrEmpty(Settings.Default.Email))
+      if (!String.IsNullOrEmpty(email))
       {
         i = 0;
-        foreach (var email in Settings.Default.Email.Split('\t'))
+        foreach (var mail in email.Split('\t'))
         {
-          this.comboEmail.Items.Add(email);
-          this.passwordByEmail[email] = pwds[i++];
+          this.comboEmail.Items.Add(mail);
+          this.passwordByEmail[mail] = i < pwds.Length ? pwds[i++] : "";
         }
-        if (!String.IsNullOrEmpty(Settings.Default.LastEmail))
-          this.comboEmail.Text = Settings.Default.LastEmail;
+        if (!String.IsNullOrEmpty(lastEmail))
+          this.comboEmail.Text = lastEmail;
         else if (this.comboEmail.Items.Count > 0)
           this.comboEmail.SelectedIndex = 0;
       }
 
-      this.txtLauncherExe.Text = Settings.Default.LauncherExe;
+      this.txtLauncherExe.Text = launcherExe;
       if (String.IsNullOrEmpty(this.txtLauncherExe.Text))
         this.txtLauncherExe.Text = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\Quake Live\\Launcher.exe";
 
-      if (!String.IsNullOrEmpty(Settings.Default.RealmHistory))
+      if (!String.IsNullOrEmpty(realmHistory))
       {
         this.comboRealm.Items.Add("");
-        foreach (var realm in Settings.Default.RealmHistory.Trim().Split('\t'))
+        foreach (var realm in realmHistory.Trim().Split('\t'))
           this.comboRealm.Items.Add(realm);
       }
-      this.comboRealm.Text = Settings.Default.Realm;
+      this.comboRealm.Text = lastRealm;
 
-      this.cbAdvanced.Checked = Settings.Default.Advanced;
-      this.cbFocus.Checked = Settings.Default.Focus;
-      this.cbBindToAll.Checked = Settings.Default.BindToAll;
+      this.cbAdvanced.Checked = advanced;
+      this.cbFocus.Checked = focus;
+      this.cbBindToAll.Checked = bindToAll;
       this.ActiveControl = this.comboEmail;
     }
 
@@ -342,15 +389,18 @@ namespace ExtraQL
         foreach (var realm in this.comboRealm.Items)
           realmHistory += realm + "\t";
 
-        Settings.Default.Email = emails.Length == 0 ? "" : emails.Substring(1);
-        Settings.Default.Password = Cypher.EncryptString(pwds.Length == 0 ? "" : pwds.Substring(1));
-        Settings.Default.Focus = this.cbFocus.Checked;
-        Settings.Default.Advanced = this.cbAdvanced.Checked;
-        Settings.Default.Realm = this.comboRealm.Text;
-        Settings.Default.RealmHistory = realmHistory.Trim();
-        Settings.Default.LauncherExe = this.txtLauncherExe.Text;
-        Settings.Default.BindToAll = this.cbBindToAll.Checked;
-        Settings.Default.Save();
+        StringBuilder config = new StringBuilder();
+        config.AppendLine("[extraQL]");
+        config.AppendLine("email=" + (emails.Length == 0 ? "" : emails.Substring(1)));
+        config.AppendLine("password=" + Cypher.EncryptString(pwds.Length == 0 ? "" : pwds.Substring(1)));
+        config.AppendLine("lastEmail=" + this.comboEmail.Text);
+        config.AppendLine("focus=" + (this.cbFocus.Checked ? 1 : 0));
+        config.AppendLine("advanced=" + (this.cbAdvanced.Checked ? 1 : 0));
+        config.AppendLine("realm=" + this.comboRealm.Text);
+        config.AppendLine("realmHistory=" + realmHistory.Trim());
+        config.AppendLine("launcherExe=" + this.txtLauncherExe.Text);
+        config.AppendLine("bindToAll=" + (this.cbBindToAll.Checked ? 1 : 0));
+        File.WriteAllText(this.ConfigFile, config.ToString(), Encoding.UTF8);
       }
       catch (Exception ex)
       {
