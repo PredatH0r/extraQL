@@ -41,8 +41,5 @@ Version 1.1
     });
   }
 
-  if (extraQL)
-    init();
-  else
-    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
+  init();
 })();

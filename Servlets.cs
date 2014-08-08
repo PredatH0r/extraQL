@@ -394,7 +394,7 @@ namespace ExtraQL
     {
       string text = "[";
       string sep = "";
-      foreach (var info in this.scriptRepository.GetScriptIds())
+      foreach (var info in this.scriptRepository.GetScripts())
       {
         text += sep + "\n{\"id\":\"" + info.Id + "\"";
         text += ",\"filename\":\"" + Path.GetFileName(info.Filepath) + "\"";

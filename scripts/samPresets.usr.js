@@ -51,9 +51,6 @@ Version 1.1
     $("#quickSamPresets a").click(function () { quakelive.mod_startamatch.loadPreset($(this).text()); });
   }
   
-  if (extraQL)
-    init();
-  else
-    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
+  init();
 })(window);
 

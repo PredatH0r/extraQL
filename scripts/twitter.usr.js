@@ -53,12 +53,9 @@ Version 1.0
   }
 
   function showTwitterTab() {
-    $("#twitter-widget-0").addClass("fullHeight"); // this enables automatic resizing via extraQL.js / resizeLayout.usr.js
+    $("#twitter-widget-0").addClass("fullHeight"); // this enables automatic resizing via resizeLayout.usr.js
     extraQL.showTabPage("twitterFeed");
   }
 
-  if (extraQL)
-    init();
-  else
-    $.getScript("http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/extraQL.js?format=raw", init);
+  init();
 })();

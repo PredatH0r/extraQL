@@ -175,8 +175,8 @@ namespace ExtraQL
     }
     #endregion
 
-    #region GetScriptIds()
-    public List<ScriptInfo> GetScriptIds()
+    #region GetScripts()
+    public List<ScriptInfo> GetScripts()
     {
       return new List<ScriptInfo>(scriptById.Values);
     }
