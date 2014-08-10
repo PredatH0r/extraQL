@@ -458,6 +458,7 @@ namespace ExtraQL
             var remoteVersion = match.Groups[1].Value;
             if (ScriptRepository.IsNewer(remoteVersion, Version))
             {
+              Log("Update for extraQL.exe version " + remoteVersion + " is available");
               if (MessageBox.Show(this, "Version " + remoteVersion + " of extraQL.exe is available!\n\nDo you want to open the download page?",
                 "Update Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
               {
@@ -465,7 +466,7 @@ namespace ExtraQL
               }
             }
             else
-              Log("You are using the latest version.");
+              Log("Your extraQL.exe is up-to-date.");
           }
           ((WebClient) sender).Dispose();
         }

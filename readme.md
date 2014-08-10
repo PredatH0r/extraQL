@@ -18,6 +18,10 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 0.107
+---
+- added checks to prevent abuse/DOS attacks on public extraQL server
+
 Version 0.106
 ---
 - added version check for extraQL.exe on sourceforge

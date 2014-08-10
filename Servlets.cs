@@ -14,6 +14,7 @@ namespace ExtraQL
 {
   internal class Servlets
   {
+    private static readonly string[] DomainsAllowedForProxy = { "esreality.com", "quakelive.com", "sourceforge.net" };
     private const string AddScriptRoute = "/addScript";
     private readonly HttpServer server;
     private readonly StringBuilder indexBuilder = new StringBuilder();
@@ -182,6 +183,14 @@ namespace ExtraQL
         HttpOk(client, "missing 'url' parameter");
       else
       {
+        string targetHost = "";
+        try { targetHost = new Uri(url).Host; }
+        catch { }
+        if (Array.Find(DomainsAllowedForProxy, targetHost.EndsWith) == null)
+        {
+          this.HttpForbidden(client, "requested domain is not supported");
+          return;
+        }
         string text = DownloadText(url);
         HttpOk(client, text);
       }
@@ -463,11 +472,11 @@ namespace ExtraQL
     /// </summary>
     private void DeliverFileOrDirectoryListing(TcpClient client, Uri uri, string basePath, string pattern = null)
     {
-      string absPath = GetFilePath(uri, basePath);
+      string absPath = this.GetFilePath(uri, basePath);
       var writer = new StreamWriter(client.GetStream());
       byte[] data;
       if (absPath != null && Directory.Exists(absPath))
-        data = GetDirectoryListing(uri, absPath, pattern);
+        data = this.GetDirectoryListing(uri, absPath, pattern);
       else if (absPath != null && File.Exists(absPath))
         data = File.ReadAllBytes(absPath);
       else
@@ -492,7 +501,7 @@ namespace ExtraQL
     /// <summary>
     ///   Returns a listing of the directory in either HTML or JSON format, if the URL parameter "json" is present
     /// </summary>
-    private static byte[] GetDirectoryListing(Uri uri, string absPath, string pattern = null)
+    private byte[] GetDirectoryListing(Uri uri, string absPath, string pattern = null)
     {
       NameValueCollection args = HttpUtility.ParseQueryString(uri.Query);
       bool json = args[null] == "json";
@@ -574,13 +583,14 @@ namespace ExtraQL
     #endregion
 
     #region HttpForbidden()
-    private void HttpForbidden(TcpClient client)
+    private void HttpForbidden(TcpClient client, string msg = null)
     {
       var writer = new StreamWriter(client.GetStream());
       writer.WriteLine("HTTP/1.1 403 Forbidden");
       writer.WriteLine("Access-Control-Allow-Origin: *");
       writer.WriteLine();
-      writer.WriteLine("This function is not available from a remote extraQL.exe server");
+
+      writer.WriteLine(msg ?? "This function is not available from a remote extraQL.exe server");
       writer.Flush();
     }
     #endregion

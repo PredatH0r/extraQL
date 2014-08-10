@@ -11,6 +11,7 @@ namespace ExtraQL
     public delegate void Servlet(TcpClient client, Uri uri, string request);
 
     private const int PortNumber = 27963;
+    private const int MaxRequestSize = 16384; // 16 KB
     private bool bindToAllInterfaces;
     private IPEndPoint endPoint;
 
@@ -58,6 +59,8 @@ namespace ExtraQL
       {
         client.ReceiveTimeout = 1000;
         string data = ReadAllBytes(client);
+        if (data == null)
+          return;
         if (!data.StartsWith("POST ") && !data.StartsWith("GET "))
           return;
         int idx = data.IndexOf(" HTTP", StringComparison.Ordinal);
@@ -95,7 +98,7 @@ namespace ExtraQL
 
     #region ReadAllBytes()
 
-    private static string ReadAllBytes(TcpClient client)
+    private string ReadAllBytes(TcpClient client)
     {
       const string ContentLength = "Content-Length:";
       var sb = new StringBuilder();
@@ -133,6 +136,14 @@ namespace ExtraQL
         }
         else
           dataBytesRead += len;
+
+        // enforce maximum allowed request size to prevent denial-of-service
+        if (dataBytesRead >= MaxRequestSize)
+        {
+          client.Client.Send(Encoding.ASCII.GetBytes("HTTP/0.9 413 Request Entity Too Large\r\n\r\n"));
+          Log("Request exceeded maximum allowed size: " + client.Client.RemoteEndPoint);
+          return null;
+        }
       } while (len == 8192 || (contentLength >= 0 && dataOffset >= 0 && dataBytesRead < contentLength));
       return sb.ToString();
     }

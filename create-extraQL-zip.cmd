@@ -5,9 +5,16 @@ set abs=%cd%
 
 rem package binaries
 if exist extraQL.zip del extraQL.zip
-if exist source.zip del source.zip
-%zipper% a -tzip extraQL.zip "%abs%\bin\Debug\extraQL.exe" images scripts
 if errorlevel 1 goto error
+mkdir extraQL
+mkdir extraQL\scripts
+mkdir extraQL\images
+xcopy "%abs%\bin\Debug\extraQL.exe" extraQL\ >nul
+xcopy "%abs%\scripts" extraQL\scripts >nul
+xcopy /s "%abs%\images" extraQL\images >nul
+%zipper% a -tzip extraQL.zip "extraQL"
+if errorlevel 1 goto error
+rmdir /s /q extraQL
 
 :success
 echo.
