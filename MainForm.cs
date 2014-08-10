@@ -14,7 +14,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.106";
+    public const string Version = "0.107";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -51,9 +51,10 @@ namespace ExtraQL
     {
       base.OnShown(e);
 
-      this.scriptRepository.UpdateScripts();
+      this.scriptRepository.UpdateAndRegisterScripts();
       this.RestartHttpServer();
-      this.CheckForUpdate();
+      if (this.cbCheckUpdate.Checked)
+        this.CheckForUpdate();
     }
     #endregion
 
@@ -186,6 +187,7 @@ namespace ExtraQL
     private void comboRealm_SelectedValueChanged(object sender, EventArgs e)
     {
       this.btnStartSteam.Enabled = this.comboRealm.Text == "" && this.GetBaseq3Path(true) != null;
+      this.miStartSteam.Enabled = this.btnStartSteam.Enabled;
     }
     #endregion
 
@@ -193,6 +195,23 @@ namespace ExtraQL
     private void cbDisableScripts_CheckedChanged(object sender, EventArgs e)
     {
       this.servlets.EnableScripts = !this.cbDisableScripts.Checked;
+      this.btnInstallHook.Text = this.cbDisableScripts.Checked ? "Delete hook.js" : "Re-install hook.js";
+    }
+    #endregion
+
+    #region cbSystemTray_CheckedChanged
+    private void cbSystemTray_CheckedChanged(object sender, EventArgs e)
+    {
+      this.ShowInTaskbar = !this.cbSystemTray.Checked;
+      this.trayIcon.Visible = cbSystemTray.Checked;
+    }
+    #endregion
+
+    #region cbCheckUpdate_CheckedChanged
+    private void cbCheckUpdate_CheckedChanged(object sender, EventArgs e)
+    {
+      if (this.cbCheckUpdate.Checked)
+        this.CheckForUpdate();
     }
     #endregion
 
@@ -226,6 +245,20 @@ namespace ExtraQL
 
     #region btnStartSteam_Click
     private void btnStartSteam_Click(object sender, EventArgs e)
+    {
+      this.Launch(true);
+    }
+    #endregion
+
+    #region miStartLauncher_Click
+    private void miStartLauncher_Click(object sender, EventArgs e)
+    {
+      this.Launch(false);
+    }
+    #endregion
+
+    #region miStartSteam_Click
+    private void miStartSteam_Click(object sender, EventArgs e)
     {
       this.Launch(true);
     }
@@ -276,6 +309,18 @@ namespace ExtraQL
     }
     #endregion
 
+    #region trayIcon_MouseUp
+    private void trayIcon_MouseUp(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Left)
+      {
+        this.WindowState = FormWindowState.Normal;
+        this.BringToFront();
+        this.Activate();
+      }
+    }
+    #endregion
+
 
 
     #region ConfigFile
@@ -303,6 +348,9 @@ namespace ExtraQL
       bool advanced = false;
       bool focus = false;
       bool bindToAll = false;
+      bool systemTray = false;
+      bool startMinimized = false;
+      bool checkUpdates = true;
 
       var configFile = this.ConfigFile;
       if (File.Exists(configFile))
@@ -324,17 +372,17 @@ namespace ExtraQL
             case "advanced": advanced = value == "1"; break;
             case "focus": focus = value == "1"; break;
             case "bindToAll": bindToAll = value == "1"; break;
+            case "systemTray": systemTray = value == "1"; break;
+            case "startMinimized": startMinimized = value == "1"; break;
+            case "checkUpdates": checkUpdates = value == "1"; break;
           }
         }
       }
 
-
       var pwds = string.IsNullOrEmpty(pwd) ? new string[0] : Cypher.DecryptString(pwd).Split('\t');
-      int i;
-
       if (!String.IsNullOrEmpty(email))
       {
-        i = 0;
+        int i = 0;
         foreach (var mail in email.Split('\t'))
         {
           this.comboEmail.Items.Add(mail);
@@ -361,6 +409,11 @@ namespace ExtraQL
       this.cbAdvanced.Checked = advanced;
       this.cbFocus.Checked = focus;
       this.cbBindToAll.Checked = bindToAll;
+      this.cbSystemTray.Checked = systemTray;
+      this.cbStartMinimized.Checked = startMinimized;
+      if (startMinimized)
+        this.WindowState = FormWindowState.Minimized;
+      this.cbCheckUpdate.Checked = checkUpdates;
       this.ActiveControl = this.comboEmail;
     }
 
@@ -401,6 +454,9 @@ namespace ExtraQL
         config.AppendLine("realmHistory=" + realmHistory.Trim());
         config.AppendLine("launcherExe=" + this.txtLauncherExe.Text);
         config.AppendLine("bindToAll=" + (this.cbBindToAll.Checked ? 1 : 0));
+        config.AppendLine("systemTray=" + (this.cbSystemTray.Checked ? 1 : 0));
+        config.AppendLine("startMinimized=" + (this.cbStartMinimized.Checked ? 1 : 0));
+        config.AppendLine("checkUpdates=" + (this.cbCheckUpdate.Checked ? 1 : 0));
         File.WriteAllText(this.ConfigFile, config.ToString(), Encoding.UTF8);
       }
       catch (Exception ex)
@@ -683,5 +739,6 @@ document.loginform.submit();";
       }
     }
     #endregion
+
   }
 }

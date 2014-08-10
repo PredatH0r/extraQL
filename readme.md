@@ -20,7 +20,11 @@ Changelog
 
 Version 0.107
 ---
+- added option to show extraQL in the system tray instead of the task bar
+- added option to start extraQL minimized (useful when started through Windows Autostart)
+- added option to disable checking for extraQL.exe updates
 - added checks to prevent abuse/DOS attacks on public extraQL server
+- allow adding scripts locally by simply putting them in the scripts/ folder
 
 Version 0.106
 ---

@@ -29,70 +29,93 @@ namespace ExtraQL
 
     public string ScriptDir { get; private set; }
 
-    #region UpdateScripts()
+    #region UpdateAndRegisterScripts()
 
-    public void UpdateScripts()
+    public void UpdateAndRegisterScripts()
     {
       var client = new WebClient();
-      client.DownloadStringCompleted += UpdateScripts_IndexDownloadCompleted;
+      client.DownloadStringCompleted += ScriptIndexFileDownloadCompleted;
       client.DownloadStringAsync(new Uri(string.Format(DEFAULT_UPDATE_BASE_URL, INDEX_FILE)));
     }
 
-    private void UpdateScripts_IndexDownloadCompleted(object sender, DownloadStringCompletedEventArgs e)
+    private void ScriptIndexFileDownloadCompleted(object sender, DownloadStringCompletedEventArgs e)
     {
+      Dictionary<string, bool> processedScripts = new Dictionary<string, bool>();
+
       if (e.Error != null)
       {
-        Log("Failed to retrieve list of available userscripts: " + e.Error.Message);
-        return;
+        Log("Failed to retrieve latest list of available userscripts: " + e.Error.Message);
+      }
+      else
+      {
+        // process files from remote index (to support downloading of new scripts)
+        var files = e.Result.Split('\n', '\r');
+        foreach (var scriptfile in files)
+        {
+          if (string.IsNullOrEmpty(scriptfile))
+            continue;
+          this.UpdateAndRegisterScript(scriptfile);
+          processedScripts.Add(scriptfile, true);
+        }
       }
 
-      var files = e.Result.Split('\n', '\r');
-      foreach (var scriptfile in files)
+      // process files from local directory (to support scripts that are not in the public index)
+      foreach (var path in Directory.GetFiles(ScriptDir, "*.usr.js"))
       {
-        if (string.IsNullOrEmpty(scriptfile))
-          continue;
-
-        string localCode = "";
-        Dictionary<string, List<string>> localMeta;
-
-        var path = ScriptDir + "/" + scriptfile;
-        if (File.Exists(path))
-        {
-          localCode = File.ReadAllText(path);
-          localMeta = GetMetadata(localCode);
-        }
-        else
-        {
-          localMeta = new Dictionary<string, List<string>>();
-          localMeta["version"] = new List<string> { "0" };
-        }
-
-        if (scriptfile.EndsWith(".usr.js"))
-        {
-          var id = localMeta.ContainsKey("id") ? localMeta["id"][0] : "";
-          if (string.IsNullOrEmpty(id))
-            id = StripAllExtenstions(scriptfile);
-          this.scriptById[id] = new ScriptInfo(id, scriptfile, localMeta, localCode);
-        }
-
-        if (!localMeta.ContainsKey("version"))
-          continue;
-
-        string url;
-        if (localMeta.ContainsKey("downloadUrl"))
-          url = localMeta["downloadUrl"][0];
-        else
-          url = string.Format(DEFAULT_UPDATE_BASE_URL, scriptfile);
-
-        try
-        {
-          WebClient client = new WebClient();
-          client.DownloadDataCompleted += Client_DownloadDataCompleted;
-          client.DownloadDataAsync(new Uri(url), new object[] { path, localMeta });
-        }
-        catch (WebException) { }
+        var scriptfile = Path.GetFileName(path) ?? "";
+        if (!processedScripts.ContainsKey(scriptfile))
+          this.UpdateAndRegisterScript(scriptfile);
       }
     }
+    #endregion
+
+    #region UpdateAndRegisterScript()
+    private void UpdateAndRegisterScript(string scriptfile)
+    {
+      string localCode = "";
+      Dictionary<string, List<string>> localMeta;
+
+      var path = ScriptDir + "/" + scriptfile;
+      if (File.Exists(path))
+      {
+        localCode = File.ReadAllText(path);
+        localMeta = GetMetadata(localCode);
+      }
+      else
+      {
+        localMeta = new Dictionary<string, List<string>>();
+        localMeta["version"] = new List<string> {"0"};
+      }
+
+      if (scriptfile.EndsWith(".usr.js"))
+      {
+        var id = localMeta.ContainsKey("id") ? localMeta["id"][0] : "";
+        if (string.IsNullOrEmpty(id))
+          id = StripAllExtenstions(scriptfile);
+        var scriptInfo = new ScriptInfo(id, scriptfile, localMeta, localCode);
+        this.scriptById[id] = scriptInfo;
+      }
+
+      if (!localMeta.ContainsKey("version"))
+        return;
+
+      string url;
+      if (localMeta.ContainsKey("downloadUrl"))
+        url = localMeta["downloadUrl"][0];
+      else
+        url = string.Format(DEFAULT_UPDATE_BASE_URL, scriptfile);
+
+      try
+      {
+        WebClient client = new WebClient();
+        client.DownloadDataCompleted += Client_DownloadDataCompleted;
+        client.DownloadDataAsync(new Uri(url), new object[] {path, localMeta});
+      }
+      catch (WebException)
+      {
+      }
+    }
+
     #endregion
 
     #region GetMetaData()
@@ -151,7 +174,7 @@ namespace ExtraQL
     }
     #endregion
 
-    #region Client_DownloadStringCompleted
+    #region Client_DownloadDataCompleted
     private void Client_DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
     {
       ((WebClient)sender).Dispose();

@@ -14,7 +14,7 @@ namespace ExtraQL
 {
   internal class Servlets
   {
-    private static readonly string[] DomainsAllowedForProxy = { "esreality.com", "quakelive.com", "sourceforge.net" };
+    private static readonly string[] DomainsAllowedForProxy = { "esreality.com", "quakelive.com", "sourceforge.net", "github.com" };
     private const string AddScriptRoute = "/addScript";
     private readonly HttpServer server;
     private readonly StringBuilder indexBuilder = new StringBuilder();
