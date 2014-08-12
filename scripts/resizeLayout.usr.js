@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name        Quake Live Layout Resizer
-// @version     1.0
+// @version     1.1
 // @author      PredatH0r
 // @description	
 // @include     http://*.quakelive.com/*
@@ -17,6 +17,9 @@ but leaves some space on the top (configurable by web_chatOverlapIndent, default
 so you can access the navigation menus and "Customize" in the server browser.
 
 If the window is wider, the chat will be shown full-height outside the content area.
+
+Version 1.1
+- removed re-appearing "send" button in chat window
 
 Version 1.0
 - twitter iframe is now also resized to use full screen height
@@ -80,7 +83,8 @@ CVARS:
       "}");
     extraQL.addStyle(
       "#chatContainer.expanded #collapsableChat { background-color: rgb(114,24,8); }",
-      "#chatContainer .fullHeight { height: 550px; }"
+      "#chatContainer .fullHeight { height: 550px; }",
+      "#im-chat #im-chat-send { display: none; }"
     );
     
     // z-index adjustments
@@ -216,7 +220,6 @@ CVARS:
       $("#im-chat").css({ "background-clip": "content-box", "height": (footerHeight - 8) + "px" });
       $("#im-chat-body").css({ left: 0, top: "13px", width: "284px", "background-color": "white", height: (footerHeight - 8 - 13 - 6 - 33 - 6) + "px" });
       $("#im-chat input").css({ width: "282px", left: 0, top: "auto", bottom: "7px" });
-      $("#im-chat-send").css("display", "none");
       $("#im-overlay-body").css({ "background-color": "white", height: (height - 87) + "px" });
 
       // resize elements which support a dynamic height

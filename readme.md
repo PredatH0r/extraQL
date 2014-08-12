@@ -18,6 +18,14 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+
+Version 0.108
+- added options to auto-start Launcher.exe or Steam QL
+- added "Quit" to context menu in system tray
+- improved detection of path to Launcher.exe
+- fixed hook.js installation path for Steam
+- clear log messages after reaching allowed max length
+
 Version 0.107
 ---
 - added option to show extraQL in the system tray instead of the task bar

@@ -1,12 +1,14 @@
 ﻿/*
 // @name        extraQL Script Manager
-// @version     0.107
-// @author      PredatH0r
-// @credits     wn
+// @version     0.108
+// @author      wn, PredatH0r
 // @description	Manages the installation and execution of QuakeLive userscripts
 
 This script is a stripped down version of wn's QuakeLive Hook Manager (QLHM),
 which is designed to work with a local or remote extraQL.exe script server.
+
+Version 0.108
+- added border in Script Management console list box to make scroll bar more visible
 
 Version 0.107
 - changed display string from "extraQL" to "hook.js" to avoid confusion of version numbers
@@ -47,13 +49,13 @@ var qlPrompt = window.qlPrompt;
 var nav = window.nav;
 var console = window.console;
 
-(function (aWin, undefined) {
+(function(aWin, undefined) {
   // !!!
   // IMPORTANT:  It is unlikely that you'll need to change anything in this file.  If you actually do,
   // it is probably only in the config object below.
   // !!!
   var config = {
-    version: "0.107",
+    version: "0.108",
     consoleCaption: "hook.js v",
     menuCaption: "Userscripts",
     BASE_URL: "http://127.0.0.1:27963/",
@@ -93,8 +95,8 @@ var console = window.console;
   */
 
   var storage = {};
-  storage.init = function () {
-    var STORAGE_TEMPLATE = { repository: undefined, scripts: { enabled: { /* [id] */ }, code: { /* id */ } } };
+  storage.init = function() {
+    var STORAGE_TEMPLATE = { repository: undefined, scripts: { enabled: { /* [id] */  }, code: { /* id */  } } };
     storage.repository = STORAGE_TEMPLATE.repository;
     storage.scripts = STORAGE_TEMPLATE.scripts;
 
@@ -118,7 +120,7 @@ var console = window.console;
     storage.save();
   };
 
-  storage.save = function () {
+  storage.save = function() {
     localStorage.extraQL = JSON.stringify(storage);
   };
 
@@ -129,14 +131,14 @@ var console = window.console;
   function HookManager() {
   }
 
-  HookManager.prototype.init = function () {
+  HookManager.prototype.init = function() {
     log("^2Initializing " + config.consoleCaption + config.version);
     storage.init();
     this.hud = new HudManager(this);
     this.loadRepository();
   };
 
-  HookManager.prototype.loadRepository = function () {
+  HookManager.prototype.loadRepository = function() {
     // try a local extraQL HTTP server
     var self = this;
     $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 1000 })
@@ -144,7 +146,7 @@ var console = window.console;
       .fail(this.tryRemoteRepository.bind(this));
   };
 
-  HookManager.prototype.tryRemoteRepository = function () {
+  HookManager.prototype.tryRemoteRepository = function() {
     // try remote extraQL HTTP server
     var self = this;
     config.BASE_URL = config.REMOTE_URL;
@@ -152,21 +154,19 @@ var console = window.console;
     $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 1000 })
       .done(function(repo) { self.initRepository(repo); })
       .fail(this.tryLocalScriptCache.bind(this));
-  }
-
-  HookManager.prototype.tryLocalScriptCache = function () {
+  };
+  HookManager.prototype.tryLocalScriptCache = function() {
     // try local script cache
     if (!storage.repository) {
       log("^1Failed to load scripts from extraQL server or local cache.^7 1Scripts are unavailable!");
-      return;     
+      return;
     }
     config.BASE_URL = null;
     extraQL.BASE_URL = null;
     log("^1Could not connected to an extraQL server^7, some cached scripts will not work.");
     this.loadScripts();
-  }
-
-  HookManager.prototype.initRepository = function (repo) {
+  };
+  HookManager.prototype.initRepository = function(repo) {
     log("Loading userscripts from ^2" + config.BASE_URL + "^7");
 
     this.checkForUpdatedHookJs();
@@ -174,7 +174,7 @@ var console = window.console;
     storage.repository = repo;
     if (config.autoEnableAllScripts) {
       // activate all scripts after first run
-      $.each(repo, function (index, script) {
+      $.each(repo, function(index, script) {
         storage.scripts.enabled[script.id] = true;
       });
     }
@@ -182,15 +182,15 @@ var console = window.console;
     this.loadScripts();
   };
 
-  HookManager.prototype.checkForUpdatedHookJs = function () {
+  HookManager.prototype.checkForUpdatedHookJs = function() {
     $.ajax({ url: config.BASE_URL + "proxy?url=" + encodeURI(config.SOURCE_URL), dataType: "html", timeout: 10000 })
-      .done(function (code) {
+      .done(function(code) {
         var match = /@version\s*(\S+)/.exec(code);
         if (match.length < 2) return;
         var localVersion = config.version.split(".");
         var remoteVersion = match[1].split(".");
         var needUpdate = false;
-        for (var i = 0; i < Math.min(localVersion.length, remoteVersion.length) ; i++) {
+        for (var i = 0; i < Math.min(localVersion.length, remoteVersion.length); i++) {
           if (localVersion[i] > remoteVersion[i])
             break;
           needUpdate |= localVersion[i] < remoteVersion[i];
@@ -202,7 +202,7 @@ var console = window.console;
             customWidth: 500,
             okLabel: "Close",
             cancelLabel: "Reload",
-            cancel: function () { qz_instance.SendGameCommand("web_reload"); },
+            cancel: function() { qz_instance.SendGameCommand("web_reload"); },
             body: "<b>A newer version of hook.js is available.</b>" +
               "<br>" +
               "<br>To install the update, either restart extraQL.exe" +
@@ -211,22 +211,21 @@ var console = window.console;
           });
         }
       })
-    .fail(function (x, y, err) { console.log("update check failed: " + err); });
-  }
-
-  HookManager.prototype.loadScripts = function () {
+      .fail(function(x, y, err) { console.log("update check failed: " + err); });
+  };
+  HookManager.prototype.loadScripts = function() {
     var self = this;
 
     // get sorted list of enabled script IDs (to make execution order a bit less random)
     var scriptIds = [];
-    $.each(storage.scripts.enabled, function (id, enabled) {
+    $.each(storage.scripts.enabled, function(id, enabled) {
       if (enabled)
         scriptIds.push(id);
     });
     scriptIds.sort();
 
     // Fire off requests for each script
-    $.each(scriptIds, function (index, id) {
+    $.each(scriptIds, function(index, id) {
       self.loadScript(id);
     });
   };
@@ -253,17 +252,15 @@ var console = window.console;
           if (repoScript.hasOwnProperty("unwrap") && config.enableUnwrap) {
             // scripts marked with @unwrap can be injected without a closure. This preserves file name info for error messages. Such scripts must not contain global "return" statements.
             $.ajax({ url: url, dataType: "script", timeout: config.async ? 5000 : 1000, async: config.async })
-              .fail(function(a, b, err) { self.runScriptFromCache(id, err); });            
-          }
-          else
+              .fail(function(a, b, err) { self.runScriptFromCache(id, err); });
+          } else
             self.runScriptFromCache(id, false);
         });
     } else {
       this.runScriptFromCache(id, false);
     }
-  }
-
-  HookManager.prototype.runScriptFromCache = function (id, err) {
+  };
+  HookManager.prototype.runScriptFromCache = function(id, err) {
     var code = storage.scripts.code[id];
     if (err !== false || !code)
       log("^1Failed to retrieve script with ID ^5" + id + "^1 : ^7" + err);
@@ -273,7 +270,7 @@ var console = window.console;
     }
   };
 
-  HookManager.prototype.toggleUserScript = function (id, enable) {
+  HookManager.prototype.toggleUserScript = function(id, enable) {
     // return true if web_reload is required to make the change take effect
 
     if (enable && !storage.scripts.enabled[id]) {
@@ -290,7 +287,7 @@ var console = window.console;
     return false;
   };
 
-  HookManager.prototype.addMenuItem = function (aCaption, aHandler) {
+  HookManager.prototype.addMenuItem = function(aCaption, aHandler) {
     this.hud.addMenuItem(aCaption, aHandler);
   };
 
@@ -309,17 +306,17 @@ var console = window.console;
     // window.alert is currently unhandled... remove this if a better option is enabled.
     if ("function alert() { [native code] }" === (aWin.alert + "")) {
       var self = this;
-      aWin.alert = function (aMsg) { self.alert.call(self, { title: "ALERT!", body: aMsg }); };
+      aWin.alert = function(aMsg) { self.alert.call(self, { title: "ALERT!", body: aMsg }); };
     }
   }
 
-  HudManager.prototype.alert = function (aOptions) {
+  HudManager.prototype.alert = function(aOptions) {
     var self = this;
     var opts = $.extend({ title: self.hm.name }, aOptions, { alert: true });
     qlPrompt(opts);
   };
 
-  HudManager.prototype.OnLayoutLoaded = function () {
+  HudManager.prototype.OnLayoutLoaded = function() {
     var layout = quakelive.activeModule ? quakelive.activeModule.GetLayout() : "";
     // Proper layout and no existing menu?
     if ("bare" !== layout && "postlogin_bare" !== layout && !$("#qlhm_nav, #hooka").length) {
@@ -327,21 +324,21 @@ var console = window.console;
     }
   };
 
-  HudManager.prototype.addMenuItem = function (aCaption, aHandler) {
+  HudManager.prototype.addMenuItem = function(aCaption, aHandler) {
     scriptMenuItems[aCaption] = aHandler;
     if (this.rebuildNavBarTimer)
       window.clearTimeout(this.rebuildNavBarTimer);
-    this.rebuildNavBarTimer = window.setTimeout(function () { this.rebuildNav(); }.bind(this), 200);
+    this.rebuildNavBarTimer = window.setTimeout(function() { this.rebuildNav(); }.bind(this), 200);
   };
 
-  HudManager.prototype.onMenuItemClicked = function (aItem) {
+  HudManager.prototype.onMenuItemClicked = function(aItem) {
     var caption = $(aItem).text();
     var handler = scriptMenuItems[caption];
     if (handler)
       handler();
   };
 
-  HudManager.prototype.rebuildNav = function () {
+  HudManager.prototype.rebuildNav = function() {
     // method could have been called by the timer before the menu was created
     this.rebuildNavBarTimer = undefined;
     if (!nav.navbar[config.menuCaption])
@@ -362,13 +359,32 @@ var console = window.console;
     });
   };
 
-  HudManager.prototype.injectMenuEntry = function () {
+  HudManager.prototype.injectMenuEntry = function() {
     var self = this;
     if (!window.extraQL)
       return;
 
     extraQL.addStyle(
-      "#qlhm_console { text-align: left !important; width: 100%; }", "#qlhm_console #detailspane { float: right; position: relative; top: 0px; width: 270px; }", "#qlhm_console strong, #qlhm_console legend { font-weight: bold; }", "#qlhm_console fieldset { margin: 10px 0 20px 0; padding: 5px; }", "#qlhm_console ul { list-style: none; }", "#qlhm_console ul li { margin-top: 5px; whitespace: nowrap; overflow:hidden; }", "#qlhm_console ul li.selected { background-color: #ffc; }", "#qlhm_console input.userscript-new { width: 400px; margin-bottom: 5px; }", "#qlhm_console a.del, #qlhm_console a.viewSource { text-decoration: none; }", "#qlhm_console .italic { font-style: italic; }", "#qlhm_console .strike { text-decoration: line-through; }", "#qlhm_console .underline { text-decoration: underline; }", "#qlhm_console .details { margin-left: 15px; font-size: smaller; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: " + (self.width - 50) + "px; }", "#qlhm_console .table { display: table; }", "#qlhm_console .row { display: table-row; }", "#qlhm_console .cell { display: table-cell; padding-right: 10px; }", "#qlhm_console .notInstalled { color: #aaa; }", "#userscripts { overflow: auto; width: 550px; max-height: 400px; }", "#qlhmSource textarea.userscript-source { width: " + (self.width - 140) + "px; }", "#qlhm_nav_scriptMgmt { border-bottom: 1px solid #888; }"
+      "#qlhm_console { text-align: left !important; width: 100%; }",
+      "#qlhm_console #detailspane { float: right; position: relative; top: 0px; width: 270px; }",
+      "#qlhm_console strong, #qlhm_console legend { font-weight: bold; }",
+      "#qlhm_console fieldset { margin: 10px 0 20px 0; padding: 5px; }",
+      "#qlhm_console ul { list-style: none; }",
+      "#qlhm_console ul li { margin-top: 5px; whitespace: nowrap; overflow:hidden; }",
+      "#qlhm_console ul li.selected { background-color: #ffc; }",
+      "#qlhm_console input.userscript-new { width: 400px; margin-bottom: 5px; }",
+      "#qlhm_console a.del, #qlhm_console a.viewSource { text-decoration: none; }",
+      "#qlhm_console .italic { font-style: italic; }",
+      "#qlhm_console .strike { text-decoration: line-through; }",
+      "#qlhm_console .underline { text-decoration: underline; }",
+      "#qlhm_console .details { margin-left: 15px; font-size: smaller; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: " + (self.width - 50) + "px; }",
+      "#qlhm_console .table { display: table; }",
+      "#qlhm_console .row { display: table-row; }",
+      "#qlhm_console .cell { display: table-cell; padding-right: 10px; }",
+      "#qlhm_console .notInstalled { color: #aaa; }",
+      "#userscripts { overflow: auto; width: 550px; max-height: 400px; border: 1px solid #666; padding: 5px; margin-top: 5px; }",
+      "#qlhmSource textarea.userscript-source { width: " + (self.width - 140) + "px; }",
+      "#qlhm_nav_scriptMgmt { border-bottom: 1px solid #888; }"
     );
 
     // New...
@@ -381,38 +397,38 @@ var console = window.console;
         }
       }; // Override nav.initNav to do post-init stuff for QLHM
       var oldInitNav = nav.initNav;
-      nav.initNav = function () {
+      nav.initNav = function() {
         oldInitNav.apply(nav, arguments);
 
         // QLHM-specific stuff
-        $("#qlhm_nav_scriptMgmt > a").click(function () {
+        $("#qlhm_nav_scriptMgmt > a").click(function() {
           self.showConsole.call(self);
           return false;
         });
-        $(".qlhm_nav_scriptMenuItem").click(function () { self.onMenuItemClicked(this); });
+        $(".qlhm_nav_scriptMenuItem").click(function() { self.onMenuItemClicked(this); });
       };
       self.rebuildNav();
     }
-      // ... or old? (TODO: remove eventually)
+    // ... or old? (TODO: remove eventually)
     else {
       extraQL.addStyle(
         "#hooka { position: relative; bottom: 20px; left: 10px; z-index: 99999; font-weight: bold; padding: 2px; text-shadow: 0 0 10px #000; }", "#hooka:hover { cursor: pointer; text-shadow: 0 0 10px yellow; }"
       );
-      $("#qlv_mainLogo").append($("<a id='hooka'>HOOK</a>").click(function () {
+      $("#qlv_mainLogo").append($("<a id='hooka'>HOOK</a>").click(function() {
         self.loadRepository.call(self);
         return false;
       }));
     }
   };
 
-  HudManager.prototype.showConsole = function () {
+  HudManager.prototype.showConsole = function() {
     var self = this;
 
     webReloadRequired = false;
 
     // sort all scripts
     var scripts = storage.repository.slice(0);
-    scripts.sort(function (a, b) {
+    scripts.sort(function(a, b) {
       var x = a.name;
       var y = b.name;
       x = x.toLowerCase(), y = y.toLowerCase();
@@ -441,7 +457,7 @@ var console = window.console;
     out.push(" - <a class='unselectall' href='javascript:void(0)'>unselect all</a>");
     out.push(")");
     out.push("<ul id='userscripts'>");
-    $.each(scripts, function (i, script) {
+    $.each(scripts, function(i, script) {
       out.push(self.scriptRowFromScriptRepository(script));
     });
     out.push("</ul>");
@@ -463,19 +479,19 @@ var console = window.console;
     });
 
     // Wait for the prompt to get inserted then do stuff...
-    setTimeout(function () {
+    setTimeout(function() {
       $("#modal-cancel").focus();
 
       var $ui = $("#qlhm_console");
-      $ui.on("keydown", function (ev) {
-        // Suppress backtick (99.999% intended for the QL console)
-        if (192 == ev.keyCode) ev.preventDefault();
-      })
-        .on("click", "#userscripts li", function () { self.showDetails(this); })
-        .on("click", ".selectall", function () { $ui.find(":checkbox").prop("checked", true); })
-        .on("click", ".unselectall", function () { $ui.find(":checkbox").prop("checked", false); })
-        .on("click", ".deleteunsel", function () {
-          $ui.find(":checkbox").each(function (index, item) {
+      $ui.on("keydown", function(ev) {
+          // Suppress backtick (99.999% intended for the QL console)
+          if (192 == ev.keyCode) ev.preventDefault();
+        })
+        .on("click", "#userscripts li", function() { self.showDetails(this); })
+        .on("click", ".selectall", function() { $ui.find(":checkbox").prop("checked", true); })
+        .on("click", ".unselectall", function() { $ui.find(":checkbox").prop("checked", false); })
+        .on("click", ".deleteunsel", function() {
+          $ui.find(":checkbox").each(function(index, item) {
             var $item = $(item);
             if (!$item.prop("checked") && !$item.parent().find("a").hasClass("notInstalled")) {
               $item.closest("li").data("toDelete", true).find("label").addClass("strike");
@@ -486,7 +502,7 @@ var console = window.console;
     }, 0);
   };
 
-  HudManager.prototype.scriptRowFromScriptRepository = function (script) {
+  HudManager.prototype.scriptRowFromScriptRepository = function(script) {
     var id = script.id;
     return "<li id='userscript" + id + "' data-id='" + id + "'>"
       + "<input type='checkbox' class='userscript-state'" + (storage.scripts.enabled[id] ? "checked" : "") + ">"
@@ -494,7 +510,7 @@ var console = window.console;
       + "</li>";
   };
 
-  HudManager.prototype.showDetails = function (elem) {
+  HudManager.prototype.showDetails = function(elem) {
     var self = this, $details = $("#scriptDetails");
 
     $("#userscripts li").removeClass("selected");
@@ -512,7 +528,7 @@ var console = window.console;
 
     var $elem = $(elem);
     var id = $elem.closest("li").data("id");
-    var repoScript = $.grep(storage.repository, function (item) { return item.id == id; })[0];
+    var repoScript = $.grep(storage.repository, function(item) { return item.id == id; })[0];
 
     self.selectedScriptElement = elem;
     $elem.addClass("selected");
@@ -536,13 +552,13 @@ var console = window.console;
     );
   };
 
-  HudManager.prototype.handleConsoleOk = function () {
+  HudManager.prototype.handleConsoleOk = function() {
     var self = this;
     var $con = $("#qlhm_console");
     var $uNew = $con.find("input.userscript-new");
 
     // enable/disable scripts
-    $con.find("input.userscript-state").each(function () {
+    $con.find("input.userscript-state").each(function() {
       var $input = $(this);
       var $item = $input.closest("li");
       var id = $item.data("id");
@@ -560,7 +576,7 @@ var console = window.console;
     self.showDetails();
   };
 
-  HudManager.prototype.handleConsoleClose = function () {
+  HudManager.prototype.handleConsoleClose = function() {
     if (webReloadRequired)
       qz_instance.SendGameCommand("web_reload");
     else
@@ -576,7 +592,6 @@ var console = window.console;
   };
 
 })(window);
-
 
 
 /*
@@ -607,7 +622,7 @@ function ExtraQL() {
 
   // public: add CSS rules
   // params: string...
-  function addStyle(/*...*/) {
+  function addStyle( /*...*/) {
     var css = "";
     for (var i = 0; i < arguments.length; i++)
       css += "\n" + arguments[i];
@@ -632,7 +647,7 @@ function ExtraQL() {
   function escapeHtml(text) {
     // originally from mustache.js MIT ( https://raw.github.com/janl/mustache.js/master/LICENSE )
     var entityMap = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;", "/": "&#x2F;" };
-    return String(text).replace(/[&<>"'\/]/g, function (s) { return entityMap[s]; });
+    return String(text).replace(/[&<>"'\/]/g, function(s) { return entityMap[s]; });
     //return $("<div/>").text(text).html();
   }
 
@@ -642,7 +657,7 @@ function ExtraQL() {
   // public: .NET-like string.Format() which allows positional placeholders like {0} ... to be replaced with parameter values
   function format(template /*, ... */) {
     var args = arguments;
-    return template.replace(REGEX_FORMAT, function (item, p1, p2, p3) {
+    return template.replace(REGEX_FORMAT, function(item, p1, p2, p3) {
       var intVal = parseInt(p3);
       var replace = intVal >= 0 ? args[1 + intVal] : "";
       return p1 + p2 + replace;
@@ -654,7 +669,7 @@ function ExtraQL() {
     tabifyChat();
 
     if (!onClick)
-      onClick = function () { showTabPage(id); };
+      onClick = function() { showTabPage(id); };
     //$("#chatContainer").append(content);
     if (content)
       $($("#chatContainer").prepend(content).children()[0]).prepend("<div class='chatTitleBar'>" + caption + "<div class='close'>X</div></div>");
@@ -685,12 +700,12 @@ function ExtraQL() {
 
     $("#qlv_chatControl").prepend("<div class='chatTitleBar'>Chat<div class='close'>X</div></div>");
 
-    quakelive.mod_friends.roster.UI_OnRosterUpdated = function () {
+    quakelive.mod_friends.roster.UI_OnRosterUpdated = function() {
       var numOnline = this.GetNumOnlineContacts();
       $('#tab_qlv_chatControl').text('Chat (' + numOnline + ')');
       this.UI_Show();
     }.bind(quakelive.mod_friends.roster);
-    quakelive.mod_friends.UI_SetChatTitle = function () {
+    quakelive.mod_friends.UI_SetChatTitle = function() {
       var numOnline = this.roster.GetNumOnlineContacts();
       $('#tab_qlv_chatControl').text('Chat (' + numOnline + ')');
     }.bind(quakelive.mod_friends);
@@ -734,7 +749,7 @@ function ExtraQL() {
     $("#collapsableChat").unbind("click").click(closeTabPage);
     $("#collapsableChat .tab").unbind("click");
 
-    $("#tab_qlv_chatControl").unbind("click").click(function () {
+    $("#tab_qlv_chatControl").unbind("click").click(function() {
       showTabPage("qlv_chatControl");
       quakelive.mod_friends.UI_ClearMessageAlert();
     });
@@ -758,11 +773,11 @@ function ExtraQL() {
       url: "http://127.0.0.1:27963/version",
       async: false,
       dataType: "json",
-      success: function (version) {
+      success: function(version) {
         lastServerCheckResult = true;
         extraQL.serverVersion = version;
       },
-      error: function () { lastServerCheckResult = false; }
+      error: function() { lastServerCheckResult = false; }
     });
     lastServerCheckTimestamp = new Date().getTime();
     return lastServerCheckResult;
@@ -774,7 +789,7 @@ function ExtraQL() {
     if (isLocalServerRunning())
       $.post(BASE_URL + "log", text);
   }
-  
+
   // public: store a text file in extraQL.exe's "data" directory
   function store(filename, text) {
     if (isLocalServerRunning())
@@ -788,7 +803,6 @@ function ExtraQL() {
     else
       callback();
   }
-
 
 
   init();

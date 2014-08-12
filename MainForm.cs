@@ -14,7 +14,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.107";
+    public const string Version = "0.108";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -34,6 +34,7 @@ namespace ExtraQL
       this.lblVersion.Text = Version;
       this.lblExtra.Parent = this.picLogo;
       this.lblVersion.Parent = this.picLogo;
+      this.trayIcon.Icon = this.Icon;
 
       this.server = new HttpServer();
       this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
@@ -55,6 +56,11 @@ namespace ExtraQL
       this.RestartHttpServer();
       if (this.cbCheckUpdate.Checked)
         this.CheckForUpdate();
+
+      if (this.cbAutostartLauncher.Checked)
+        this.Launch(false);
+      else if (this.cbAutostartSteam.Checked)
+        this.Launch(true);
     }
     #endregion
 
@@ -321,6 +327,25 @@ namespace ExtraQL
     }
     #endregion
 
+    #region miQuit_Click
+    private void miQuit_Click(object sender, EventArgs e)
+    {
+      this.Close();
+    }
+    #endregion
+
+    #region cbAutostart_CheckedChanged
+    private void cbAutostart_CheckedChanged(object sender, EventArgs e)
+    {
+      if (!((CheckBox)sender).Checked)
+        return;
+      if (sender == this.cbAutostartLauncher)
+        this.cbAutostartSteam.Checked = false;
+      else
+        this.cbAutostartLauncher.Checked = false;
+    }
+    #endregion
+
 
 
     #region ConfigFile
@@ -351,6 +376,7 @@ namespace ExtraQL
       bool systemTray = false;
       bool startMinimized = false;
       bool checkUpdates = true;
+      int autostart = 0;
 
       var configFile = this.ConfigFile;
       if (File.Exists(configFile))
@@ -375,6 +401,7 @@ namespace ExtraQL
             case "systemTray": systemTray = value == "1"; break;
             case "startMinimized": startMinimized = value == "1"; break;
             case "checkUpdates": checkUpdates = value == "1"; break;
+            case "autostart": autostart = int.Parse(value); break;
           }
         }
       }
@@ -396,7 +423,7 @@ namespace ExtraQL
 
       this.txtLauncherExe.Text = launcherExe;
       if (String.IsNullOrEmpty(this.txtLauncherExe.Text))
-        this.txtLauncherExe.Text = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\Quake Live\\Launcher.exe";
+        this.txtLauncherExe.Text = this.GetDefaultLauncherPath();
 
       if (!String.IsNullOrEmpty(realmHistory))
       {
@@ -414,6 +441,8 @@ namespace ExtraQL
       if (startMinimized)
         this.WindowState = FormWindowState.Minimized;
       this.cbCheckUpdate.Checked = checkUpdates;
+      this.cbAutostartLauncher.Checked = autostart == 1;
+      this.cbAutostartSteam.Checked = autostart == 2;
       this.ActiveControl = this.comboEmail;
     }
 
@@ -457,6 +486,7 @@ namespace ExtraQL
         config.AppendLine("systemTray=" + (this.cbSystemTray.Checked ? 1 : 0));
         config.AppendLine("startMinimized=" + (this.cbStartMinimized.Checked ? 1 : 0));
         config.AppendLine("checkUpdates=" + (this.cbCheckUpdate.Checked ? 1 : 0));
+        config.AppendLine("autostart=" + (this.cbAutostartLauncher.Checked ? 1 : this.cbAutostartSteam.Checked ? 2 : 0));
         File.WriteAllText(this.ConfigFile, config.ToString(), Encoding.UTF8);
       }
       catch (Exception ex)
@@ -478,7 +508,25 @@ namespace ExtraQL
       if (this.InvokeRequired)
         this.BeginInvoke((Action) (() => this.Log(msg)));
       else
-        this.txtLog.Text += "[" + DateTime.Now.ToString("T") + "] " + msg + "\r\n";
+      {
+        var text = this.txtLog.Text;
+        if (text.Length > 10000) // truncate log after 10k chars
+          text = ""; 
+        this.txtLog.Text = text + "[" + DateTime.Now.ToString("T") + "] " + msg + "\r\n";
+      }
+    }
+    #endregion
+
+    #region GetDefaultLauncherPath()
+    private string GetDefaultLauncherPath()
+    {
+      string path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\id Software\Quake Live", null, null) as string;
+      if (path != null && File.Exists(path += "\\Launcher.exe"))
+        return path;
+      path = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Quake Live", "UninstallString", null) as string;
+      if (path != null && File.Exists(path = path.Replace("uninstall.exe", "Launcher.exe")))
+        return path;
+      return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\Quake Live\\Launcher.exe";
     }
     #endregion
 
@@ -621,16 +669,16 @@ namespace ExtraQL
       {
         path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
         if (path != null)
-          path += @"\SteamApps\Common\Quake Live\baseq3";
+          path += @"\SteamApps\Common\Quake Live\baseq3\";
       }
       else
       {
         path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         if (path.EndsWith("Roaming"))
-          path = Path.GetDirectoryName(path) + "\\LocalLow";
+          path = Path.GetDirectoryName(path) + @"\LocalLow";
 
         string realmDir = this.comboRealm.Text.Contains("focus") ? "focus" : "quakelive";
-        path += "\\id Software\\" + realmDir + "\\home\\baseq3\\";
+        path += @"\id Software\" + realmDir + @"\home\baseq3\";
       }
 
       return path != null && Directory.Exists(path) ? path : null;
