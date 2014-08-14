@@ -18,8 +18,15 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 0.109
+---
+- automatically click on "Play" in the QL Launcher
+- allow user defined command line for starting Launcher.exe
+- removing eventual read-only flag before updating hook.js
+- activate already running extraQL.exe, when a 2nd instance is started
 
 Version 0.108
+---
 - added options to auto-start Launcher.exe or Steam QL
 - added "Quit" to context menu in system tray
 - improved detection of path to Launcher.exe

@@ -1,12 +1,15 @@
 ﻿// ==UserScript==
 // @name        Quake Live Twich.tv Streams and VODs
-// @version     1.2
+// @version     1.3
 // @author      PredatH0r
 // @description	Shows a list of twitch.tv QL live streams and videos
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.3
+- ensuring consistent order of tabs in the chat bar
 
 Version 1.2
 - updated extraQL script url to sourceforge
@@ -42,7 +45,10 @@ Version 1.0
 
   function init() {
     // delay init so that twitch, twitter, ESR and IRC scripts add items to chat menu bar in a defined order
-    setTimeout(delayedInit, 0);
+    if (extraQL.hookVersion) // introduced at the same time as the addTabPage() "priority" param
+      delayedInit();
+    else
+      setTimeout(delayedInit, 0);
   }
 
   function delayedInit() {
@@ -87,7 +93,7 @@ Version 1.0
       "  <div id='twitchDetails'><img src='' width='288' height='180'><div id='twitchStatus'></div></div>" +
       "  <div id='twitchContent' data-fill='" + fixedElementsHeight + "'></div>" +
       "</div></div>";
-    extraQL.addTabPage("twitch", "Twitch", content);
+    extraQL.addTabPage("twitch", "Twitch", content, undefined, 100);
 
     $("#twitchShowStreams").click(function () {
       currentView = VIEW_STREAMS;

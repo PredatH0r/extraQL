@@ -14,7 +14,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.108";
+    public const string Version = "0.109";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -42,7 +42,7 @@ namespace ExtraQL
       this.scriptRepository = new ScriptRepository();
       this.scriptRepository.Log = this.Log;
 
-      this.servlets = new Servlets(this.server, this.scriptRepository, this.Log);
+      this.servlets = new Servlets(this.server, this.scriptRepository, this.Log, this);
     }
     #endregion
 
@@ -291,23 +291,6 @@ namespace ExtraQL
     }
     #endregion
 
-    #region laucherDetectionTimer_Tick
-    private void laucherDetectionTimer_Tick(object sender, EventArgs e)
-    {
-      // find Launcher main window handle
-      var handle = LauncherWindowHandle;
-      if (handle == IntPtr.Zero)
-      {
-        if (++this.timerCount == 20)
-          this.launcherDetectionTimer.Stop();
-        return;
-      }
-
-      this.launcherDetectionTimer.Stop();
-      this.FillLaucherWithEmailAndPassword(handle);
-    }
-    #endregion
-
     #region cbBindAll_CheckedChanged
     private void cbBindAll_CheckedChanged(object sender, EventArgs e)
     {
@@ -346,6 +329,47 @@ namespace ExtraQL
     }
     #endregion
 
+    #region laucherDetectionTimer_Tick
+    private void laucherDetectionTimer_Tick(object sender, EventArgs e)
+    {
+      // find Launcher main window handle
+      var handle = LauncherWindowHandle;
+      if (handle == IntPtr.Zero)
+      {
+        if (++this.timerCount == 20)
+          this.launcherDetectionTimer.Stop();
+        return;
+      }
+
+      this.launcherDetectionTimer.Stop();
+      this.FillLaucherWithEmailAndPassword(handle);
+    }
+    #endregion
+
+    #region launcherPlayTimer_Tick
+    private void launcherPlayTimer_Tick(object sender, EventArgs e)
+    {
+      // this method is periodically called after starting the launcher to wait for the Play button to become enabled
+      object[] context = (object[])((Timer)sender).Tag;
+      IntPtr hwndPlay = (IntPtr)context[0];
+      int attemptCount = (int)context[1];
+
+      long style = Win32.GetWindowLong(hwndPlay, Win32.GWL_STYLE);
+      if ((style & Win32.WS_DISABLED) == 0)
+      {
+        Win32.PostMessage(hwndPlay, Win32.WM_LBUTTONDOWN, 0, 0);
+        Win32.PostMessage(hwndPlay, Win32.WM_LBUTTONUP, 0, 0);
+        this.launcherDetectionTimer.Stop();
+      }
+      else
+      {
+        context[1] = ++attemptCount;
+        if (attemptCount == 25) // 25*200ms = 5sec
+          this.launcherDetectionTimer.Stop();
+      }
+    }
+    #endregion
+
 
 
     #region ConfigFile
@@ -353,9 +377,9 @@ namespace ExtraQL
     {
       get
       {
-        var path = Path.GetDirectoryName(Application.ExecutablePath);
+        var path = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
         if (path.EndsWith(("Debug")))
-          path = Path.GetDirectoryName(Path.GetDirectoryName(path));
+          path = Path.GetDirectoryName(Path.GetDirectoryName(path)) ?? "";
         return Path.Combine(path, "extraQL.ini");
       }
     }
@@ -376,6 +400,7 @@ namespace ExtraQL
       bool systemTray = false;
       bool startMinimized = false;
       bool checkUpdates = true;
+      bool runAsCommandLine = false;
       int autostart = 0;
 
       var configFile = this.ConfigFile;
@@ -402,6 +427,7 @@ namespace ExtraQL
             case "startMinimized": startMinimized = value == "1"; break;
             case "checkUpdates": checkUpdates = value == "1"; break;
             case "autostart": autostart = int.Parse(value); break;
+            case "runAsCommandLine": runAsCommandLine = value == "1"; break;
           }
         }
       }
@@ -443,6 +469,7 @@ namespace ExtraQL
       this.cbCheckUpdate.Checked = checkUpdates;
       this.cbAutostartLauncher.Checked = autostart == 1;
       this.cbAutostartSteam.Checked = autostart == 2;
+      this.cbRunAsCommandLine.Checked = runAsCommandLine;
       this.ActiveControl = this.comboEmail;
     }
 
@@ -487,6 +514,7 @@ namespace ExtraQL
         config.AppendLine("startMinimized=" + (this.cbStartMinimized.Checked ? 1 : 0));
         config.AppendLine("checkUpdates=" + (this.cbCheckUpdate.Checked ? 1 : 0));
         config.AppendLine("autostart=" + (this.cbAutostartLauncher.Checked ? 1 : this.cbAutostartSteam.Checked ? 2 : 0));
+        config.AppendLine("runAsCommandLine=" + (this.cbRunAsCommandLine.Checked ? 1 : 0));
         File.WriteAllText(this.ConfigFile, config.ToString(), Encoding.UTF8);
       }
       catch (Exception ex)
@@ -650,13 +678,24 @@ namespace ExtraQL
         bundledHook = Path.GetDirectoryName(Path.GetDirectoryName(bundledHook));
       bundledHook += "/scripts/hook.js";
 
-      if (force || new FileInfo(targetHook).LastWriteTimeUtc < new FileInfo(bundledHook).LastWriteTimeUtc)
-        File.Delete(targetHook);
-
-      if (!File.Exists(targetHook))
+      try
       {
-        File.Copy(bundledHook, targetHook);
-        Log("Installed new hook.js");
+        var attrib = File.GetAttributes(targetHook);
+        if ((attrib & FileAttributes.ReadOnly) != 0)
+          File.SetAttributes(targetHook, attrib & ~FileAttributes.ReadOnly);
+        if (force || new FileInfo(targetHook).LastWriteTimeUtc < new FileInfo(bundledHook).LastWriteTimeUtc)
+          File.Delete(targetHook);
+
+        if (!File.Exists(targetHook))
+        {
+          File.Copy(bundledHook, targetHook);
+          Log("Installed new hook.js");
+        }
+      }
+      catch (UnauthorizedAccessException ex)
+      {
+        MessageBox.Show(this, "Unable to write to hook.js.\nPlease make sure your QL config directory is not read-only.\n\nError: " + ex.Message,
+          "extraQL", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
     }
     #endregion
@@ -690,24 +729,73 @@ namespace ExtraQL
 
     private void StartLauncher()
     {
-      if (!File.Exists(this.txtLauncherExe.Text))
-      {
-        MessageBox.Show(this, "Can't find Launcher.exe at the specified location", "extraQL", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-        return;
-      }
-
-      this.Log("Starting Quake Live Laucher...");
       string realmUrl = this.comboRealm.Text.Trim();
 
       ProcessStartInfo si = new ProcessStartInfo();
-      si.FileName = this.txtLauncherExe.Text;
+      if (this.cbRunAsCommandLine.Checked)
+      {
+        if (!this.RunAsCommandLine(si)) 
+          return;
+      }
+      else
+      {
+        string cmd = this.txtLauncherExe.Text.Trim(new [] { ' ', '"' });
+        if (!File.Exists(cmd))
+        {
+          MessageBox.Show(this, "Can't find Launcher.exe at the specified location", "extraQL", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+          return;
+        }
+        si.FileName = cmd;
+      }
+
       if (!String.IsNullOrEmpty(realmUrl))
-        si.Arguments = "--realm=\"" + realmUrl + "\"";
-      Process.Start(si);
+        si.Arguments += "--realm=\"" + realmUrl + "\"";
+
+      try
+      {
+        this.Log("Starting Quake Live...");
+        Process.Start(si);
+      }
+      catch(Exception ex)
+      {
+        MessageBox.Show(this, "Could not start \"" + si.FileName + "\":\n" + ex.Message, "extraQL", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        return;
+      }
       this.WindowState = FormWindowState.Minimized;
 
       this.timerCount = 0;
       this.launcherDetectionTimer.Start();
+    }
+    #endregion
+
+    #region RunAsCommandLine
+    private bool RunAsCommandLine(ProcessStartInfo si)
+    {
+      string cmd = this.txtLauncherExe.Text;
+      if (cmd.StartsWith("\""))
+      {
+        int end = cmd.IndexOf("\"", 1);
+        if (end < 0)
+        {
+          MessageBox.Show(this, "Non-matching quotes in command line for Launcher.exe", "extraQL", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+          return false;
+        }
+        si.FileName = cmd.Substring(1, end - 1);
+        if (end + 2 < cmd.Length)
+          si.Arguments = cmd.Substring(end + 2, cmd.Length - (end + 2));
+      }
+      else
+      {
+        int end = cmd.IndexOf(" ");
+        if (end > 0)
+        {
+          si.FileName = cmd.Substring(0, end);
+          si.Arguments = cmd.Substring(end + 1, cmd.Length - (end + 1));
+        }
+        else
+          si.FileName = cmd;
+      }
+      return true;
     }
 
     #endregion
@@ -771,6 +859,7 @@ document.loginform.submit();";
       var name = new StringBuilder(100);
       Win32.GetClassName(handle, name, 100);
       int i = 0;
+      IntPtr hwndPlay = IntPtr.Zero;
       foreach (var hwndChild in Win32.GetChildWindows(handle))
       {
         Win32.GetClassName(hwndChild, name, 100);
@@ -784,6 +873,19 @@ document.loginform.submit();";
             break;
           }
         }
+        else if (name.ToString() == "WindowsForms10.Window.8.app.0.33c0d9d")
+        {
+          Win32.RECT rect;
+          Win32.GetWindowRect(hwndChild, out rect);
+          if (rect.Width == 87 && rect.Height == 88)
+            hwndPlay = hwndChild;
+        }
+      }
+
+      if (hwndPlay != IntPtr.Zero)
+      {
+        launcherPlayTimer.Tag = new object[] { hwndPlay, 0 };
+        launcherPlayTimer.Start();
       }
     }
     #endregion

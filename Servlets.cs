@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Web;
 using System.Windows.Forms;
 
@@ -20,15 +21,17 @@ namespace ExtraQL
     private readonly StringBuilder indexBuilder = new StringBuilder();
     private string _fileBaseDir;
     private readonly ScriptRepository scriptRepository;
+    private readonly Form form;
 
     public Action<string> Log;
     
     #region ctor()
 
-    public Servlets(HttpServer server, ScriptRepository scriptRepository, Action<string> logger)
+    public Servlets(HttpServer server, ScriptRepository scriptRepository, Action<string> logger, Form form)
     {
       this.server = server;
       this.scriptRepository = scriptRepository;
+      this.form = form;
       this.EnableScripts = true;
       this.EnablePrivateServlets = true;
       server.Log = logger;
@@ -59,6 +62,7 @@ namespace ExtraQL
       RegisterServlet("/log", ScriptLog);
       RegisterServlet(AddScriptRoute, AddScript);
       RegisterServlet("/repository.json", RepositoryJson);
+      RegisterServlet("/bringToFront", BringToFront);
     }
 
     #endregion
@@ -418,6 +422,25 @@ namespace ExtraQL
       }
       text += "\n]";
       this.HttpOk(client, text);
+    }
+    #endregion
+
+    #region BringToFront()
+    private void BringToFront(TcpClient client, Uri uri, string request)
+    {
+      if (!this.EnablePrivateServlets)
+      {
+        HttpForbidden(client);
+        return;
+      }
+
+      form.BeginInvoke((ThreadStart) (() =>
+      {
+        this.form.WindowState = FormWindowState.Normal;
+        this.form.BringToFront();
+        this.form.Activate();
+      }));
+      this.HttpOk(client, "ok");
     }
     #endregion
 

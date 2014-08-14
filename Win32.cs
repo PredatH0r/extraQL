@@ -38,6 +38,8 @@ namespace ExtraQL
     public delegate bool EnumWindowProc(IntPtr hWnd, IntPtr lParam);
 
     public const int WM_MOUSEMOVE = 0x0200;
+    public const int WM_LBUTTONDOWN = 0x0201;
+    public const int WM_LBUTTONUP = 0x0202;
     public const int WM_SETTEXT = 0x000C;
     public const int WM_EXITSIZEMOVE = 0x0232;
     public const int WM_SYSKEYDOWN = 0x0104;
@@ -49,6 +51,8 @@ namespace ExtraQL
     public const int SWP_NOZORDER = 0x0004;
 
     public const int GWL_STYLE = -16;
+
+    public const int WS_DISABLED = 0x08000000;
 
     #region struct RECT
 

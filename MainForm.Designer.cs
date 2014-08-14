@@ -44,6 +44,8 @@ namespace ExtraQL
       this.btnInstallHook = new System.Windows.Forms.Button();
       this.panelAdvanced = new System.Windows.Forms.Panel();
       this.grpAdvanced = new System.Windows.Forms.GroupBox();
+      this.cbAutostartSteam = new System.Windows.Forms.CheckBox();
+      this.cbAutostartLauncher = new System.Windows.Forms.CheckBox();
       this.cbCheckUpdate = new System.Windows.Forms.CheckBox();
       this.cbStartMinimized = new System.Windows.Forms.CheckBox();
       this.cbSystemTray = new System.Windows.Forms.CheckBox();
@@ -77,8 +79,8 @@ namespace ExtraQL
       this.miStartSteam = new System.Windows.Forms.ToolStripMenuItem();
       this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
       this.miQuit = new System.Windows.Forms.ToolStripMenuItem();
-      this.cbAutostartLauncher = new System.Windows.Forms.CheckBox();
-      this.cbAutostartSteam = new System.Windows.Forms.CheckBox();
+      this.cbRunAsCommandLine = new System.Windows.Forms.CheckBox();
+      this.launcherPlayTimer = new System.Windows.Forms.Timer(this.components);
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -107,7 +109,7 @@ namespace ExtraQL
       this.txtLauncherExe.Location = new System.Drawing.Point(10, 37);
       this.txtLauncherExe.Name = "txtLauncherExe";
       this.txtLauncherExe.Size = new System.Drawing.Size(359, 21);
-      this.txtLauncherExe.TabIndex = 1;
+      this.txtLauncherExe.TabIndex = 2;
       // 
       // btnLauncherExe
       // 
@@ -117,7 +119,7 @@ namespace ExtraQL
       this.btnLauncherExe.Location = new System.Drawing.Point(375, 37);
       this.btnLauncherExe.Name = "btnLauncherExe";
       this.btnLauncherExe.Size = new System.Drawing.Size(23, 21);
-      this.btnLauncherExe.TabIndex = 2;
+      this.btnLauncherExe.TabIndex = 3;
       this.btnLauncherExe.Text = "…";
       this.btnLauncherExe.UseVisualStyleBackColor = false;
       this.btnLauncherExe.Click += new System.EventHandler(this.btnLauncherExe_Click);
@@ -151,7 +153,7 @@ namespace ExtraQL
       this.btnInstallHook.Location = new System.Drawing.Point(209, 65);
       this.btnInstallHook.Name = "btnInstallHook";
       this.btnInstallHook.Size = new System.Drawing.Size(189, 29);
-      this.btnInstallHook.TabIndex = 4;
+      this.btnInstallHook.TabIndex = 5;
       this.btnInstallHook.Text = "Re-install hook.js";
       this.btnInstallHook.UseVisualStyleBackColor = false;
       this.btnInstallHook.Click += new System.EventHandler(this.btnInstallHook_Click);
@@ -171,6 +173,7 @@ namespace ExtraQL
       this.grpAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpAdvanced.Controls.Add(this.cbRunAsCommandLine);
       this.grpAdvanced.Controls.Add(this.cbAutostartSteam);
       this.grpAdvanced.Controls.Add(this.cbAutostartLauncher);
       this.grpAdvanced.Controls.Add(this.cbCheckUpdate);
@@ -192,6 +195,28 @@ namespace ExtraQL
       this.grpAdvanced.TabStop = false;
       this.grpAdvanced.Text = "Advanced";
       // 
+      // cbAutostartSteam
+      // 
+      this.cbAutostartSteam.AutoSize = true;
+      this.cbAutostartSteam.Location = new System.Drawing.Point(209, 137);
+      this.cbAutostartSteam.Name = "cbAutostartSteam";
+      this.cbAutostartSteam.Size = new System.Drawing.Size(105, 17);
+      this.cbAutostartSteam.TabIndex = 10;
+      this.cbAutostartSteam.Text = "Autostart Steam";
+      this.cbAutostartSteam.UseVisualStyleBackColor = true;
+      this.cbAutostartSteam.CheckedChanged += new System.EventHandler(this.cbAutostart_CheckedChanged);
+      // 
+      // cbAutostartLauncher
+      // 
+      this.cbAutostartLauncher.AutoSize = true;
+      this.cbAutostartLauncher.Location = new System.Drawing.Point(10, 137);
+      this.cbAutostartLauncher.Name = "cbAutostartLauncher";
+      this.cbAutostartLauncher.Size = new System.Drawing.Size(119, 17);
+      this.cbAutostartLauncher.TabIndex = 9;
+      this.cbAutostartLauncher.Text = "Autostart Launcher";
+      this.cbAutostartLauncher.UseVisualStyleBackColor = true;
+      this.cbAutostartLauncher.CheckedChanged += new System.EventHandler(this.cbAutostart_CheckedChanged);
+      // 
       // cbCheckUpdate
       // 
       this.cbCheckUpdate.AutoSize = true;
@@ -200,7 +225,7 @@ namespace ExtraQL
       this.cbCheckUpdate.Location = new System.Drawing.Point(10, 91);
       this.cbCheckUpdate.Name = "cbCheckUpdate";
       this.cbCheckUpdate.Size = new System.Drawing.Size(179, 17);
-      this.cbCheckUpdate.TabIndex = 5;
+      this.cbCheckUpdate.TabIndex = 6;
       this.cbCheckUpdate.Text = "Check for extraQL.exe Updates";
       this.cbCheckUpdate.UseVisualStyleBackColor = true;
       this.cbCheckUpdate.CheckedChanged += new System.EventHandler(this.cbCheckUpdate_CheckedChanged);
@@ -211,7 +236,7 @@ namespace ExtraQL
       this.cbStartMinimized.Location = new System.Drawing.Point(209, 114);
       this.cbStartMinimized.Name = "cbStartMinimized";
       this.cbStartMinimized.Size = new System.Drawing.Size(98, 17);
-      this.cbStartMinimized.TabIndex = 7;
+      this.cbStartMinimized.TabIndex = 8;
       this.cbStartMinimized.Text = "Start Minimized";
       this.cbStartMinimized.UseVisualStyleBackColor = true;
       // 
@@ -221,7 +246,7 @@ namespace ExtraQL
       this.cbSystemTray.Location = new System.Drawing.Point(10, 114);
       this.cbSystemTray.Name = "cbSystemTray";
       this.cbSystemTray.Size = new System.Drawing.Size(126, 17);
-      this.cbSystemTray.TabIndex = 6;
+      this.cbSystemTray.TabIndex = 7;
       this.cbSystemTray.Text = "Show in System Tray";
       this.cbSystemTray.UseVisualStyleBackColor = true;
       this.cbSystemTray.CheckedChanged += new System.EventHandler(this.cbSystemTray_CheckedChanged);
@@ -232,7 +257,7 @@ namespace ExtraQL
       this.cbBindToAll.Location = new System.Drawing.Point(10, 162);
       this.cbBindToAll.Name = "cbBindToAll";
       this.cbBindToAll.Size = new System.Drawing.Size(310, 17);
-      this.cbBindToAll.TabIndex = 10;
+      this.cbBindToAll.TabIndex = 11;
       this.cbBindToAll.Text = "Allow other computers to access your extraQL HTTP server";
       this.cbBindToAll.UseVisualStyleBackColor = true;
       this.cbBindToAll.CheckedChanged += new System.EventHandler(this.cbBindAll_CheckedChanged);
@@ -249,7 +274,7 @@ namespace ExtraQL
       this.txtLog.ReadOnly = true;
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.txtLog.Size = new System.Drawing.Size(388, 172);
-      this.txtLog.TabIndex = 12;
+      this.txtLog.TabIndex = 13;
       // 
       // label2
       // 
@@ -257,7 +282,7 @@ namespace ExtraQL
       this.label2.Location = new System.Drawing.Point(10, 192);
       this.label2.Name = "label2";
       this.label2.Size = new System.Drawing.Size(28, 13);
-      this.label2.TabIndex = 11;
+      this.label2.TabIndex = 12;
       this.label2.Text = "Log:";
       // 
       // cbDisableScripts
@@ -266,7 +291,7 @@ namespace ExtraQL
       this.cbDisableScripts.Location = new System.Drawing.Point(10, 68);
       this.cbDisableScripts.Name = "cbDisableScripts";
       this.cbDisableScripts.Size = new System.Drawing.Size(116, 17);
-      this.cbDisableScripts.TabIndex = 3;
+      this.cbDisableScripts.TabIndex = 4;
       this.cbDisableScripts.Text = "Disable Userscripts";
       this.cbDisableScripts.UseVisualStyleBackColor = true;
       this.cbDisableScripts.CheckedChanged += new System.EventHandler(this.cbDisableScripts_CheckedChanged);
@@ -584,27 +609,20 @@ namespace ExtraQL
       this.miQuit.Text = "Quit";
       this.miQuit.Click += new System.EventHandler(this.miQuit_Click);
       // 
-      // cbAutostartLauncher
+      // cbRunAsCommandLine
       // 
-      this.cbAutostartLauncher.AutoSize = true;
-      this.cbAutostartLauncher.Location = new System.Drawing.Point(10, 137);
-      this.cbAutostartLauncher.Name = "cbAutostartLauncher";
-      this.cbAutostartLauncher.Size = new System.Drawing.Size(119, 17);
-      this.cbAutostartLauncher.TabIndex = 8;
-      this.cbAutostartLauncher.Text = "Autostart Launcher";
-      this.cbAutostartLauncher.UseVisualStyleBackColor = true;
-      this.cbAutostartLauncher.CheckedChanged += new System.EventHandler(this.cbAutostart_CheckedChanged);
+      this.cbRunAsCommandLine.AutoSize = true;
+      this.cbRunAsCommandLine.Location = new System.Drawing.Point(209, 19);
+      this.cbRunAsCommandLine.Name = "cbRunAsCommandLine";
+      this.cbRunAsCommandLine.Size = new System.Drawing.Size(131, 17);
+      this.cbRunAsCommandLine.TabIndex = 1;
+      this.cbRunAsCommandLine.Text = "Run as Command Line";
+      this.cbRunAsCommandLine.UseVisualStyleBackColor = true;
       // 
-      // cbAutostartSteam
+      // launcherPlayTimer
       // 
-      this.cbAutostartSteam.AutoSize = true;
-      this.cbAutostartSteam.Location = new System.Drawing.Point(209, 137);
-      this.cbAutostartSteam.Name = "cbAutostartSteam";
-      this.cbAutostartSteam.Size = new System.Drawing.Size(105, 17);
-      this.cbAutostartSteam.TabIndex = 9;
-      this.cbAutostartSteam.Text = "Autostart Steam";
-      this.cbAutostartSteam.UseVisualStyleBackColor = true;
-      this.cbAutostartSteam.CheckedChanged += new System.EventHandler(this.cbAutostart_CheckedChanged);
+      this.launcherPlayTimer.Interval = 200;
+      this.launcherPlayTimer.Tick += new System.EventHandler(this.launcherPlayTimer_Tick);
       // 
       // MainForm
       // 
@@ -686,6 +704,8 @@ namespace ExtraQL
     private ToolStripMenuItem miQuit;
     private CheckBox cbAutostartSteam;
     private CheckBox cbAutostartLauncher;
+    private CheckBox cbRunAsCommandLine;
+    private Timer launcherPlayTimer;
   }
 }
 

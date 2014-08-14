@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Net;
 using System.Windows.Forms;
 
 namespace ExtraQL
 {
   static class Program
   {
+    #region Main()
     [STAThread]
     static void Main()
     {
@@ -13,6 +15,9 @@ namespace ExtraQL
 
       try
       {
+        if (ActivateRunningInstance()) 
+          return;
+
         Application.EnableVisualStyles();
         Application.Run(new MainForm());
       }
@@ -21,10 +26,32 @@ namespace ExtraQL
         HandleException(ex);
       }
     }
+    #endregion
 
+    #region ActivateRunningInstance()
+    private static bool ActivateRunningInstance()
+    {
+      using (WebClient client = new WebClient())
+      {
+        try
+        {
+          var result = client.DownloadString("http://127.0.0.1:27963/bringToFront");
+          if (result == "ok")
+            return true;
+        }
+        catch
+        {
+        }
+      }
+      return false;
+    }
+    #endregion
+
+    #region HandleException()
     private static void HandleException(Exception ex)
     {
       MessageBox.Show(ex.ToString(), "Program failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
+    #endregion
   }
 }

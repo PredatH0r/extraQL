@@ -1,13 +1,16 @@
 ﻿// ==UserScript==
 // @id          esreality
 // @name        ESReality.com Integration
-// @version     1.0
+// @version     1.1
 // @author      PredatH0r
 // @description	Shows a list of esreality.com Quake Live forum posts
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.1
+- ensuring consistent order of tabs in the chat bar
 
 Version 1.0
 - first public release
@@ -29,7 +32,10 @@ Version 1.0
     }
 
     // delay init so that twitch, twitter, ESR and IRC scripts add items to chat menu bar in a defined order
-    setTimeout(delayedInit, 1600);
+    if (extraQL.hookVersion) // introduced at the same time as the addTabPage() "priority" param
+      delayedInit();
+    else
+      setTimeout(delayedInit, 1600);
   }
 
   function delayedInit() {
@@ -67,7 +73,7 @@ Version 1.0
       "  <div id='esrealityDetails'></div>" +
       "  <div id='esrealityContent' data-fill='" + fixedElementsHeight + "'></div>" +
       "</div>";
-    extraQL.addTabPage("esreality", "ESR", content);
+    extraQL.addTabPage("esreality", "ESR", content, undefined, 300);
 
     $("#esrealityShowForums").click(function () {
       $("#esrealityHeader a").removeClass("active");

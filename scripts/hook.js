@@ -1,11 +1,14 @@
 ﻿/*
 // @name        extraQL Script Manager
-// @version     0.108
+// @version     0.109
 // @author      wn, PredatH0r
 // @description	Manages the installation and execution of QuakeLive userscripts
 
 This script is a stripped down version of wn's QuakeLive Hook Manager (QLHM),
 which is designed to work with a local or remote extraQL.exe script server.
+
+Version 0.109
+- added "priority" parameter to extraQL.addTabPage() so tabs dont show up in random order
 
 Version 0.108
 - added border in Script Management console list box to make scroll bar more visible
@@ -39,6 +42,7 @@ function main_hook() {
 
   ExtraQL();
   HOOK_MANAGER.init();
+  extraQL.hookVersion = HOOK_MANAGER.version;
 }
 
 // referenced globals
@@ -55,7 +59,7 @@ var console = window.console;
   // it is probably only in the config object below.
   // !!!
   var config = {
-    version: "0.108",
+    version: "0.109",
     consoleCaption: "hook.js v",
     menuCaption: "Userscripts",
     BASE_URL: "http://127.0.0.1:27963/",
@@ -587,6 +591,7 @@ var console = window.console;
   // Make init and addMenuItem available
   var hm = new HookManager();
   aWin.HOOK_MANAGER = {
+    version: config.version,
     init: hm.init.bind(hm),
     addMenuItem: hm.addMenuItem.bind(hm)
   };
@@ -598,7 +603,6 @@ var console = window.console;
 // @name        extraQL
 // @description Quake Live userscript utilities
 // @author      PredatH0r
-// @version     0.102
 
 This script provides common functions to various Quake Live user scripts.
 
@@ -612,6 +616,7 @@ Version 0.102
 function ExtraQL() {
   var BASE_URL = "http://127.0.0.1:27963/";
   var tabClickHandlers = {};
+  var tabPagePriority = [ 0 ];
   var chatBarTabified = false;
   var lastServerCheckTimestamp = 0;
   var lastServerCheckResult = false;
@@ -665,15 +670,21 @@ function ExtraQL() {
   };
 
   // public: add a tab page to the chat bar/area
-  function addTabPage(id, caption, content, onClick) {
+  function addTabPage(id, caption, content, onClick, priority) {
     tabifyChat();
 
     if (!onClick)
       onClick = function() { showTabPage(id); };
-    //$("#chatContainer").append(content);
     if (content)
       $($("#chatContainer").prepend(content).children()[0]).prepend("<div class='chatTitleBar'>" + caption + "<div class='close'>X</div></div>");
-    $("#collapsableChat").append("<div class='tab' id='tab_" + id + "'>" + caption + "</div>");
+
+    var index;
+    if (priority === undefined)
+      priority = 999999;
+    for (index = 1; index < tabPagePriority.length && tabPagePriority[index] <= priority; index++) {
+    }
+    tabPagePriority.splice(index, 0, priority );
+    $($("#collapsableChat").children()[index - 1]).after("<div class='tab' id='tab_" + id + "'>" + caption + "</div>");
     tabClickHandlers[id] = onClick;
 
     restoreTabPageClickHandlers();
