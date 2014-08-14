@@ -84,7 +84,7 @@ CVARS:
     extraQL.addStyle(
       "#chatContainer.expanded #collapsableChat { background-color: rgb(114,24,8); }",
       "#chatContainer .fullHeight { height: 550px; }",
-      "#im-chat #im-chat-send { display: none; }"
+      "#im-chat #im-chat-send { left: 300px; }" // "display" gets overruled, so use "left" to move it off-screen
     );
     
     // z-index adjustments
