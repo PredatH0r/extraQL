@@ -44,6 +44,7 @@ namespace ExtraQL
       this.btnInstallHook = new System.Windows.Forms.Button();
       this.panelAdvanced = new System.Windows.Forms.Panel();
       this.grpAdvanced = new System.Windows.Forms.GroupBox();
+      this.cbRunAsCommandLine = new System.Windows.Forms.CheckBox();
       this.cbAutostartSteam = new System.Windows.Forms.CheckBox();
       this.cbAutostartLauncher = new System.Windows.Forms.CheckBox();
       this.cbCheckUpdate = new System.Windows.Forms.CheckBox();
@@ -79,7 +80,6 @@ namespace ExtraQL
       this.miStartSteam = new System.Windows.Forms.ToolStripMenuItem();
       this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
       this.miQuit = new System.Windows.Forms.ToolStripMenuItem();
-      this.cbRunAsCommandLine = new System.Windows.Forms.CheckBox();
       this.launcherPlayTimer = new System.Windows.Forms.Timer(this.components);
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
@@ -95,7 +95,7 @@ namespace ExtraQL
       // label1
       // 
       this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(10, 20);
+      this.label1.Location = new System.Drawing.Point(10, 19);
       this.label1.Name = "label1";
       this.label1.Size = new System.Drawing.Size(134, 13);
       this.label1.TabIndex = 0;
@@ -173,6 +173,7 @@ namespace ExtraQL
       this.grpAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpAdvanced.Controls.Add(this.txtLauncherExe);
       this.grpAdvanced.Controls.Add(this.cbRunAsCommandLine);
       this.grpAdvanced.Controls.Add(this.cbAutostartSteam);
       this.grpAdvanced.Controls.Add(this.cbAutostartLauncher);
@@ -180,7 +181,6 @@ namespace ExtraQL
       this.grpAdvanced.Controls.Add(this.cbStartMinimized);
       this.grpAdvanced.Controls.Add(this.cbSystemTray);
       this.grpAdvanced.Controls.Add(this.cbBindToAll);
-      this.grpAdvanced.Controls.Add(this.txtLauncherExe);
       this.grpAdvanced.Controls.Add(this.txtLog);
       this.grpAdvanced.Controls.Add(this.label1);
       this.grpAdvanced.Controls.Add(this.label2);
@@ -194,6 +194,16 @@ namespace ExtraQL
       this.grpAdvanced.TabIndex = 0;
       this.grpAdvanced.TabStop = false;
       this.grpAdvanced.Text = "Advanced";
+      // 
+      // cbRunAsCommandLine
+      // 
+      this.cbRunAsCommandLine.AutoSize = true;
+      this.cbRunAsCommandLine.Location = new System.Drawing.Point(209, 18);
+      this.cbRunAsCommandLine.Name = "cbRunAsCommandLine";
+      this.cbRunAsCommandLine.Size = new System.Drawing.Size(131, 17);
+      this.cbRunAsCommandLine.TabIndex = 1;
+      this.cbRunAsCommandLine.Text = "Run as Command Line";
+      this.cbRunAsCommandLine.UseVisualStyleBackColor = true;
       // 
       // cbAutostartSteam
       // 
@@ -608,16 +618,6 @@ namespace ExtraQL
       this.miQuit.Size = new System.Drawing.Size(125, 22);
       this.miQuit.Text = "Quit";
       this.miQuit.Click += new System.EventHandler(this.miQuit_Click);
-      // 
-      // cbRunAsCommandLine
-      // 
-      this.cbRunAsCommandLine.AutoSize = true;
-      this.cbRunAsCommandLine.Location = new System.Drawing.Point(209, 19);
-      this.cbRunAsCommandLine.Name = "cbRunAsCommandLine";
-      this.cbRunAsCommandLine.Size = new System.Drawing.Size(131, 17);
-      this.cbRunAsCommandLine.TabIndex = 1;
-      this.cbRunAsCommandLine.Text = "Run as Command Line";
-      this.cbRunAsCommandLine.UseVisualStyleBackColor = true;
       // 
       // launcherPlayTimer
       // 

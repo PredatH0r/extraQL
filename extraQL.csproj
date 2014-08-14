@@ -108,7 +108,8 @@
     <None Include="images\topright.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="scripts\rosterGroup.usr.js" />
+    <None Include="scripts\links.usr.js" />
+    <Content Include="scripts\rosterGroup.usr.js" />
     <None Include="resources\background.png" />
     <Content Include="c:\users\hbeham\appdata\locallow\id software\focus\home\baseq3\hook.js">
       <Link>focus\hook.js</Link>
