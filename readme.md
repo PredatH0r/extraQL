@@ -26,6 +26,12 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 0.110
+---
+- fixed error installing "hook.js" when the file didn't exist before
+- increased timeout for script update checks
+- added "links.usr.js" script
+
 Version 0.109
 ---
 - automatically click on "Play" in the QL Launcher

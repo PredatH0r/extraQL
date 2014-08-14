@@ -33,7 +33,7 @@ namespace ExtraQL
 
     public void UpdateAndRegisterScripts()
     {
-      var client = new WebClient();
+      var client = new XWebClient(10000);
       client.DownloadStringCompleted += ScriptIndexFileDownloadCompleted;
       client.DownloadStringAsync(new Uri(string.Format(DEFAULT_UPDATE_BASE_URL, INDEX_FILE)));
     }
@@ -97,7 +97,10 @@ namespace ExtraQL
       }
 
       if (!localMeta.ContainsKey("version"))
+      {
+        Log("Ignoring script without @version in update check: " + scriptfile);
         return;
+      }
 
       string url;
       if (localMeta.ContainsKey("downloadUrl"))
@@ -107,12 +110,13 @@ namespace ExtraQL
 
       try
       {
-        WebClient client = new WebClient();
+        WebClient client = new XWebClient(30000);
         client.DownloadDataCompleted += Client_DownloadDataCompleted;
         client.DownloadDataAsync(new Uri(url), new object[] {path, localMeta});
       }
-      catch (WebException)
+      catch (Exception ex)
       {
+        Log("Failed to check version of " + Path.GetFileName(scriptfile) + ": " + ex.Message);
       }
     }
 
@@ -197,6 +201,8 @@ namespace ExtraQL
         File.WriteAllText(scriptfile, remoteCode, utf8withoutBom);
         Log("Downloaded version " + remoteMeta["version"][0] + " of " + Path.GetFileName(scriptfile));
       }
+      else
+        Log(Path.GetFileName(scriptfile) + " is up-to-date");
     }
 
     #endregion

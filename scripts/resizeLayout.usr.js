@@ -1,10 +1,9 @@
 ﻿// ==UserScript==
+// @id          resizeLayout
 // @name        Quake Live Layout Resizer
 // @version     1.2
 // @author      PredatH0r
-// @description	
-// @include     http://*.quakelive.com/*
-// @exclude     http://*.quakelive.com/forum*
+// @description	Optimize the QL web UI to take advantage of your actual screen/window size
 // @unwrap
 // ==/UserScript==
 

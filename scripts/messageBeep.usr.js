@@ -1,6 +1,7 @@
 ﻿// ==UserScript==
 // @id             134614
 // @name           Quake Live Message Beep
+// @version        1.0
 // @description    Generates a beep when you get a web message on Quake Live
 // ==/UserScript==
 

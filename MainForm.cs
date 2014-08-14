@@ -14,7 +14,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.109";
+    public const string Version = "0.110";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -680,11 +680,14 @@ namespace ExtraQL
 
       try
       {
-        var attrib = File.GetAttributes(targetHook);
-        if ((attrib & FileAttributes.ReadOnly) != 0)
-          File.SetAttributes(targetHook, attrib & ~FileAttributes.ReadOnly);
-        if (force || new FileInfo(targetHook).LastWriteTimeUtc < new FileInfo(bundledHook).LastWriteTimeUtc)
-          File.Delete(targetHook);
+        if (File.Exists(targetHook))
+        {
+          var attrib = File.GetAttributes(targetHook);
+          if ((attrib & FileAttributes.ReadOnly) != 0)
+            File.SetAttributes(targetHook, attrib & ~FileAttributes.ReadOnly);
+          if (force || new FileInfo(targetHook).LastWriteTimeUtc < new FileInfo(bundledHook).LastWriteTimeUtc)
+            File.Delete(targetHook);
+        }
 
         if (!File.Exists(targetHook))
         {

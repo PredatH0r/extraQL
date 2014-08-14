@@ -61,6 +61,9 @@
     <Compile Include="HttpServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <None Include="scripts\!ndex.txt" />
     <None Include="scripts\autoExec.usr.js" />
     <None Include="scripts\openChat.usr.js" />
