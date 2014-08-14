@@ -11,6 +11,7 @@ hook.js
 irc.usr.js
 keyboardNav.usr.js
 linkify.usr.js
+links.usr.js
 matchtip.usr.js
 messageBeep.usr.js
 openChat.usr.js

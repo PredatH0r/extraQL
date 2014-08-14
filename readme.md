@@ -1,15 +1,23 @@
-﻿![screenshot](https://a.fsdn.com/con/app/proj/extraql/screenshots/001-extraQL.png/182/137)
+﻿Installation Instructions
+=========================
 
-What is extraQL?
-================
+A) Full local installation (recommended)
+---
+- download the latest extraQL ZIP file
+- unzip the extraQL ZIP file to a folder of your liking, e.g. "c:\\program files (x86)"
+- right-click on extraQL.exe and select "Create shortcut"
+- right-click the "Shortcut to extraQL.exe" and select "Cut"
+- right-click on your desktop and select "Paste"
+- rename the shortcut to "extraQL"
 
-- an all-in-one package for installing and running QuakeLive enhancements (user scripts)
-- a tool for QL Focus members (beta testers) to quickly access test environments
-- a collection of popular userscripts
-- a local HTTP server that makes the scripts from your HDD available to QL
-- a HTTP proxy that allows user scripts to fetch resources from other websites
-- a middleware that allows scripts to utilize certain windows functions that are not accessible from within QL
-- a small javascript library that provides commonly used functions to user scripts
+B) hook.js only (reduced functionality)
+---
+- download the hook.js (or if you have the ZIP, use the extraQL\\scripts\\hook.js file)
+- save hook.js to your Quake Live config directory
+   - For the standalone launcher on Windows XP this is: %appdata%\\id software\\quakelive\\home\\baseq3
+   - For the standalone launcher on Win Vista and later: %appdata%\\..\\LocalLow\\id software\\home\\baseq3
+   - For Steam version of QL this is: <steamdir>\\SteamApps\\Common\\Quake Live\\baseq3
+
 
 [Download extraQL](https://sourceforge.net/projects/extraql/files/)
 
