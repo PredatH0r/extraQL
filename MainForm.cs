@@ -14,7 +14,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.110";
+    public const string Version = "0.111";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -328,48 +328,6 @@ namespace ExtraQL
         this.cbAutostartLauncher.Checked = false;
     }
     #endregion
-
-    #region laucherDetectionTimer_Tick
-    private void laucherDetectionTimer_Tick(object sender, EventArgs e)
-    {
-      // find Launcher main window handle
-      var handle = LauncherWindowHandle;
-      if (handle == IntPtr.Zero)
-      {
-        if (++this.timerCount == 20)
-          this.launcherDetectionTimer.Stop();
-        return;
-      }
-
-      this.launcherDetectionTimer.Stop();
-      this.FillLaucherWithEmailAndPassword(handle);
-    }
-    #endregion
-
-    #region launcherPlayTimer_Tick
-    private void launcherPlayTimer_Tick(object sender, EventArgs e)
-    {
-      // this method is periodically called after starting the launcher to wait for the Play button to become enabled
-      object[] context = (object[])((Timer)sender).Tag;
-      IntPtr hwndPlay = (IntPtr)context[0];
-      int attemptCount = (int)context[1];
-
-      long style = Win32.GetWindowLong(hwndPlay, Win32.GWL_STYLE);
-      if ((style & Win32.WS_DISABLED) == 0)
-      {
-        Win32.PostMessage(hwndPlay, Win32.WM_LBUTTONDOWN, 0, 0);
-        Win32.PostMessage(hwndPlay, Win32.WM_LBUTTONUP, 0, 0);
-        this.launcherDetectionTimer.Stop();
-      }
-      else
-      {
-        context[1] = ++attemptCount;
-        if (attemptCount == 25) // 25*200ms = 5sec
-          this.launcherDetectionTimer.Stop();
-      }
-    }
-    #endregion
-
 
 
     #region ConfigFile
@@ -728,6 +686,15 @@ namespace ExtraQL
 
     #endregion
 
+    #region StartSteam()
+    private void StartSteam()
+    {
+      this.Log("Starting Quake Live Steam App...");
+      Process.Start("steam://rungameid/282440");
+      this.WindowState = FormWindowState.Minimized;
+    }
+    #endregion
+
     #region StartLauncher()
 
     private void StartLauncher()
@@ -803,42 +770,43 @@ namespace ExtraQL
 
     #endregion
 
-    #region StartSteam()
-    private void StartSteam()
+    #region laucherDetectionTimer_Tick
+    private void laucherDetectionTimer_Tick(object sender, EventArgs e)
     {
-      this.Log("Starting Quake Live Steam App...");
-      Process.Start("steam://rungameid/282440");
-      this.WindowState = FormWindowState.Minimized;
+      // find Launcher main window handle
+      var handle = LauncherWindowHandle;
+      if (handle == IntPtr.Zero)
+      {
+        if (++this.timerCount == 20)
+          this.launcherDetectionTimer.Stop();
+        return;
+      }
+
+      this.launcherDetectionTimer.Stop();
+      this.FillLaucherWithEmailAndPassword(handle);
     }
     #endregion
 
-    #region LoginToQlFocus()
-    private void LoginToQlFocus()
+    #region launcherPlayTimer_Tick
+    private void launcherPlayTimer_Tick(object sender, EventArgs e)
     {
-      using (var webRequest = new WebClient())
-      {
-        webRequest.Encoding = Encoding.UTF8;
-        var html = webRequest.DownloadString("http://focus.quakelive.com/focusgate/");
-        string js = @"
-document.loginform.login.value = '" + this.comboEmail.Text + @"';
-document.loginform.passwd.value = '" + this.txtPassword.Text + @"';
-document.loginform.submit();";
-        html = html.Replace("document.loginform.login.focus();", js);
-        var file = Path.GetTempFileName();
-        File.Move(file, file + ".html");
-        file += ".html";
-        File.WriteAllText(file, html);
-        Process.Start(file);
+      // this method is periodically called after starting the launcher to wait for the Play button to become enabled
+      object[] context = (object[])((Timer)sender).Tag;
+      IntPtr hwndPlay = (IntPtr)context[0];
+      int attemptCount = (int)context[1];
 
-        Timer timer = new Timer();
-        timer.Interval = 5000;
-        timer.Tick += (sender2, args) =>
-        {
-          timer.Stop();
-          File.Delete(file);
-          ((IDisposable)sender2).Dispose();
-        };
-        timer.Start();
+      long style = Win32.GetWindowLong(hwndPlay, Win32.GWL_STYLE);
+      if ((style & Win32.WS_DISABLED) == 0)
+      {
+        Win32.PostMessage(hwndPlay, Win32.WM_LBUTTONDOWN, 0, 0);
+        Win32.PostMessage(hwndPlay, Win32.WM_LBUTTONUP, 0, 0);
+        this.launcherPlayTimer.Stop();
+      }
+      else
+      {
+        context[1] = ++attemptCount;
+        if (attemptCount == 25) // 25*200ms = 5sec
+          this.launcherPlayTimer.Stop();
       }
     }
     #endregion
@@ -889,6 +857,37 @@ document.loginform.submit();";
       {
         launcherPlayTimer.Tag = new object[] { hwndPlay, 0 };
         launcherPlayTimer.Start();
+      }
+    }
+    #endregion
+
+    #region LoginToQlFocus()
+    private void LoginToQlFocus()
+    {
+      using (var webRequest = new WebClient())
+      {
+        webRequest.Encoding = Encoding.UTF8;
+        var html = webRequest.DownloadString("http://focus.quakelive.com/focusgate/");
+        string js = @"
+document.loginform.login.value = '" + this.comboEmail.Text + @"';
+document.loginform.passwd.value = '" + this.txtPassword.Text + @"';
+document.loginform.submit();";
+        html = html.Replace("document.loginform.login.focus();", js);
+        var file = Path.GetTempFileName();
+        File.Move(file, file + ".html");
+        file += ".html";
+        File.WriteAllText(file, html);
+        Process.Start(file);
+
+        Timer timer = new Timer();
+        timer.Interval = 5000;
+        timer.Tick += (sender2, args) =>
+        {
+          timer.Stop();
+          File.Delete(file);
+          ((IDisposable)sender2).Dispose();
+        };
+        timer.Start();
       }
     }
     #endregion

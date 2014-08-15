@@ -638,9 +638,9 @@ function ExtraQL() {
   function log(msg) {
     if (msg instanceof Error && msg.fileName)
       msg = msg.fileName + "," + msg.lineNumber + ": " + msg.name + ": " + msg.message;
-    if (quakelive.IsGameRunning())
-      qz_instance.SendGameCommand("echo \"" + msg.replace('"', "'") + "\"");
-    else
+    //if (quakelive.IsGameRunning())
+    //  qz_instance.SendGameCommand("echo \"" + msg.replace('"', "'") + "\"");
+    //else
       console.log(msg);
   }
 
