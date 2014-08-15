@@ -2,7 +2,7 @@
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
 // @version        1.94
-// @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "ecsDisplayGamesCompleted", bind l "qlrdShuffle" (if even num players) )
+// @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
 // @author         wn,szr,syncore,simonov,PredatH0r,ecs
@@ -33,7 +33,7 @@ Version 1.92
 /// * this version doesn't cache the results. if the script gets popular we might have to reinstate it to save qlranks bandwidth. 
 ///
 /// use these commands in QuakeLive 
-/// ecsDisplayGamesCompleted show number of games completed in the game type
+/// qlrdDisplayGamesCompleted show number of games completed in the game type
 /// qlrdShuffle (for showing you a good shuffle, uses a naive random search, requires even number ppl)
 /// qlrdShufflePerform (and perform the local shuffle if you are an admin) works if player slots are {0,1,...n-1} and dont skip, often the case
 /// qlrdAnnounce (now color codes team membership and shows average team elos)
@@ -54,6 +54,12 @@ Version 1.92
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // RUN OR NOT
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var quakelive = window.quakelive;
+var qz_instance = window.qz_instance;
+var console = window.console;
+var document = window.document;
+var localStorage = window.localStorage;
 
 // Don't bother if Quake Live is down for maintenance
 if (/offline/i.test(document.title)) {
@@ -1032,7 +1038,7 @@ var cvarDefaults = {
 }
 
 var aliasDefaults = {
-  "ecsDisplayGamesCompleted": "seta _gamescomp 0; seta _gamescomp 1;",
+  "qlrdDisplayGamesCompleted": "seta _gamescomp 0; seta _gamescomp 1;",
   "qlrdShuffle": "seta _qlrd_shuffle 0; seta _qlrd_shuffle 1;",
   "qlrdShufflePerform": "seta _qlrd_shuffle_perform 0; seta _qlrd_shuffle_perform 1;",
   "qlrdAnnounce": "seta _qlrd_announce 0; seta _qlrd_announce 1;",
@@ -1057,609 +1063,654 @@ $.each(aliasDefaults, function(alias, def) {
 /**
  * Override OnCvarChanged to track our in-game commands
  */
+var CMD_NAME = "elo";
+var CMD_USAGE = "Use ^1" + CMD_NAME + " help^7 for help";
+var CMD_DEFAULT = "\" a user command. " + CMD_USAGE + "\"";
+qz_instance.SendGameCommand("seta " + CMD_NAME + " \"\""); // set default value to blank
+qz_instance.SendGameCommand("set " + CMD_NAME + " " + CMD_DEFAULT);
 
 var oldOnCvarChanged = OnCvarChanged;
 OnCvarChanged = function(name, val, replicate) {
-
   switch (name) {
-   
+    case CMD_NAME:
+      handleQlrdCommand(val);
+      break;
+
+    case "_qlrd_outputMethod":
+      val = setOutputMethod(val);
+      replicate = 1;
+      break;
+
     case "_qlrd_announce":
-
-      if (1 !== parseInt(val) || !quakelive.IsGameRunning()) {
-        return;
-      }
-
-      // Give the request some time to complete
-      if (QLRD.activeServerReq) {
-        QLRD.igAnnounce("Please wait for the current request to complete...", false);
-        break;
-      }
-
-      QLRD.activeServerReq = true;
-
-      // Refresh the current server's details
-      quakelive.serverManager.RefreshServerDetails(quakelive.currentServerId, {
-        // Force a new request
-        cacheTime: -1,
-
-        onSuccess: function() {
-          var server = quakelive.serverManager.GetServerInfo(quakelive.currentServerId);
-
-          // Stop if no players were returned
-          if (0 == server.players.length) {
-            QLRD.igAnnounce("No players were returned by Quake Live.  "
-									  + "Please try again in a few seconds.", true);
-            QLRD.activeServerReq = false;
-            return;
-          }
-
-          // Make sure we're using a gametype tracked by QLRanks
-          try {
-            var gt = mapdb.getGameTypeByID(server.game_type).title.toLowerCase();
-          }
-          catch(e) {
-            QLRD.igAnnounce("Unable to determine server gametype. " + e, true);
-            QLRD.activeServerReq = false;
-            return;
-          }
-          if (!(gt in QLRD.GAMETYPES)) {
-            QLRD.igAnnounce(gt.toUpperCase() + " is not currently tracked by QLRanks.", true);
-            QLRD.activeServerReq = false;
-            return;
-          }
-
-          QLRD.igAnnounce("Collecting QLRanks.com data (" + server.players.length
-								  + " players)...", false);
-
-          // Wait for all server players to be available in the QLRD cache.
-          var names = $.map(server.players, function(p) {return {"name": p.name}});
-          QLRD.waitFor(names, gt, function(error, players, gt) {
-            // Always clear the active request flag.
-            QLRD.activeServerReq = false;
-
-            // Stop if something went wrong.
-            if (error) {
-              QLRD.igAnnounce("Unable to retrieve QLRanks.com data.", true);
-              return;
-            }
-            
-            // Display the results.
-            // NOTE: mul is "1" to separate the header from the results
-            var mul = 1
-						  , currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value
-						  , step = $.inArray(currentOut, ["echo","print"]) > -1 ? 100 : 1000;
-
-            // Show the chat pane for 10 seconds if output method is 'print',
-            // otherwise it will be difficult to notice.
-            if ("print" == currentOut) {
-              qz_instance.SendGameCommand("+chat;");
-              setTimeout(function() {
-                qz_instance.SendGameCommand("-chat;");
-              }, 10E3);
-            }
-
-            blues = [];
-            reds=[];
-            
-            function getQlmEloByName(players, name)
-            {
-              for(var p=0;p<players.length;p++){
-
-                if(players[p].name==name)
-                  return parseInt(players[p].elo);
-              }
-               
-              return -1;
-            }
-          
-            index = 0;
-          
-            var players_copy = $.map(server.players, 
-						  function(p) { return {
-						    "name": p.name,
-						    "team": p.team,
-						    "elo": getQlmEloByName(players,p.name),
-						    "index": index++ } } );
-                
-            // Sort players by Elo (descending).
-            players_copy.sort(function(a, b) {return b.elo - a.elo});
-
-            for (var i = 0, out = [], len = players_copy.length; i < len; ++i) {
-            
-              var color = "^7";
-              
-              if(players_copy[i].team    ==2)
-              {
-                color = "^4";
-                blues.push(players_copy[i].elo);
-              }
-              else  if(players_copy[i].team    ==1)
-              {
-                color = "^1";
-                reds.push(players_copy[i].elo);
-              }
-                          
-              out.push( color  + players_copy[i].name.replace(/\_nova$/i,"sexy!nova") + " " + players_copy[i].elo + "^7");
-
-              // Group by 4, delaying commands as needed
-              if ((i+1) % 4 == 0 || (i+1) == len) {
-                setTimeout(function(txt, isLast) {
-                
-                  qz_instance.SendGameCommand(currentOut + " " + txt + ";");
-                
-                }.bind(null, out.join(", "), (i+1) == len), mul++ * step);
-                out = [];
-              }
-            }
-            
-            bluecount = 0;
-            for(b=0;b<blues.length;b++)
-            {
-              bluecount +=blues[b];
-            }
-            
-            blueavg = Math.round(bluecount/blues.length);
-            
-            redcount = 0;
-            for(b=0;b<reds.length;b++)
-            {
-              redcount += reds[b];
-            }
-            
-            redsavg = Math.round(redcount/reds.length);
-            
-            var delta = Math.floor( Math.abs(redsavg-blueavg) );
-
-            var desc = "^1ragequit^7";
-            if(delta<300) desc = "^1unplayable^7";
-            if(delta<200) desc = "^1very unbalanced^7";
-            if(delta<150) desc = "unbalanced";
-            if(delta<100) desc = "challenging^7";
-            if(delta<80) desc = "^4balanced^7";
-            if(delta<40) desc = "^4very balanced^7";
-            
-            if(reds.length==blues.length && reds.length != 0)
-              qz_instance.SendGameCommand( currentOut + " ^4* ^7Team Elo ^4*^1 " + reds.length +"@"+ redsavg + " ^4"+ blues.length +"@"+ blueavg +" ^7Gap: "+ delta +" ("+desc+"^7)" );
-          });
-        },
-        onError: function(aServer) {
-          QLRD.igAnnounce("Unable to update current server info.", true);
-          QLRD.activeServerReq = false;
-        }
-      });
-      
+      announce("1");      
       break;
 
     case "_gamescomp":
-
-      if (1 !== parseInt(val) || !quakelive.IsGameRunning()) {
-        return;
-      }
-
-      var currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value;
-
-      QLRD.activeServerReq = true;
-      //extraQL.log("Updating current server info...", false);
-
-      // Refresh the current server's details
-      quakelive.serverManager.RefreshServerDetails(quakelive.currentServerId, {
-        // Force a new request
-        cacheTime: -1,
-
-        onSuccess: function() {
-          var server = quakelive.serverManager.GetServerInfo(quakelive.currentServerId);
-
-          // Stop if no players were returned
-          if (0 == server.players.length) {
-            QLRD.igAnnounce("No players were returned by Quake Live.  "
-									  + "Please try again in a few seconds.", true);
-            QLRD.activeServerReq = false;
-            return;
-          }
-
-          // Make sure we're using a gametype tracked by QLRanks
-          try {
-            var gt = mapdb.getGameTypeByID(server.game_type).title.toLowerCase();
-          }
-          catch(e) {
-            QLRD.igAnnounce("Unable to determine server gametype. " + e, true);
-            QLRD.activeServerReq = false;
-            return;
-          }
-          if (!(gt in QLRD.GAMETYPES)) {
-            QLRD.igAnnounce(gt.toUpperCase() + " is not currently tracked by ecs.", true);
-            QLRD.activeServerReq = false;
-            return;
-          }
-
-          QLRD.igAnnounce("Collecting data from ecs webservice (" + server.players.length
-								  + " players)...", false);
-
-          // Wait for all server players to be available in the QLRD cache.
-          var names = $.map(server.players, function(p) {return {"name": p.name}});
-          QLRD.waitFor(names, gt, function(error, players, gt) {
-            // Always clear the active request flag.
-            QLRD.activeServerReq = false;
-
-            // Stop if something went wrong.
-            if (error) {
-              QLRD.igAnnounce("Unable to retrieve ecs data.", true);
-              return;
-            }
-
-            // Wait for all server players to be available in the QLRD cache.
-            var just_names = $.map(server.players, function(p) { return p.name });
-
-            $.ajax({
-              type: "GET"
-									, url: "http://qlranks20917.azurewebsites.net/api/Stats/GetProfileGametypesFinished?profile="+ just_names.join(",")
-            })
-						.done(function(aData) {
-
-						  var games_played = $.map(aData, function(p) { 
-						    return { "Games": parseInt(p[QLRD.GAMETYPES[gt].toUpperCase()]), "Name": p["ProfileName"] }
-						  });
-
-						  games_played.sort(function(a, b) {return b.Games - a.Games});
-
-						  var step = $.inArray(currentOut, ["echo","print"]) > -1 ? 100 : 1000;
-              var gametype = QLRD.GAMETYPES[gt];
-						  qz_instance.SendGameCommand( currentOut +" \"^5PLAYER_________   #" + gametype.toUpperCase() + " games completed^7\"");
-						  for(var i=0;i<games_played.length;i++)
-						  {
-						    (function(player) { 
-						      setTimeout(function() {
-                
-						        color = player.Games < 400 ? "^3" : "^2";
-
-						        qz_instance.SendGameCommand( currentOut +" \"^7"+  pad(player.Name, 15) +" "+ color + pad(player.Games, -6) + "^7\"");
-
-						      }, i * step );
-						    })(games_played[i]);
-						  }
-						} );
-          } 
-				) 
-        } } )
-
+      games(val);
       break;
 		
     case "_qlrd_shuffle":
     case "_qlrd_shuffle_perform":
-    
-      if (1 !== parseInt(val) || !quakelive.IsGameRunning()) {
-        return;
-      }
-
-      var doit = name == "_qlrd_shuffle_perform";
-    
-      // Give the request some time to complete
-      if (QLRD.activeServerReq) {
-        QLRD.igAnnounce("Please wait for the current request to complete...", false);
-        break;
-      }
-      
-      // Refresh the current server's details
-      quakelive.serverManager.RefreshServerDetails(quakelive.currentServerId, {
-        // Force a new request
-        cacheTime: -1,
-
-        onSuccess: function() {
-          var server = quakelive.serverManager.GetServerInfo(quakelive.currentServerId);
-
-          // Stop if no players were returned
-          if (0 == server.players.length) {
-            QLRD.igAnnounce("No players were returned by Quake Live.  "
-									  + "Please try again in a few seconds.", true);
-            QLRD.activeServerReq = false;
-            return;
-          }
-
-          // Make sure we're using a gametype tracked by QLRanks
-          try {
-            var gt = mapdb.getGameTypeByID(server.game_type).title.toLowerCase();
-          }
-          catch(e) {
-            QLRD.igAnnounce("Unable to determine server gametype. " + e, true);
-            QLRD.activeServerReq = false;
-            return;
-          }
-          if (!(gt in QLRD.GAMETYPES)) {
-            QLRD.igAnnounce(gt.toUpperCase() + " is not currently tracked by QLRanks.", true);
-            QLRD.activeServerReq = false;
-            return;
-          }
-
-          QLRD.igAnnounce("Collecting QLRanks.com data (" + server.players.length
-								  + " players)...", false);
-
-          // Wait for all server players to be available in the QLRD cache.
-          var names = $.map(server.players, function(p) {return {"name": p.name}});
-          
-          QLRD.waitFor(names, gt, function(error, players, gt) {
-            // Always clear the active request flag.
-            QLRD.activeServerReq = false;
-
-            // Stop if something went wrong.
-            if (error) {
-              QLRD.igAnnounce("Unable to retrieve QLRanks.com data.", true);
-              return;
-            }
-
-            var index = 0;
-          
-            //extraQL.log("Mapping players_copy");
-          
-            function getQlmPlayerByName(players, name)
-            {
-              for(var p=0;p<players.length;p++)
-                if(players[p].name==name)return players[p];
-            }
-          
-            var players_copy = $.map(server.players, 
-						  function(p) { return {
-						    "name": p.name,
-						    "elo": parseInt(getQlmPlayerByName(players,p.name).elo),
-						    "team": p.team,
-						    "index": index++,
-						    "candidateTeam": -1 } } );
-                
-            //extraQL.log("Mapped players_copy");
-            //extraQL.log("shuffle func");
-            
-            if(players_copy.length % 2 != 0 
-							|| players_copy.length < 2 )
-            {
-              QLRD.igAnnounce(("Need at least 2 people and an even number of people, currently " + players_copy.length + " people"), true);
-              return;
-            }
-            
-						
-            var bestdiff = 1e8;
-            var best_shuff = null;
-            
-            function k_combinations(set, k) 
-            {
-              var i, j, combs, head, tailcombs;
-	
-              if (k > set.length || k <= 0) {
-                return [];
-              }
-	
-              if (k == set.length) {
-                return [set];
-              }
-	
-              if (k == 1) {
-                combs = [];
-                for (i = 0; i < set.length; i++) {
-                  combs.push([set[i]]);
-                }
-                return combs;
-              }
-	
-              combs = [];
-              for (i = 0; i < set.length - k + 1; i++) {
-                head = set.slice(i, i+1);
-                tailcombs = k_combinations(set.slice(i + 1), k - 1);
-                for (j = 0; j < tailcombs.length; j++) {
-                  combs.push(head.concat(tailcombs[j]));
-                }
-              }
-              return combs;
-            }
-
-            function range(start, end)
-            {
-              var array = new Array();
-              for(var i = start; i < end; i++)
-              {
-                array.push(i);
-              }
-              return array;
-            }
-
-            var team_size = players_copy.length/2;
-
-            ///ecs@060714 number of team permutations is n choose k where n is server size k teamsize
-            var shuffle_perms = k_combinations( range(0,players_copy.length), team_size);
-
-            for(var i=0;i<shuffle_perms.length;i++)
-            {
-              var reds = 0;
-              var blues = 0;
-
-              for( var p=0;p<players_copy.length;p++ )
-              {
-                if( shuffle_perms[i].indexOf(p) != -1 )
-                {
-                  reds = reds + players_copy[p].elo;
-                  players_copy[p].candidateTeam=0;
-                }
-                else
-                {
-                  blues = blues + players_copy[p].elo;
-                  players_copy[p].candidateTeam=1;
-                }
-              }
-                
-              ///average it
-              var reds_avg = reds / team_size;
-              var blues_avg = blues / team_size;
-                
-              var diff = Math.abs( (reds_avg-blues_avg) );
-                
-              if( diff < bestdiff )
-              {
-                bestdiff = diff;
-                best_shuff = $.map(players_copy, 
-												function(p) { return {
-												  "name": p.name,
-												  "elo": p.elo,
-												  "team": p.candidateTeam == 0 ? 1 : 2 
-												} } );
-              }
-            }
-
-            if( doit )
-            {
-              var commands = [];
-              for(var i=0;i<best_shuff.length;i++)
-              {
-                command =("put " + (players_copy[i].index) +" " + (best_shuff[i].team == 1 ? "r":"b") +";");
-                    
-                commands.push(command);
-                
-                QLRD.igAnnounce( command );
-              }
-                
-              for(var i=0;i<best_shuff.length;i++)
-              {
-                var put_command = commands[i];
-                   
-                (function(put_command,i) { 
-                  setTimeout(function(command) {
-                
-                    qz_instance.SendGameCommand(put_command);
-                
-                  }, i * 1100 );
-                })(put_command,i);
-                
-              }
-            }
-            
-            //extraQL.log("best diff " + bestdiff / best_shuff.length );
-            //extraQL.log("best_shuff length " + best_shuff.length );
-            
-            //extraQL.log("sort");
-            
-            // Sort players by Elo (descending).
-            best_shuff.sort(function(a, b) {return b.team - a.team});
-
-            //extraQL.log("sort done");
-            
-            var players = best_shuff;
-            
-            // Display the results.
-            // NOTE: mul is "1" to separate the header from the results
-            var mul = 1
-						  , currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value
-						  , step = $.inArray(currentOut, ["echo","print"]) > -1 ? 100 : 1000;
-
-            // Show the chat pane for 10 seconds if output method is 'print',
-            // otherwise it will be difficult to notice.
-            if ("print" == currentOut) {
-              qz_instance.SendGameCommand("+chat;");
-              setTimeout(function() {
-                qz_instance.SendGameCommand("-chat;");
-              }, 10E3);
-            }
-
-            blues = [];
-            reds=[];
-            for(var i=0;i<best_shuff.length;i++)
-            {
-              var color = "^7";
-              
-              if(best_shuff[i].team  ==2)
-              {
-                color = "^4";
-                blues.push(best_shuff[i].elo);
-              }
-              else  if(best_shuff[i].team ==1)
-              {
-                color = "^1";
-                reds.push(best_shuff[i].elo);
-              }
-            }
-            
-            bluecount = 0;
-            for(b=0;b<blues.length;b++)
-            {
-              bluecount += blues[b];
-            }
-            
-            blueavg = Math.round(bluecount/blues.length);
-            
-            redcount = 0;
-            for(b=0;b<reds.length;b++)
-            {
-              redcount += reds[b];
-            }
-            
-            redsavg = Math.round(redcount/reds.length);
-            
-            //extraQL.log("final");
-                
-            var delta = Math.floor( Math.abs(redsavg-blueavg) );
-            
-            var desc = "^1ragequit^7";
-            if(delta<300) desc = "^1unplayable^7";
-            if(delta<200) desc = "^1very unbalanced^7";
-            if(delta<150) desc = "unbalanced";
-            if(delta<100) desc = "challenging^7";
-            if(delta<80) desc = "^4balanced";
-            if(delta<40) desc = "^4very balanced^7";
-             
-            var desc_word = "optimum";
-            if(doit) desc_word = "performing";
-             
-            qz_instance.SendGameCommand( currentOut + " ^4*^7 "+desc_word+" elo shuffle ^4* ^1"+ reds.length+"@"+ redsavg + "elo ^4"+ blues.length +"@"+blueavg +"elo ^7Gap: "+ delta+" ("+desc+");" );
-          
-            for (var i = 0, out = [], len = players.length; i < len; ++i) {
-            
-              var color = "^7";
-              
-              if(best_shuff[i].team  ==2)
-              {
-                color = "^4";
-              }
-              else  if(best_shuff[i].team ==1)
-              {
-                color = "^1";
-              }
-              
-              out.push( color + best_shuff[i].name.replace(/.nova/i,"sexyBiTcHnova"));
-
-              // Group by 4, delaying commands as needed
-              if ((i+1) % 4 == 0 || (i+1) == len) {
-                setTimeout(function(txt, isLast) {
-                
-                  qz_instance.SendGameCommand(currentOut + " " + txt + "; ");
-                
-                }.bind(null, out.join("^7 "), (i+1) == len), mul++ * step);
-                out = [];
-              }
-            }
-          });
-        },
-        onError: function(aServer) {
-          QLRD.igAnnounce("Unable to update current server info.", true);
-          QLRD.activeServerReq = false;
-        }
-      });
-      
-      break;
-
-    case "_qlrd_outputMethod":
-
-      logMsg("cvar '" + name + "' changed to '" + val + "'");
-
-      // See if the value is valid.  If not, set it to a good one.
-      var oi = 0;
-      val = $.trim((val+"")).toLowerCase();
-      for (var i = 0, e = QLRD.OUTPUT.length; i < e; ++i) {
-        if (val == QLRD.OUTPUT[i]) {
-          oi = i;
-          break;
-        }
-      }
-      val = QLRD.OUTPUT[oi];
-      replicate = 1;
+      shuffle(val, name == "_qlrd_shuffle_perform");      
       break;
   }
   oldOnCvarChanged.call(null, name, val, replicate);
 }
+
+function handleQlrdCommand(val) {
+  if (val == "" || "\"" + val + "\"" == CMD_DEFAULT)
+    return;
+  if (val == "help") {
+    qz_instance.SendGameCommand("echo Usage: ^5/" + CMD_NAME + "^7 <^3command^7>");
+    qz_instance.SendGameCommand("echo \"^3method^7     print the current output method\"");
+    qz_instance.SendGameCommand("echo \"^3method=^7x  sets the output method to ^3echo^7,^3print^7,^3say_team^7 or ^3say^7\"");
+    qz_instance.SendGameCommand("echo \"^score^7      shows the QLRanks score of each player on the server\"");
+    qz_instance.SendGameCommand("echo \"^3games^7     shows the number of completed games for each player\"");
+    qz_instance.SendGameCommand("echo \"^3shuffle^7   suggest the most even teams based on QLRanks score\"");
+    qz_instance.SendGameCommand("echo \"^3shuffle!^7  if OP, setup the teams as suggested\"");
+  }
+  else if (val == "score")
+    announce("1");
+  else if (val == "method")
+    qz_instance.SendGameCommand("echo Output method is: " + quakelive.cvars.Get("_qlrd_outputMethod").value);
+  else if (val.indexOf("method=") == 0)
+    quakelive.cvars.Set("_qlrd_outputMethod", val.substr(7, val.length - 7));
+  else if (val == "games")
+    games("1");
+  else if (val == "shuffle")
+    shuffle("1", false);
+  else if (val == "shuffle!")
+    shuffle("1", true);
+  else
+    qz_instance.SendGameCommand("echo " + CMD_USAGE);
+  qz_instance.SendGameCommand("seta " + name + "\"\"");
+}
+
+function setOutputMethod(val) {
+  logMsg("cvar '" + name + "' changed to '" + val + "'");
+
+  // See if the value is valid.  If not, set it to a good one.
+  var oi = 0;
+  val = $.trim((val+"")).toLowerCase();
+  for (var i = 0, e = QLRD.OUTPUT.length; i < e; ++i) {
+    if (val == QLRD.OUTPUT[i]) {
+      oi = i;
+      break;
+    }
+  }
+  return QLRD.OUTPUT[oi];  
+}
+
+function announce(val) {
+  if (1 !== parseInt(val) || !quakelive.IsGameRunning()) {
+    return;
+  }
+
+  // Give the request some time to complete
+  if (QLRD.activeServerReq) {
+    QLRD.igAnnounce("Please wait for the current request to complete...", false);
+    return;
+  }
+
+  QLRD.activeServerReq = true;
+
+  // Refresh the current server's details
+  quakelive.serverManager.RefreshServerDetails(quakelive.currentServerId, {
+    // Force a new request
+    cacheTime: -1,
+
+    onSuccess: function() {
+      var server = quakelive.serverManager.GetServerInfo(quakelive.currentServerId);
+
+      // Stop if no players were returned
+      if (0 == server.players.length) {
+        QLRD.igAnnounce("No players were returned by Quake Live.  "
+                + "Please try again in a few seconds.", true);
+        QLRD.activeServerReq = false;
+        return;
+      }
+
+      // Make sure we're using a gametype tracked by QLRanks
+      try {
+        var gt = mapdb.getGameTypeByID(server.game_type).title.toLowerCase();
+      }
+      catch(e) {
+        QLRD.igAnnounce("Unable to determine server gametype. " + e, true);
+        QLRD.activeServerReq = false;
+        return;
+      }
+      if (!(gt in QLRD.GAMETYPES)) {
+        QLRD.igAnnounce(gt.toUpperCase() + " is not currently tracked by QLRanks.", true);
+        QLRD.activeServerReq = false;
+        return;
+      }
+
+      QLRD.igAnnounce("Collecting QLRanks.com data (" + server.players.length
+              + " players)...", false);
+
+      // Wait for all server players to be available in the QLRD cache.
+      var names = $.map(server.players, function(p) {return {"name": p.name}});
+      QLRD.waitFor(names, gt, function(error, players, gt) {
+        // Always clear the active request flag.
+        QLRD.activeServerReq = false;
+
+        // Stop if something went wrong.
+        if (error) {
+          QLRD.igAnnounce("Unable to retrieve QLRanks.com data.", true);
+          return;
+        }
+            
+        // Display the results.
+        // NOTE: mul is "1" to separate the header from the results
+        var mul = 1
+          , currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value
+          , step = $.inArray(currentOut, ["echo","print"]) > -1 ? 100 : 1000;
+
+        // Show the chat pane for 10 seconds if output method is 'print',
+        // otherwise it will be difficult to notice.
+        if ("print" == currentOut) {
+          qz_instance.SendGameCommand("+chat;");
+          setTimeout(function() {
+            qz_instance.SendGameCommand("-chat;");
+          }, 10E3);
+        }
+
+        blues = [];
+        reds=[];
+            
+        function getQlmEloByName(players, name)
+        {
+          for(var p=0;p<players.length;p++){
+
+            if(players[p].name==name)
+              return parseInt(players[p].elo);
+          }
+               
+          return -1;
+        }
+          
+        index = 0;
+          
+        var players_copy = $.map(server.players, 
+          function(p) { return {
+            "name": p.name,
+            "team": p.team,
+            "elo": getQlmEloByName(players,p.name),
+            "index": index++ } } );
+                
+        // Sort players by Elo (descending).
+        players_copy.sort(function(a, b) {return b.elo - a.elo});
+
+        for (var i = 0, out = [], len = players_copy.length; i < len; ++i) {
+            
+          var color = "^7";
+              
+          if(players_copy[i].team    ==2)
+          {
+            color = "^4";
+            blues.push(players_copy[i].elo);
+          }
+          else  if(players_copy[i].team    ==1)
+          {
+            color = "^1";
+            reds.push(players_copy[i].elo);
+          }
+                          
+          out.push( color  + players_copy[i].name.replace(/\_nova$/i,"sexy!nova") + " " + players_copy[i].elo + "^7");
+
+          // Group by 4, delaying commands as needed
+          if ((i+1) % 4 == 0 || (i+1) == len) {
+            setTimeout(function(txt, isLast) {
+                
+              qz_instance.SendGameCommand(currentOut + " " + txt + ";");
+                
+            }.bind(null, out.join(", "), (i+1) == len), mul++ * step);
+            out = [];
+          }
+        }
+            
+        bluecount = 0;
+        for(b=0;b<blues.length;b++)
+        {
+          bluecount +=blues[b];
+        }
+            
+        blueavg = Math.round(bluecount/blues.length);
+            
+        redcount = 0;
+        for(b=0;b<reds.length;b++)
+        {
+          redcount += reds[b];
+        }
+            
+        redsavg = Math.round(redcount/reds.length);
+            
+        var delta = Math.floor( Math.abs(redsavg-blueavg) );
+
+        var desc = "^1ragequit^7";
+        if(delta<300) desc = "^1unplayable^7";
+        if(delta<200) desc = "^1very unbalanced^7";
+        if(delta<150) desc = "unbalanced";
+        if(delta<100) desc = "challenging^7";
+        if(delta<80) desc = "^4balanced^7";
+        if(delta<40) desc = "^4very balanced^7";
+            
+        if(reds.length==blues.length && reds.length != 0)
+          qz_instance.SendGameCommand( currentOut + " ^4* ^7Team Elo ^4*^1 " + reds.length +"@"+ redsavg + " ^4"+ blues.length +"@"+ blueavg +" ^7Gap: "+ delta +" ("+desc+"^7)" );
+      });
+    },
+    onError: function(aServer) {
+      QLRD.igAnnounce("Unable to update current server info.", true);
+      QLRD.activeServerReq = false;
+    }
+  });  
+}
+
+function games(val) {
+  if (1 !== parseInt(val) || !quakelive.IsGameRunning()) {
+    return;
+  }
+
+  var currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value;
+
+  QLRD.activeServerReq = true;
+  //extraQL.log("Updating current server info...", false);
+
+  // Refresh the current server's details
+  quakelive.serverManager.RefreshServerDetails(quakelive.currentServerId, {
+    // Force a new request
+    cacheTime: -1,
+
+    onSuccess: function() {
+      var server = quakelive.serverManager.GetServerInfo(quakelive.currentServerId);
+
+      // Stop if no players were returned
+      if (0 == server.players.length) {
+        QLRD.igAnnounce("No players were returned by Quake Live.  "
+                + "Please try again in a few seconds.", true);
+        QLRD.activeServerReq = false;
+        return;
+      }
+
+      // Make sure we're using a gametype tracked by QLRanks
+      try {
+        var gt = mapdb.getGameTypeByID(server.game_type).title.toLowerCase();
+      }
+      catch(e) {
+        QLRD.igAnnounce("Unable to determine server gametype. " + e, true);
+        QLRD.activeServerReq = false;
+        return;
+      }
+      if (!(gt in QLRD.GAMETYPES)) {
+        QLRD.igAnnounce(gt.toUpperCase() + " is not currently tracked by ecs.", true);
+        QLRD.activeServerReq = false;
+        return;
+      }
+
+      QLRD.igAnnounce("Collecting data from ecs webservice (" + server.players.length
+              + " players)...", false);
+
+      // Wait for all server players to be available in the QLRD cache.
+      var names = $.map(server.players, function(p) {return {"name": p.name}});
+      QLRD.waitFor(names, gt, function(error, players, gt) {
+        // Always clear the active request flag.
+        QLRD.activeServerReq = false;
+
+        // Stop if something went wrong.
+        if (error) {
+          QLRD.igAnnounce("Unable to retrieve ecs data.", true);
+          return;
+        }
+
+        // Wait for all server players to be available in the QLRD cache.
+        var just_names = $.map(server.players, function(p) { return p.name });
+
+        $.ajax({
+          type: "GET"
+              , url: "http://qlranks20917.azurewebsites.net/api/Stats/GetProfileGametypesFinished?profile="+ just_names.join(",")
+        })
+        .done(function(aData) {
+
+          var games_played = $.map(aData, function(p) { 
+            return { "Games": parseInt(p[QLRD.GAMETYPES[gt].toUpperCase()]), "Name": p["ProfileName"] }
+          });
+
+          games_played.sort(function(a, b) {return b.Games - a.Games});
+
+          var step = $.inArray(currentOut, ["echo","print"]) > -1 ? 100 : 1000;
+          var gametype = QLRD.GAMETYPES[gt];
+          qz_instance.SendGameCommand( currentOut +" \"^5PLAYER_________   #" + gametype.toUpperCase() + " games completed^7\"");
+          for(var i=0;i<games_played.length;i++)
+          {
+            (function(player) { 
+              setTimeout(function() {
+                
+                color = player.Games < 400 ? "^3" : "^2";
+
+                qz_instance.SendGameCommand( currentOut +" \"^7"+  pad(player.Name, 15) +" "+ color + pad(player.Games, -6) + "^7\"");
+
+              }, i * step );
+            })(games_played[i]);
+          }
+        } );
+      } 
+    ) 
+    } } )
+  
+}
+
+function shuffle(val, doit) {
+  if (1 !== parseInt(val) || !quakelive.IsGameRunning()) {
+    return;
+  }
+    
+  // Give the request some time to complete
+  if (QLRD.activeServerReq) {
+    QLRD.igAnnounce("Please wait for the current request to complete...", false);
+    return;
+  }
+      
+  // Refresh the current server's details
+  quakelive.serverManager.RefreshServerDetails(quakelive.currentServerId, {
+    // Force a new request
+    cacheTime: -1,
+
+    onSuccess: function() {
+      var server = quakelive.serverManager.GetServerInfo(quakelive.currentServerId);
+
+      // Stop if no players were returned
+      if (0 == server.players.length) {
+        QLRD.igAnnounce("No players were returned by Quake Live.  "
+                + "Please try again in a few seconds.", true);
+        QLRD.activeServerReq = false;
+        return;
+      }
+
+      // Make sure we're using a gametype tracked by QLRanks
+      try {
+        var gt = mapdb.getGameTypeByID(server.game_type).title.toLowerCase();
+      }
+      catch(e) {
+        QLRD.igAnnounce("Unable to determine server gametype. " + e, true);
+        QLRD.activeServerReq = false;
+        return;
+      }
+      if (!(gt in QLRD.GAMETYPES)) {
+        QLRD.igAnnounce(gt.toUpperCase() + " is not currently tracked by QLRanks.", true);
+        QLRD.activeServerReq = false;
+        return;
+      }
+
+      QLRD.igAnnounce("Collecting QLRanks.com data (" + server.players.length
+              + " players)...", false);
+
+      // Wait for all server players to be available in the QLRD cache.
+      var names = $.map(server.players, function(p) {return {"name": p.name}});
+          
+      QLRD.waitFor(names, gt, function(error, players, gt) {
+        // Always clear the active request flag.
+        QLRD.activeServerReq = false;
+
+        // Stop if something went wrong.
+        if (error) {
+          QLRD.igAnnounce("Unable to retrieve QLRanks.com data.", true);
+          return;
+        }
+
+        var index = 0;
+          
+        //extraQL.log("Mapping players_copy");
+          
+        function getQlmPlayerByName(players, name)
+        {
+          for(var p=0;p<players.length;p++)
+            if(players[p].name==name)return players[p];
+        }
+          
+        var players_copy = $.map(server.players, 
+          function(p) { return {
+            "name": p.name,
+            "elo": parseInt(getQlmPlayerByName(players,p.name).elo),
+            "team": p.team,
+            "index": index++,
+            "candidateTeam": -1 } } );
+                
+        //extraQL.log("Mapped players_copy");
+        //extraQL.log("shuffle func");
+            
+        if(players_copy.length % 2 != 0 
+          || players_copy.length < 2 )
+        {
+          QLRD.igAnnounce(("Need at least 2 people and an even number of people, currently " + players_copy.length + " people"), true);
+          return;
+        }
+            
+						
+        var bestdiff = 1e8;
+        var best_shuff = null;
+            
+        function k_combinations(set, k) 
+        {
+          var i, j, combs, head, tailcombs;
+	
+          if (k > set.length || k <= 0) {
+            return [];
+          }
+	
+          if (k == set.length) {
+            return [set];
+          }
+	
+          if (k == 1) {
+            combs = [];
+            for (i = 0; i < set.length; i++) {
+              combs.push([set[i]]);
+            }
+            return combs;
+          }
+	
+          combs = [];
+          for (i = 0; i < set.length - k + 1; i++) {
+            head = set.slice(i, i+1);
+            tailcombs = k_combinations(set.slice(i + 1), k - 1);
+            for (j = 0; j < tailcombs.length; j++) {
+              combs.push(head.concat(tailcombs[j]));
+            }
+          }
+          return combs;
+        }
+
+        function range(start, end)
+        {
+          var array = new Array();
+          for(var i = start; i < end; i++)
+          {
+            array.push(i);
+          }
+          return array;
+        }
+
+        var team_size = players_copy.length/2;
+
+        ///ecs@060714 number of team permutations is n choose k where n is server size k teamsize
+        var shuffle_perms = k_combinations( range(0,players_copy.length), team_size);
+
+        for(var i=0;i<shuffle_perms.length;i++)
+        {
+          var reds = 0;
+          var blues = 0;
+
+          for( var p=0;p<players_copy.length;p++ )
+          {
+            if( shuffle_perms[i].indexOf(p) != -1 )
+            {
+              reds = reds + players_copy[p].elo;
+              players_copy[p].candidateTeam=0;
+            }
+            else
+            {
+              blues = blues + players_copy[p].elo;
+              players_copy[p].candidateTeam=1;
+            }
+          }
+                
+          ///average it
+          var reds_avg = reds / team_size;
+          var blues_avg = blues / team_size;
+                
+          var diff = Math.abs( (reds_avg-blues_avg) );
+                
+          if( diff < bestdiff )
+          {
+            bestdiff = diff;
+            best_shuff = $.map(players_copy, 
+                    function(p) { return {
+                      "name": p.name,
+                      "elo": p.elo,
+                      "team": p.candidateTeam == 0 ? 1 : 2 
+                    } } );
+          }
+        }
+
+        if( doit )
+        {
+          var commands = [];
+          for(var i=0;i<best_shuff.length;i++)
+          {
+            command =("put " + (players_copy[i].index) +" " + (best_shuff[i].team == 1 ? "r":"b") +";");
+                    
+            commands.push(command);
+                
+            QLRD.igAnnounce( command );
+          }
+                
+          for(var i=0;i<best_shuff.length;i++)
+          {
+            var put_command = commands[i];
+                   
+            (function(put_command,i) { 
+              setTimeout(function(command) {
+                
+                qz_instance.SendGameCommand(put_command);
+                
+              }, i * 1100 );
+            })(put_command,i);
+                
+          }
+        }
+            
+        //extraQL.log("best diff " + bestdiff / best_shuff.length );
+        //extraQL.log("best_shuff length " + best_shuff.length );
+            
+        //extraQL.log("sort");
+            
+        // Sort players by Elo (descending).
+        best_shuff.sort(function(a, b) {return b.team - a.team});
+
+        //extraQL.log("sort done");
+            
+        var players = best_shuff;
+            
+        // Display the results.
+        // NOTE: mul is "1" to separate the header from the results
+        var mul = 1
+          , currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value
+          , step = $.inArray(currentOut, ["echo","print"]) > -1 ? 100 : 1000;
+
+        // Show the chat pane for 10 seconds if output method is 'print',
+        // otherwise it will be difficult to notice.
+        if ("print" == currentOut) {
+          qz_instance.SendGameCommand("+chat;");
+          setTimeout(function() {
+            qz_instance.SendGameCommand("-chat;");
+          }, 10E3);
+        }
+
+        blues = [];
+        reds=[];
+        for(var i=0;i<best_shuff.length;i++)
+        {
+          var color = "^7";
+              
+          if(best_shuff[i].team  ==2)
+          {
+            color = "^4";
+            blues.push(best_shuff[i].elo);
+          }
+          else  if(best_shuff[i].team ==1)
+          {
+            color = "^1";
+            reds.push(best_shuff[i].elo);
+          }
+        }
+            
+        bluecount = 0;
+        for(b=0;b<blues.length;b++)
+        {
+          bluecount += blues[b];
+        }
+            
+        blueavg = Math.round(bluecount/blues.length);
+            
+        redcount = 0;
+        for(b=0;b<reds.length;b++)
+        {
+          redcount += reds[b];
+        }
+            
+        redsavg = Math.round(redcount/reds.length);
+            
+        //extraQL.log("final");
+                
+        var delta = Math.floor( Math.abs(redsavg-blueavg) );
+            
+        var desc = "^1ragequit^7";
+        if(delta<300) desc = "^1unplayable^7";
+        if(delta<200) desc = "^1very unbalanced^7";
+        if(delta<150) desc = "unbalanced";
+        if(delta<100) desc = "challenging^7";
+        if(delta<80) desc = "^4balanced";
+        if(delta<40) desc = "^4very balanced^7";
+             
+        var desc_word = "optimum";
+        if(doit) desc_word = "performing";
+             
+        qz_instance.SendGameCommand( currentOut + " ^4*^7 "+desc_word+" elo shuffle ^4* ^1"+ reds.length+"@"+ redsavg + "elo ^4"+ blues.length +"@"+blueavg +"elo ^7Gap: "+ delta+" ("+desc+");" );
+          
+        for (var i = 0, out = [], len = players.length; i < len; ++i) {
+            
+          var color = "^7";
+              
+          if(best_shuff[i].team  ==2)
+          {
+            color = "^4";
+          }
+          else  if(best_shuff[i].team ==1)
+          {
+            color = "^1";
+          }
+              
+          out.push( color + best_shuff[i].name.replace(/.nova/i,"sexyBiTcHnova"));
+
+          // Group by 4, delaying commands as needed
+          if ((i+1) % 4 == 0 || (i+1) == len) {
+            setTimeout(function(txt, isLast) {
+                
+              qz_instance.SendGameCommand(currentOut + " " + txt + "; ");
+                
+            }.bind(null, out.join("^7 "), (i+1) == len), mul++ * step);
+            out = [];
+          }
+        }
+      });
+    },
+    onError: function(aServer) {
+      QLRD.igAnnounce("Unable to update current server info.", true);
+      QLRD.activeServerReq = false;
+    }
+  });  
+}
+
 
 function pad(text, minLength, paddingChar) {
   if (text === undefined || text == null) text = "";
