@@ -1,13 +1,16 @@
 // ==UserScript==
 // @id          links
 // @name        Links to QL related Websites
-// @version     2.0
+// @version     3.0
 // @author      PredatH0r
 // @description	Adds a "Links" menu with links to important QL related websites
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 3.0
+- added some links
 
 Version 2.0
 - added some links
@@ -28,9 +31,11 @@ Version 1.0
       id: "eql_links",
       callback: "",
       submenu: {
+        "Quakenet IRChat": { newwindow: "http://webchat.quakenet.org/?nick=" + quakelive.username + "&channels=quakelive&prompt=1" },
         "ESReality Forum": { newwindow: "http://www.esreality.com/?a=post&forum=17" },
         "Reddit Forum": { newwindow: "http://www.reddit.com/r/quakelive"},
         "Quakehub Videos": { newwindow: "http://quakehub.com/" },
+        "Quake History": { newwindow: "http://www.quakehistory.com/" },
         "QLRanks": { newwindow: "http://www.qlranks.com/", "class": "sep" },
         "QLStats": { newwindow: "http://ql.leeto.fi/#/" },
         "FaceIt Cups": { newwindow: "http://play.faceit.com/" },
