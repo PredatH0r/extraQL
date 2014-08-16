@@ -409,13 +409,16 @@ namespace ExtraQL
       string sep = "";
       foreach (var info in this.scriptRepository.GetScripts())
       {
+        if (!info.IsUserscript)
+          continue;
         text += sep + "\n{\"id\":\"" + info.Id + "\"";
         text += ",\"filename\":\"" + Path.GetFileName(info.Filepath) + "\"";
-        foreach (var entry in info.Metadata)
+        foreach (var key in info.Metadata.Keys)
         {
-          if (entry.Key == "id")
+          if (key == "id")
             continue;
-          text += ",\"" + entry.Key + "\":\"" + entry.Value[0].Replace("\\","\\\\").Replace("\"", "\\\"") + "\"";
+          var value = info.Metadata.Get(key);
+          text += ",\"" + key + "\":\"" + value.Replace("\\","\\\\").Replace("\"", "\\\"") + "\"";
         }
         text += "}";
         sep = ",";

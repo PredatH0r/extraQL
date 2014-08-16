@@ -23,5 +23,17 @@ namespace ExtraQL
         request.Timeout = this.Timeout;
       return request;
     }
+
+    protected override WebResponse GetWebResponse(WebRequest request)
+    {
+      var response = base.GetWebResponse(request);
+      var stream = response == null ? null : response.GetResponseStream();
+      if (stream != null && this.Timeout >= 0)
+      {
+        stream.ReadTimeout = Timeout;
+        stream.WriteTimeout = Timeout;
+      }
+      return response;
+    }
   }
 }

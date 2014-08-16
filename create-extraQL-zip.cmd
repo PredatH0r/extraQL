@@ -12,7 +12,7 @@ mkdir extraQL\images
 xcopy "%abs%\bin\Debug\extraQL.exe" extraQL\ >nul
 xcopy "%abs%\scripts" extraQL\scripts >nul
 xcopy /s "%abs%\images" extraQL\images >nul
-%zipper% a -tzip extraQL.zip "extraQL"
+%zipper% a -tzip extraQL.zip "extraQL" -x!extraQL\scripts\!ndex.txt
 if errorlevel 1 goto error
 rmdir /s /q extraQL
 

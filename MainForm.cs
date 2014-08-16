@@ -14,7 +14,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "0.111";
+    public const string Version = "1.2";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -52,10 +52,13 @@ namespace ExtraQL
     {
       base.OnShown(e);
 
-      this.scriptRepository.UpdateAndRegisterScripts();
+      this.scriptRepository.RegisterScripts();
       this.RestartHttpServer();
       if (this.cbCheckUpdate.Checked)
+      {
         this.CheckForUpdate();
+        this.scriptRepository.UpdateScripts();
+      }
 
       if (this.cbAutostartLauncher.Checked)
         this.Launch(false);
@@ -519,7 +522,7 @@ namespace ExtraQL
     #region CheckForUpdate()
     private void CheckForUpdate()
     {
-      Log("Checking for update...");
+      Log("Checking for updates...");
       try
       {
         WebClient client = new WebClient();

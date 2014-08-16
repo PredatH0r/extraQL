@@ -35,6 +35,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <PlatformTarget>x86</PlatformTarget>
@@ -68,7 +70,6 @@
     <None Include="scripts\autoExec.usr.js" />
     <None Include="scripts\openChat.usr.js" />
     <None Include="scripts\startpage.usr.js" />
-    <None Include="scripts\extraQL.js" />
     <Compile Include="Servlets.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TcpServer.cs" />
@@ -112,6 +113,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\links.usr.js" />
+    <Content Include="scripts\extraQL.js" />
     <Content Include="scripts\rosterGroup.usr.js" />
     <None Include="resources\background.png" />
     <Content Include="c:\users\hbeham\appdata\locallow\id software\focus\home\baseq3\hook.js">

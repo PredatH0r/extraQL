@@ -1,13 +1,13 @@
+hook.js
+extraQL.js
 autoExec.usr.js
 autoInvite.usr.js
 docker.usr.js
 escaper.usr.js
 esreality.usr.js
-extraQL.js
 extStats.usr.js
 friendCommands.usr.js
 gametype.usr.js
-hook.js
 irc.usr.js
 keyboardNav.usr.js
 linkify.usr.js

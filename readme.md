@@ -26,6 +26,11 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 0.111
+---
+- fixed Launcher username and password were not filled after starting a 2nd time
+- QLranks.com script improved with Team Extensions
+
 Version 0.110
 ---
 - fixed error installing "hook.js" when the file didn't exist before
