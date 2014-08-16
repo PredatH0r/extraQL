@@ -1102,9 +1102,9 @@ function handleQlrdCommand(val) {
     return;
   if (val == "help") {
     qz_instance.SendGameCommand("echo Usage: ^5/" + CMD_NAME + "^7 <^3command^7>");
-    qz_instance.SendGameCommand("echo \"^3method^7     print the current output method\"");
+    qz_instance.SendGameCommand("echo \"^3method^7    print the current output method\"");
     qz_instance.SendGameCommand("echo \"^3method=^7x  sets the output method to ^3echo^7,^3print^7,^3say_team^7 or ^3say^7\"");
-    qz_instance.SendGameCommand("echo \"^score^7      shows the QLRanks score of each player on the server\"");
+    qz_instance.SendGameCommand("echo \"^3score^7     shows the QLRanks score of each player on the server\"");
     qz_instance.SendGameCommand("echo \"^3games^7     shows the number of completed games for each player\"");
     qz_instance.SendGameCommand("echo \"^3shuffle^7   suggest the most even teams based on QLRanks score\"");
     qz_instance.SendGameCommand("echo \"^3shuffle!^7  if OP, setup the teams as suggested\"");
