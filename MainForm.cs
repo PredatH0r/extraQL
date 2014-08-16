@@ -21,7 +21,7 @@ namespace ExtraQL
     private readonly HttpServer server;
     private readonly Servlets servlets;
     private readonly ScriptRepository scriptRepository;
-
+    private string masterServer = "ql.beham.biz:27963";
     private Size windowDragOffset;
 
     #region ctor()
@@ -57,7 +57,7 @@ namespace ExtraQL
       if (this.cbCheckUpdate.Checked)
       {
         this.CheckForUpdate();
-        this.scriptRepository.UpdateScripts();
+        this.scriptRepository.UpdateScripts(this.cbBindToAll.Checked, this.masterServer);
       }
 
       if (this.cbAutostartLauncher.Checked)
@@ -298,6 +298,10 @@ namespace ExtraQL
     private void cbBindAll_CheckedChanged(object sender, EventArgs e)
     {
       this.RestartHttpServer();
+      if (this.cbBindToAll.Checked)
+        this.updateCheckTimer.Start();
+      else
+        this.updateCheckTimer.Stop();
     }
     #endregion
 
@@ -329,6 +333,13 @@ namespace ExtraQL
         this.cbAutostartSteam.Checked = false;
       else
         this.cbAutostartLauncher.Checked = false;
+    }
+    #endregion
+
+    #region updateCheckTimer_Tick
+    private void updateCheckTimer_Tick(object sender, EventArgs e)
+    {
+      this.scriptRepository.UpdateScripts(true, this.masterServer);
     }
     #endregion
 
@@ -389,6 +400,7 @@ namespace ExtraQL
             case "checkUpdates": checkUpdates = value == "1"; break;
             case "autostart": autostart = int.Parse(value); break;
             case "runAsCommandLine": runAsCommandLine = value == "1"; break;
+            case "masterServer": this.masterServer = value; break;
           }
         }
       }
@@ -476,6 +488,7 @@ namespace ExtraQL
         config.AppendLine("checkUpdates=" + (this.cbCheckUpdate.Checked ? 1 : 0));
         config.AppendLine("autostart=" + (this.cbAutostartLauncher.Checked ? 1 : this.cbAutostartSteam.Checked ? 2 : 0));
         config.AppendLine("runAsCommandLine=" + (this.cbRunAsCommandLine.Checked ? 1 : 0));
+        config.AppendLine("masterServer=" + this.masterServer);
         File.WriteAllText(this.ConfigFile, config.ToString(), Encoding.UTF8);
       }
       catch (Exception ex)
@@ -522,7 +535,6 @@ namespace ExtraQL
     #region CheckForUpdate()
     private void CheckForUpdate()
     {
-      Log("Checking for updates...");
       try
       {
         WebClient client = new WebClient();
@@ -559,7 +571,7 @@ namespace ExtraQL
               }
             }
             else
-              Log("Your extraQL.exe is up-to-date.");
+              Log("extraQL.exe is up-to-date");
           }
           ((WebClient) sender).Dispose();
         }

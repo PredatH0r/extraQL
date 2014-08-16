@@ -407,9 +407,10 @@ namespace ExtraQL
     {
       string text = "[";
       string sep = "";
+      bool all = uri.Query == "?all";
       foreach (var info in this.scriptRepository.GetScripts())
       {
-        if (!info.IsUserscript)
+        if (!all && !info.IsUserscript)
           continue;
         text += sep + "\n{\"id\":\"" + info.Id + "\"";
         text += ",\"filename\":\"" + Path.GetFileName(info.Filepath) + "\"";

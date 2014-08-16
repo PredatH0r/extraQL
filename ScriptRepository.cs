@@ -11,14 +11,16 @@ namespace ExtraQL
 {
   public class ScriptRepository
   {
-    internal const string DEFAULT_UPDATE_BASE_URL = "http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/{0}?format=raw";
-    private const string INDEX_FILE = "!ndex.txt";
-    private const int SCRIPT_UPDATE_DELAY = 5000; // in millisec
+    private const string SCRIPTINDEX_URL_FORMAT = "http://{0}/repository.json?all";
+    private const string SCRIPTFILE_URL_FORMAT = "http://{0}/scripts/{1}";
+    internal const string DEFAULT_DOWNLOADSOURCE_URL = "http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/{0}?format=raw";
     private readonly Dictionary<string, ScriptInfo> scriptById = new Dictionary<string, ScriptInfo>();
     private readonly Dictionary<string, ScriptInfo> scriptByFileName = new Dictionary<string, ScriptInfo>();
     private readonly Encoding utf8withoutBom = new UTF8Encoding(false);
     private readonly System.Timers.Timer updateTimer = new System.Timers.Timer();
     private readonly List<UpdateQueueItem> updateQueue = new List<UpdateQueueItem>();
+    private bool convertNewline;
+    private string masterServer;
 
     #region ctor()
     public ScriptRepository()
@@ -30,7 +32,6 @@ namespace ExtraQL
         this.ScriptDir = Path.GetDirectoryName(Path.GetDirectoryName(ScriptDir));
       this.ScriptDir += "/scripts";
       updateTimer.AutoReset = true;
-      updateTimer.Interval = SCRIPT_UPDATE_DELAY;
       updateTimer.Elapsed += ProcessNextItemInUpdateQueue;
     }
     #endregion
@@ -58,26 +59,31 @@ namespace ExtraQL
 
     #region UpdateScripts()
 
-    public void UpdateScripts()
+    public void UpdateScripts(bool fromDownloadsourceUrl, string extraqlServer)
     {
+      Log("Checking for updates...");
+      this.masterServer = extraqlServer;
+
       lock (this)
       {
         this.updateTimer.Stop();
         this.updateQueue.Clear();
       }
 
-      this.AddLocalScriptsToUpdateQueue();
-      this.AddNewScriptsFromRemoteIndexfileToUpdateQueueAndStartUpdate();
+      if (fromDownloadsourceUrl || string.IsNullOrEmpty(extraqlServer))
+        this.LoadUpdatesFromDownloadsource();
+      else
+        this.LoadUpdatesFromMasterServer();
     }
     #endregion
 
-    #region AddLocalScriptsToUpdateQueue()
-    private void AddLocalScriptsToUpdateQueue()
+    #region LoadUpdatesFromDownloadsource()
+    private void LoadUpdatesFromDownloadsource()
     {
       foreach (var script in this.scriptByFileName.Values)
       {
         if (script.Metadata.Get("version") == null)
-          Log("Ignoring script without @version in update check: " + Path.GetFileName(script.Filepath));
+          Log("Script has no @version: " + Path.GetFileName(script.Filepath));
         else
         {
           var queueItem = new UpdateQueueItem(script);
@@ -87,39 +93,9 @@ namespace ExtraQL
             this.updateQueue.Add(queueItem);
         }
       }
-    }
-    #endregion
 
-    #region AddNewScriptsFromRemoteIndexfileToUpdateQueueAndStartUpdate()
-    private void AddNewScriptsFromRemoteIndexfileToUpdateQueueAndStartUpdate()
-    {
-      var client = new XWebClient(5000);
-      client.DownloadStringCompleted += ScriptIndexFileDownloadCompleted;
-      var url = new Uri(string.Format(DEFAULT_UPDATE_BASE_URL, INDEX_FILE));
-      client.DownloadStringAsync(url, new WebRequestState(url));
-    }
-
-    #endregion
-
-    #region ScriptIndexFileDownloadCompleted()
-    private void ScriptIndexFileDownloadCompleted(object sender, DownloadStringCompletedEventArgs e)
-    {
-      var client = (XWebClient) sender;
-      var state = (WebRequestState) e.UserState;
-
-      if (e.Error == null)
-        this.AddNewScriptsFromRemoteIndexFileToQueue(e.Result);
-      else
-      {
-        if (state.Attempt++ < 3)
-        {
-          client.DownloadStringAsync(state.Uri, state);
-          return;
-        }
-        Log("Failed to retrieve latest list of available userscripts: " + e.Error.Message);
-      }
-      client.Dispose();
-
+      this.convertNewline = true;
+      this.updateTimer.Interval = 5000; // sourceforge silently drops requests when hammered
       this.updateTimer.Start();
       // process hook.js and extraQL.js immediately (which are the first two)
       this.ProcessNextItemInUpdateQueue(this.updateTimer, null);
@@ -127,19 +103,70 @@ namespace ExtraQL
     }
     #endregion
 
-    #region AddNewScriptsFromRemoteIndexFileToQueue()
-    private void AddNewScriptsFromRemoteIndexFileToQueue(string indexFileContent)
+    #region LoadUpdatesFromMasterServer()
+    private void LoadUpdatesFromMasterServer()
+    {
+      var client = new XWebClient(5000);
+      client.DownloadStringCompleted += RepositoryJsonDownloadCompleted;
+      var url = new Uri(string.Format(SCRIPTINDEX_URL_FORMAT, this.masterServer));
+      client.DownloadStringAsync(url, new WebRequestState(url));
+    }
+
+    #endregion
+
+    #region RepositoryJsonDownloadCompleted()
+    private void RepositoryJsonDownloadCompleted(object sender, DownloadStringCompletedEventArgs e)
+    {
+      var client = (XWebClient) sender;
+      var state = (WebRequestState) e.UserState;
+
+      if (e.Error == null)
+      {
+        this.AddUpdatedScriptsFromMasterServerToQueue(e.Result);
+        this.convertNewline = false;
+        this.updateTimer.Interval = 100;
+        this.updateTimer.Start();
+      }
+      else
+      {
+        if (state.Attempt++ < 3)
+        {
+          client.DownloadStringAsync(state.Uri, state);
+          return;
+        }
+        Log("Update server not responding, checking scripts one-by-one...");
+        this.LoadUpdatesFromDownloadsource(); // fallback to script source
+      }
+      client.Dispose();
+
+    }
+    #endregion
+
+    #region AddUpdatedScriptsFromMasterServerToQueue()
+    private void AddUpdatedScriptsFromMasterServerToQueue(string indexFileContent)
     {
       var files = indexFileContent.Split('\n', '\r');
-      foreach (var scriptfile in files)
+      Regex regexFilename = new Regex(".*\"filename\":\"(.*?)\".*");
+      Regex regexVersion = new Regex(".*\"version\":\"(.*?)\".*");
+      foreach (var jsonLine in files)
       {
-        if (string.IsNullOrEmpty(scriptfile))
+        var matchVersion = regexVersion.Match(jsonLine);
+        if (!matchVersion.Success)
           continue;
-        if (!this.scriptByFileName.ContainsKey(scriptfile))
+        var matchFilename = regexFilename.Match(jsonLine);
+        var remoteVersion = matchVersion.Groups[1].Value;
+        var filename = matchFilename.Groups[1].Value;
+
+        ScriptInfo localScript;
+        this.scriptByFileName.TryGetValue(filename, out localScript);
+
+        if (localScript == null || IsNewer(remoteVersion, localScript.Metadata.Get("version")))
         {
-          string url = string.Format(DEFAULT_UPDATE_BASE_URL, scriptfile);
+          string url = string.Format(SCRIPTFILE_URL_FORMAT, this.masterServer, filename);
           this.updateQueue.Add(new UpdateQueueItem(url));
         }
+        //else
+        //  Log(filename + " is up-to-date");
       }
     }
     #endregion
@@ -152,6 +179,7 @@ namespace ExtraQL
         if (this.updateQueue.Count == 0)
         {
           this.updateTimer.Stop();
+          this.Log("Scripts are up-to-date");
           return;
         }
 
@@ -194,7 +222,8 @@ namespace ExtraQL
         {
           string scriptPath = queueItem.ScritpInfo != null ? queueItem.ScritpInfo.Filepath : Path.Combine(this.ScriptDir, Path.GetFileName(queueItem.Uri.LocalPath));
           string scriptFile = Path.GetFileName(scriptPath) ?? "";
-          remoteCode = remoteCode.Replace("\n", Environment.NewLine);
+          if (convertNewline)
+            remoteCode = remoteCode.Replace("\n", Environment.NewLine);
           File.WriteAllText(scriptPath, remoteCode, utf8withoutBom);
           lock (this)
           {
@@ -355,7 +384,7 @@ namespace ExtraQL
       this.Timestamp = new FileInfo(filepath).LastWriteTimeUtc.Ticks;
       this.Metadata = metadata;
       this.Code = code;
-      this.DownloadUrl = metadata.Get("downloadUrl") ?? string.Format(ScriptRepository.DEFAULT_UPDATE_BASE_URL, fileName);
+      this.DownloadUrl = metadata.Get("downloadUrl") ?? string.Format(ScriptRepository.DEFAULT_DOWNLOADSOURCE_URL, fileName);
       this.IsUserscript = filepath.EndsWith(".usr.js");
     }
 

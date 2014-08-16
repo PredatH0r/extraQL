@@ -66,7 +66,6 @@
     <Compile Include="XWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
-    <None Include="scripts\!ndex.txt" />
     <None Include="scripts\autoExec.usr.js" />
     <None Include="scripts\openChat.usr.js" />
     <None Include="scripts\startpage.usr.js" />

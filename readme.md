@@ -26,6 +26,11 @@ Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki
 Changelog
 =========
 
+Version 1.2
+---
+- unmerged hook.js and extraQL.exe
+- rewritten script update logic to improve performance and stability
+
 Version 0.111
 ---
 - fixed Launcher username and password were not filled after starting a 2nd time

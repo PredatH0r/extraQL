@@ -81,6 +81,7 @@ namespace ExtraQL
       this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
       this.miQuit = new System.Windows.Forms.ToolStripMenuItem();
       this.launcherPlayTimer = new System.Windows.Forms.Timer(this.components);
+      this.updateCheckTimer = new System.Windows.Forms.Timer(this.components);
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -234,9 +235,9 @@ namespace ExtraQL
       this.cbCheckUpdate.CheckState = System.Windows.Forms.CheckState.Checked;
       this.cbCheckUpdate.Location = new System.Drawing.Point(10, 91);
       this.cbCheckUpdate.Name = "cbCheckUpdate";
-      this.cbCheckUpdate.Size = new System.Drawing.Size(179, 17);
+      this.cbCheckUpdate.Size = new System.Drawing.Size(115, 17);
       this.cbCheckUpdate.TabIndex = 6;
-      this.cbCheckUpdate.Text = "Check for extraQL.exe Updates";
+      this.cbCheckUpdate.Text = "Check for Updates";
       this.cbCheckUpdate.UseVisualStyleBackColor = true;
       this.cbCheckUpdate.CheckedChanged += new System.EventHandler(this.cbCheckUpdate_CheckedChanged);
       // 
@@ -624,6 +625,11 @@ namespace ExtraQL
       this.launcherPlayTimer.Interval = 200;
       this.launcherPlayTimer.Tick += new System.EventHandler(this.launcherPlayTimer_Tick);
       // 
+      // updateCheckTimer
+      // 
+      this.updateCheckTimer.Interval = 600000;
+      this.updateCheckTimer.Tick += new System.EventHandler(this.updateCheckTimer_Tick);
+      // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -706,6 +712,7 @@ namespace ExtraQL
     private CheckBox cbAutostartLauncher;
     private CheckBox cbRunAsCommandLine;
     private Timer launcherPlayTimer;
+    private Timer updateCheckTimer;
   }
 }
 
