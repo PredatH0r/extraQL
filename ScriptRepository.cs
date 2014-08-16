@@ -19,7 +19,6 @@ namespace ExtraQL
     private readonly Encoding utf8withoutBom = new UTF8Encoding(false);
     private readonly System.Timers.Timer updateTimer = new System.Timers.Timer();
     private readonly List<UpdateQueueItem> updateQueue = new List<UpdateQueueItem>();
-    private bool convertNewline;
     private string masterServer;
 
     #region ctor()
@@ -87,19 +86,15 @@ namespace ExtraQL
         else
         {
           var queueItem = new UpdateQueueItem(script);
-          if (script.Id == "hook" || script.Id == "extraQL")
-            this.updateQueue.Insert(0, queueItem); // update system relevant scripts first so they're in place when QL starts
-          else
+          if (script.IsUserscript)
             this.updateQueue.Add(queueItem);
+          else
+            this.updateQueue.Insert(0, queueItem); // update system relevant scripts first
         }
       }
 
-      this.convertNewline = true;
       this.updateTimer.Interval = 5000; // sourceforge silently drops requests when hammered
       this.updateTimer.Start();
-      // process hook.js and extraQL.js immediately (which are the first two)
-      this.ProcessNextItemInUpdateQueue(this.updateTimer, null);
-      this.ProcessNextItemInUpdateQueue(this.updateTimer, null);
     }
     #endregion
 
@@ -123,7 +118,6 @@ namespace ExtraQL
       if (e.Error == null)
       {
         this.AddUpdatedScriptsFromMasterServerToQueue(e.Result);
-        this.convertNewline = false;
         this.updateTimer.Interval = 100;
         this.updateTimer.Start();
       }
@@ -222,7 +216,7 @@ namespace ExtraQL
         {
           string scriptPath = queueItem.ScritpInfo != null ? queueItem.ScritpInfo.Filepath : Path.Combine(this.ScriptDir, Path.GetFileName(queueItem.Uri.LocalPath));
           string scriptFile = Path.GetFileName(scriptPath) ?? "";
-          if (convertNewline)
+          if (!remoteCode.Contains(Environment.NewLine))
             remoteCode = remoteCode.Replace("\n", Environment.NewLine);
           File.WriteAllText(scriptPath, remoteCode, utf8withoutBom);
           lock (this)
@@ -384,7 +378,7 @@ namespace ExtraQL
       this.Timestamp = new FileInfo(filepath).LastWriteTimeUtc.Ticks;
       this.Metadata = metadata;
       this.Code = code;
-      this.DownloadUrl = metadata.Get("downloadUrl") ?? string.Format(ScriptRepository.DEFAULT_DOWNLOADSOURCE_URL, fileName);
+      this.DownloadUrl = metadata.Get("downloadURL") ?? string.Format(ScriptRepository.DEFAULT_DOWNLOADSOURCE_URL, fileName);
       this.IsUserscript = filepath.EndsWith(".usr.js");
     }
 
