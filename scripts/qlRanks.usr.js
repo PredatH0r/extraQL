@@ -1064,7 +1064,7 @@ $.each(aliasDefaults, function(alias, def) {
  * Override OnCvarChanged to track our in-game commands
  */
 var CMD_NAME = "elo";
-var CMD_USAGE = "Use ^1" + CMD_NAME + " help^7 for help";
+var CMD_USAGE = "Use ^1/" + CMD_NAME + " help^7 for help";
 var CMD_DEFAULT = "\" a user command. " + CMD_USAGE + "\"";
 qz_instance.SendGameCommand("seta " + CMD_NAME + " \"\""); // set default value to blank
 qz_instance.SendGameCommand("set " + CMD_NAME + " " + CMD_DEFAULT);
