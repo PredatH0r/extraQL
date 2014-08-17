@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id          188803
 // @name        Game Start AutoExec/FullScreen
-// @version     2.0
+// @version     2.1
 // @author      PredatH0r
 // @description	Automates execution of commands when starting/ending game-mode or switching fullscreen
 // @unwrap
@@ -27,7 +27,7 @@ Version 2.0
   }
 
   function debug(msg) {
-    window.console.log("DEBUG - " + msg);
+    //window.console.log("DEBUG - " + msg);
   }
 
   function init() {
