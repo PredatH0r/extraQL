@@ -1,5 +1,7 @@
-﻿Installation Instructions
-=========================
+﻿[extraQL Download Page](https://sourceforge.net/projects/extraql/files/) | [Help / Wiki](https://sourceforge.net/p/extraql/wiki/Home/) | [Discussion Forum](https://sourceforge.net/p/extraql/discussion/)
+
+Installation
+============
 
 A) Full local installation (recommended)
 ---
@@ -12,19 +14,22 @@ A) Full local installation (recommended)
 
 B) hook.js only (reduced functionality)
 ---
-- download the hook.js (or if you have the ZIP, use the extraQL\\scripts\\hook.js file)
-- save hook.js to your Quake Live config directory
-   - For the standalone launcher on Windows XP this is: %appdata%\\id software\\quakelive\\home\\baseq3
-   - For the standalone launcher on Win Vista and later: %appdata%\\..\\LocalLow\\id software\\home\\baseq3
-   - For Steam version of QL this is: <steamdir>\\SteamApps\\Common\\Quake Live\\baseq3
+- download hook.js (or if you have the ZIP, use the extraQL\\scripts\\hook.js file)
+- save hook.js to your Quake Live config directory:
+   * For the standalone launcher on Windows XP this is: %appdata%\\id software\\quakelive\\home\\baseq3
+   * For the standalone launcher on Win Vista and later: %appdata%\\..\\LocalLow\\id software\\home\\baseq3
+   * For Steam version of QL this is: <steamdir>\\SteamApps\\Common\\Quake Live\\baseq3
 
-
-[Download extraQL](https://sourceforge.net/projects/extraql/files/)
-
-Find out more about extraQL in the [Wiki](https://sourceforge.net/p/extraql/wiki/Home/) or [Discussion Forum](https://sourceforge.net/p/extraql/discussion/)
 
 Changelog
 =========
+
+Version 1.3
+---
+- "Account Settings" page didn't open due to https/http scripting protection
+- script names in "Script Management" are cleansed again (removing leading "Quake Live" or "QL ")
+- script authors can use a @downloadURL script header to tell extraQL where to get updates from
+- automatic newline correction when downloading script updates
 
 Version 1.2
 ---
