@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -416,9 +417,12 @@ namespace ExtraQL
         text += ",\"filename\":\"" + Path.GetFileName(info.Filepath) + "\"";
         foreach (var key in info.Metadata.Keys)
         {
-          if (key == "id")
-            continue;
-          var value = info.Metadata.Get(key);
+          var value = info.Metadata.Get(key); 
+          switch (key)
+          {
+            case "id": continue;
+            case "name": value = info.Name; break;
+          }        
           text += ",\"" + key + "\":\"" + value.Replace("\\","\\\\").Replace("\"", "\\\"") + "\"";
         }
         text += "}";
