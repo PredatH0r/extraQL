@@ -1,12 +1,16 @@
 ﻿// ==UserScript==
 // @name        Quake Live Twich.tv Streams and VODs
-// @version     1.3
+// @version     1.4
 // @author      PredatH0r
 // @description	Shows a list of twitch.tv QL live streams and videos
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.4
+- fixed stuck at "loading..." on live streams
+- fixed accumulating auto-update timers for live streams
 
 Version 1.3
 - ensuring consistent order of tabs in the chat bar
@@ -127,11 +131,14 @@ Version 1.0
   var gameIndex;
   var gameStreams;
   var streamCount;
-  
+  var refreshTimeoutHandle;
+
   function updateStreams() {
     if (quakelive.IsGameRunning())
       return;
 
+    if (refreshTimeoutHandle)
+      window.clearTimeout(refreshTimeoutHandle);
     gameIndex = 0;
     gameStreams = {};
     streamCount = 0;
@@ -151,19 +158,38 @@ Version 1.0
     if (gameIndex > games.length) return;
 
     var game = games[gameIndex - 1];
-    //extraQL.log("Loading streams for ^3" + game + "^7");
+    requestStreamsForGame(game, 1);
+  }
+
+  function requestStreamsForGame(game, attempt) {
+    if (attempt >= 3) {
+      failedStreamsForGame(game);
+      return;
+    }
+
     $.ajax({
       url: extraQL.format(URL_STREAMS, encodeURIComponent(game)),
       dataType: "jsonp",
       jsonp: "callback",
-      success: parseStreamsForGame,
-      error: function() { extraQL.log("^Failed^7 to load twitch streams for " + game); },
-      complete: loadStreamsForNextGame
+      success: function (data) {
+        if (data && data.streams) {
+          parseStreamsForGame(data);
+          loadStreamsForNextGame();
+        } else {
+          requestStreamsForGame(game, ++attempt);
+        }
+      },
+      error: function() { failedStreamsForGame(game); }
     });
   }
 
+  function failedStreamsForGame(game) {
+    extraQL.echo("^1[twitch]^7 failed to retrieve streams for " + game);
+    loadStreamsForNextGame();
+  }
+
   function parseStreamsForGame(data) {
-    $.each(data.streams, function (i, stream) {
+    $.each(data.streams, function(i, stream) {
       if (!gameStreams[stream.game])
         gameStreams[stream.game] = [];
       gameStreams[stream.game].push(stream);
@@ -205,7 +231,7 @@ Version 1.0
       $("#twitchContent div").hover(showStreamDetails);
       showDetailsForFirstEntry();
 
-      window.setTimeout(updateStreams, UPDATE_INTERVAL);
+      refreshTimeoutHandle = window.setTimeout(updateStreams, UPDATE_INTERVAL);
     } catch (e) {
       extraQL.log(e);
     }
