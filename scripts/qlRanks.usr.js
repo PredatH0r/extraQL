@@ -1104,6 +1104,7 @@ function handleQlrdCommand(val) {
     qz_instance.SendGameCommand("echo Usage: ^5/" + CMD_NAME + "^7 <^3command^7>");
     qz_instance.SendGameCommand("echo \"^3method^7    print the current output method\"");
     qz_instance.SendGameCommand("echo \"^3method=^7x  sets the output method to ^3echo^7,^3print^7,^3say_team^7 or ^3say^7\"");
+    qz_instance.SendGameCommand("echo \"^3format=^7x  sets the output format to ^3table^7 or ^3list^7\"");
     qz_instance.SendGameCommand("echo \"^3score^7     shows the QLRanks score of each player on the server\"");
     qz_instance.SendGameCommand("echo \"^3games^7     shows the number of completed games for each player\"");
     qz_instance.SendGameCommand("echo \"^3shuffle^7   suggest the most even teams based on QLRanks score\"");
@@ -1115,6 +1116,10 @@ function handleQlrdCommand(val) {
     qz_instance.SendGameCommand("echo Output method is: " + quakelive.cvars.Get("_qlrd_outputMethod").value);
   else if (val.indexOf("method=") == 0)
     quakelive.cvars.Set("_qlrd_outputMethod", val.substr(7, val.length - 7));
+  else if (val == "format")
+    qz_instance.SendGameCommand("echo Output format is: " + quakelive.cvars.Get("_qlrd_outputFormat").value);
+  else if (val.indexOf("format=") == 0)
+    quakelive.cvars.Set("_qlrd_outputFormat", val.substr(7, val.length - 7) == "list" ? "list" : "table");
   else if (val == "games")
     games("1");
   else if (val == "shuffle")
@@ -1123,7 +1128,7 @@ function handleQlrdCommand(val) {
     shuffle("1", true);
   else
     qz_instance.SendGameCommand("echo " + CMD_USAGE);
-  qz_instance.SendGameCommand("seta " + name + "\"\"");
+  qz_instance.SendGameCommand("set " + CMD_NAME + "\"\"");
 }
 
 function setOutputMethod(val) {
@@ -1241,62 +1246,92 @@ function announce(val) {
         // Sort players by Elo (descending).
         players_copy.sort(function(a, b) {return b.elo - a.elo});
 
-        for (var i = 0, out = [], len = players_copy.length; i < len; ++i) {
-            
-          var color = "^7";
-              
-          if(players_copy[i].team    ==2)
-          {
-            color = "^4";
-            blues.push(players_copy[i].elo);
-          }
-          else  if(players_copy[i].team    ==1)
-          {
-            color = "^1";
-            reds.push(players_copy[i].elo);
-          }
-                          
-          out.push( color  + players_copy[i].name.replace(/\_nova$/i,"sexy!nova") + " " + players_copy[i].elo + "^7");
+        var newStyle = quakelive.cvars.Get("_qlrd_outputFormat");
+        newStyle = !newStyle || newStyle.value == "table";
+        if (newStyle) {
+          for (var i = 0, out = [], len = players_copy.length; i < len; ++i) {
 
-          // Group by 4, delaying commands as needed
-          if ((i+1) % 4 == 0 || (i+1) == len) {
-            setTimeout(function(txt, isLast) {
-                
-              qz_instance.SendGameCommand(currentOut + " " + txt + ";");
-                
-            }.bind(null, out.join(", "), (i+1) == len), mul++ * step);
-            out = [];
+            var color = "^7";
+
+            if (players_copy[i].team == 2) {
+              color = "^4";
+              blues.push(players_copy[i].elo);
+            } else if (players_copy[i].team == 1) {
+              color = "^1";
+              reds.push(players_copy[i].elo);
+            }
+
+            out.push(color + pad(players_copy[i].name.replace(/\_nova$/i, "sexy!nova"), 10).substr(0,10) + "^7 " + pad(players_copy[i].elo, -4));
+
+            // Group by 4, delaying commands as needed
+            if ((i + 1) % 4 == 0 || (i + 1) == len) {
+              setTimeout(function(txt, isLast) {
+                qz_instance.SendGameCommand(currentOut + " \"" + txt + "\";");
+              }.bind(null, out.join("|"), (i + 1) == len), mul++ * step);
+              out = [];
+            }
+          }
+
+          bluecount = 0;
+          for (b = 0; b < blues.length; b++) {
+            bluecount += blues[b];
+          }
+
+          blueavg = Math.round(bluecount / blues.length);
+
+          redcount = 0;
+          for (b = 0; b < reds.length; b++) {
+            redcount += reds[b];
+          }
+
+          redsavg = Math.round(redcount / reds.length);
+
+          var delta = Math.floor(Math.abs(redsavg - blueavg));
+
+          var desc = "^1ragequit^7";
+          if (delta < 300) desc = "^1unplayable^7";
+          if (delta < 200) desc = "^1very unbalanced^7";
+          if (delta < 150) desc = "unbalanced";
+          if (delta < 100) desc = "challenging^7";
+          if (delta < 80) desc = "^4balanced^7";
+          if (delta < 40) desc = "^4very balanced^7";
+
+          if (reds.length == blues.length && reds.length != 0)
+            qz_instance.SendGameCommand(currentOut + " ^3Team rating: ^1" + redsavg + "^7(" + reds.length + ") ^4" + blueavg + "^7(" + blues.length + ") ^3Gap:^7 " + delta + " (" + desc + "^7)");
+        } else {
+          // Display the results.
+          // NOTE: mul is "1" to separate the header from the results
+          var mul = 1
+            , currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value
+            , step = $.inArray(currentOut, ["echo","print"]) > -1 ? 100 : 1000;
+
+          // Show the chat pane for 10 seconds if output method is 'print',
+          // otherwise it will be difficult to notice.
+          if ("print" == currentOut) {
+            qz_instance.SendGameCommand("+chat;");
+            setTimeout(function() {
+              qz_instance.SendGameCommand("-chat;");
+            }, 10E3);
+          }
+
+          qz_instance.SendGameCommand(currentOut + " ^2[QLRD] " + gt.toUpperCase() + " results:;");
+          for (var i = 0, out = [], len = players.length; i < len; ++i) {
+            out.push("^5" + players[i].name + " ^7(^3" + players[i].elo + "^7)");
+
+            // Group by 4, delaying commands as needed
+            if ((i+1) % 4 == 0 || (i+1) == len) {
+              setTimeout(function(txt, isLast) {
+                qz_instance.SendGameCommand(currentOut + " \"^2[QLRD] " + txt + "\";");
+                if (isLast) {
+                  setTimeout(function() {
+                    QLRD.igAnnounce("Done.", false);
+                  }, step);
+                }
+              }.bind(null, out.join(", "), (i+1) == len), mul++ * step);
+              out = [];
+            }
           }
         }
-            
-        bluecount = 0;
-        for(b=0;b<blues.length;b++)
-        {
-          bluecount +=blues[b];
-        }
-            
-        blueavg = Math.round(bluecount/blues.length);
-            
-        redcount = 0;
-        for(b=0;b<reds.length;b++)
-        {
-          redcount += reds[b];
-        }
-            
-        redsavg = Math.round(redcount/reds.length);
-            
-        var delta = Math.floor( Math.abs(redsavg-blueavg) );
-
-        var desc = "^1ragequit^7";
-        if(delta<300) desc = "^1unplayable^7";
-        if(delta<200) desc = "^1very unbalanced^7";
-        if(delta<150) desc = "unbalanced";
-        if(delta<100) desc = "challenging^7";
-        if(delta<80) desc = "^4balanced^7";
-        if(delta<40) desc = "^4very balanced^7";
-            
-        if(reds.length==blues.length && reds.length != 0)
-          qz_instance.SendGameCommand( currentOut + " ^4* ^7Team Elo ^4*^1 " + reds.length +"@"+ redsavg + " ^4"+ blues.length +"@"+ blueavg +" ^7Gap: "+ delta +" ("+desc+"^7)" );
       });
     },
     onError: function(aServer) {
