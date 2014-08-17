@@ -1,13 +1,16 @@
 // ==UserScript==
 // @id          links
 // @name        Links to QL related Websites
-// @version     3.0
+// @version     4.0
 // @author      PredatH0r
 // @description	Adds a "Links" menu with links to important QL related websites
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 4.0
+- added http://qlhud.net/
 
 Version 3.0
 - added some links
@@ -41,6 +44,7 @@ Version 1.0
         "FaceIt Cups": { newwindow: "http://play.faceit.com/" },
         "125fps League": { newwindow: "https://twitter.com/125fps" },
         "vHUD Editor": { newwindow: "http://visualhud.pk69.com/", "class": "sep" },
+        "qlhud Custom HUDs": { newwindow: "http://qlhud.net/"},
         "Wolfcam/Whisperer": { newwindow: "http://www.wolfwhisperer.net/"},
         "Yakumo's QL Guide": { newwindow: "http://www.quakelive.com/forum/showthread.php?831-The-Ultimate-Quake-Live-Guide", "class": "sep" },
         "QL Console Guide": { newwindow: "http://www.regurge.at/ql/" },
