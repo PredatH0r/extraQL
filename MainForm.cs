@@ -14,7 +14,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.3";
+    public const string Version = "1.4";
 
     private int timerCount;
     private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
@@ -38,6 +38,7 @@ namespace ExtraQL
 
       this.server = new HttpServer();
       this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
+      this.server.UseHttps = Program.UseHttps;
 
       this.scriptRepository = new ScriptRepository();
       this.scriptRepository.Log = this.Log;
@@ -192,6 +193,19 @@ namespace ExtraQL
     }
     #endregion
 
+    #region cbLog_CheckedChanged
+    private void cbLog_CheckedChanged(object sender, EventArgs e)
+    {
+      this.SuspendLayout();
+      this.panelLog.Visible = this.cbLog.Checked;
+      if (!cbLog.Checked)
+        this.Width -= this.panelLog.Width;
+      else
+        this.Width += this.panelLog.Width;
+      this.ResumeLayout();
+    }
+    #endregion
+
     #region comboRealm_SelectedValueChanged
     private void comboRealm_SelectedValueChanged(object sender, EventArgs e)
     {
@@ -343,6 +357,13 @@ namespace ExtraQL
     }
     #endregion
 
+    #region btnClearLog_Click
+    private void btnClearLog_Click(object sender, EventArgs e)
+    {
+      this.txtLog.Clear();
+    }
+    #endregion
+
 
     #region ConfigFile
     private string ConfigFile
@@ -373,6 +394,8 @@ namespace ExtraQL
       bool startMinimized = false;
       bool checkUpdates = true;
       bool runAsCommandLine = false;
+      bool log = false;
+      bool followLog = false;
       int autostart = 0;
 
       var configFile = this.ConfigFile;
@@ -401,6 +424,8 @@ namespace ExtraQL
             case "autostart": autostart = int.Parse(value); break;
             case "runAsCommandLine": runAsCommandLine = value == "1"; break;
             case "masterServer": this.masterServer = value; break;
+            case "log": log = value == "1"; break;
+            case "followLog": followLog = value == "1"; break;
           }
         }
       }
@@ -443,6 +468,8 @@ namespace ExtraQL
       this.cbAutostartLauncher.Checked = autostart == 1;
       this.cbAutostartSteam.Checked = autostart == 2;
       this.cbRunAsCommandLine.Checked = runAsCommandLine;
+      this.cbLog.Checked = log;
+      this.cbFollowLog.Checked = followLog;
       this.ActiveControl = this.comboEmail;
     }
 
@@ -489,6 +516,8 @@ namespace ExtraQL
         config.AppendLine("autostart=" + (this.cbAutostartLauncher.Checked ? 1 : this.cbAutostartSteam.Checked ? 2 : 0));
         config.AppendLine("runAsCommandLine=" + (this.cbRunAsCommandLine.Checked ? 1 : 0));
         config.AppendLine("masterServer=" + this.masterServer);
+        config.AppendLine("log=" + (this.cbLog.Checked ? 1 : 0));
+        config.AppendLine("followLog=" + (this.cbFollowLog.Checked ? 1 : 0));
         File.WriteAllText(this.ConfigFile, config.ToString(), Encoding.UTF8);
       }
       catch (Exception ex)
@@ -515,6 +544,12 @@ namespace ExtraQL
         if (text.Length > 10000) // truncate log after 10k chars
           text = ""; 
         this.txtLog.Text = text + "[" + DateTime.Now.ToString("T") + "] " + msg + "\r\n";
+        if (this.cbFollowLog.Checked)
+        {
+          this.txtLog.SelectionStart = this.txtLog.TextLength;
+          this.txtLog.SelectionLength = 0;
+          this.txtLog.ScrollToCaret();
+        }
       }
     }
     #endregion
@@ -595,9 +630,9 @@ namespace ExtraQL
       this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
       this.servlets.EnablePrivateServlets = !this.cbBindToAll.Checked;
       if (this.server.Start())
-        this.Log("extraQL server listening on http://" + this.server.EndPoint);
+        this.Log("extraQL server listening on " + this.server.EndPointUrl);
       else
-        this.Log("extraQL server failed to start on http://" + this.server.EndPoint +". Scripts are disabled!");
+        this.Log("extraQL server failed to start on " + this.server.EndPointUrl +". Scripts are disabled!");
     }
     #endregion
 
@@ -906,6 +941,5 @@ document.loginform.submit();";
       }
     }
     #endregion
-
   }
 }

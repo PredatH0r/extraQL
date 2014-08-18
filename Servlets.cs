@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -62,8 +60,8 @@ namespace ExtraQL
       RegisterServlet("/dockWindow", DockWindow);
       RegisterServlet("/log", ScriptLog);
       RegisterServlet(AddScriptRoute, AddScript);
-      RegisterServlet("/repository.json", RepositoryJson);
       RegisterServlet("/bringToFront", BringToFront);
+      RegisterServlet("/repository.json", RepositoryJson);
     }
 
     #endregion
@@ -89,11 +87,10 @@ namespace ExtraQL
     /// <summary>
     ///   returns a HTML page with the registered servlet URLs, in case the user opens the extraQL HTTP URL in a browser
     /// </summary>
-    private void Index(TcpClient client, Uri uri, string request)
+    private void Index(Stream stream, Uri uri, string request)
     {
-      HttpOk(client, "<html><body><h1>extraQL script server</h1>" + indexBuilder + "</body></html>");
+      HttpOk(stream, "<html><body><h1>extraQL script server</h1>" + indexBuilder + "</body></html>");
     }
-
     #endregion
 
     #region Version()
@@ -102,9 +99,9 @@ namespace ExtraQL
     ///   Returns the extraQL version number.
     ///   Used by the extraQL user scripts to test wheter the local server is running.
     /// </summary>
-    private void Version(TcpClient client, Uri uri, string request)
+    private void Version(Stream stream, Uri uri, string request)
     {
-      HttpOk(client, "{ \"version\": \"" + MainForm.Version + "\", \"enabled\": " + this.EnableScripts.ToString().ToLower() + " }");
+      HttpOk(stream, "{ \"version\": \"" + MainForm.Version + "\", \"enabled\": " + this.EnableScripts.ToString().ToLower() + " }");
     }
 
     #endregion
@@ -114,12 +111,12 @@ namespace ExtraQL
     /// <summary>
     ///   returns a script or list of script names from the "/scripts" folder
     /// </summary>
-    /// <param name="client"></param>
+    /// <param name="stream"></param>
     /// <param name="uri"></param>
     /// <param name="request"></param>
-    private void GetLocalScript(TcpClient client, Uri uri, string request)
+    private void GetLocalScript(Stream stream, Uri uri, string request)
     {
-      DeliverFileOrDirectoryListing(client, uri, "scripts", @".*\.usr\.js$");
+      DeliverFileOrDirectoryListing(stream, uri, "scripts", @".*\.usr\.js$");
     }
 
     #endregion
@@ -129,9 +126,9 @@ namespace ExtraQL
     /// <summary>
     ///   Returns a binary file from the "/images" folder
     /// </summary>
-    private void GetImage(TcpClient client, Uri uri, string request)
+    private void GetImage(Stream stream, Uri uri, string request)
     {
-      DeliverFileOrDirectoryListing(client, uri, "images");
+      DeliverFileOrDirectoryListing(stream, uri, "images");
     }
 
     #endregion
@@ -141,11 +138,11 @@ namespace ExtraQL
     /// <summary>
     ///   Retrieve (GET) or write (POST) a file from/to the "/data" folder
     /// </summary>
-    private void DataStorage(TcpClient client, Uri uri, string request)
+    private void DataStorage(Stream stream, Uri uri, string request)
     {
       if (!this.EnablePrivateServlets)
       {
-        HttpForbidden(client);
+        HttpForbidden(stream);
         return;
       }
 
@@ -168,7 +165,7 @@ namespace ExtraQL
         if (File.Exists(path))
           response = File.ReadAllText(path, Encoding.UTF8);
       }
-      HttpOk(client, response);
+      HttpOk(stream, response);
     }
 
     #endregion
@@ -180,12 +177,12 @@ namespace ExtraQL
     ///   This allows bypassing the "same-origin-policy" of browsers and QL and request
     ///   HTML data from external web sites like esreality.com
     /// </summary>
-    private void Proxy(TcpClient client, Uri uri, string request)
+    private void Proxy(Stream stream, Uri uri, string request)
     {
       NameValueCollection args = HttpUtility.ParseQueryString(uri.Query);
       var url = args.Get("url");
       if (string.IsNullOrEmpty(url))
-        HttpOk(client, "missing 'url' parameter");
+        HttpOk(stream, "missing 'url' parameter");
       else
       {
         string targetHost = "";
@@ -193,11 +190,11 @@ namespace ExtraQL
         catch { }
         if (Array.Find(DomainsAllowedForProxy, targetHost.EndsWith) == null)
         {
-          this.HttpForbidden(client, "requested domain is not supported");
+          this.HttpForbidden(stream, "requested domain is not supported");
           return;
         }
         string text = DownloadText(url);
-        HttpOk(client, text);
+        HttpOk(stream, text);
       }
     }
 
@@ -208,15 +205,15 @@ namespace ExtraQL
     /// <summary>
     ///   Send Alt+Enter key stroke to QL window
     /// </summary>
-    private void ToggleFullscreen(TcpClient client, Uri uri, string request)
+    private void ToggleFullscreen(Stream stream, Uri uri, string request)
     {
       if (!this.EnablePrivateServlets)
       {
-        HttpForbidden(client);
+        HttpForbidden(stream);
         return;
       }
       Win32.PostMessage(QLWindowHandle, Win32.WM_SYSKEYDOWN, (int) Keys.Enter, 0);
-      HttpOk(client, "Ok");
+      HttpOk(stream, "Ok");
     }
 
     #endregion
@@ -236,11 +233,11 @@ namespace ExtraQL
     ///   If this function is called twice with the same argument, it will toggle the width
     ///   between the specified value and that value + 304 to make extra space for the chat area
     /// </summary>
-    private void DockWindow(TcpClient client, Uri uri, string request)
+    private void DockWindow(Stream stream, Uri uri, string request)
     {
       if (!this.EnablePrivateServlets)
       {
-        HttpForbidden(client);
+        HttpForbidden(stream);
         return;
       }
 
@@ -248,7 +245,7 @@ namespace ExtraQL
       int sides, w, h;
       if (!int.TryParse(args.Get("sides"), out sides))
       {
-        HttpOk(client, "'sides' parameter missing");
+        HttpOk(stream, "'sides' parameter missing");
         return;
       }
       if (!int.TryParse(args.Get("w"), out w)) w = 1328;
@@ -312,7 +309,7 @@ namespace ExtraQL
       pos.Offset(x - oldRect.Left, y - oldRect.Top);
       Cursor.Position = pos;
 
-      HttpOk(client, "ok");
+      HttpOk(stream, "ok");
     }
 
     #endregion
@@ -324,22 +321,22 @@ namespace ExtraQL
     ///   Allows logging of large text messages independent of web- or in-game-console
     ///   and copy/paste the logged message
     /// </summary>
-    private void ScriptLog(TcpClient client, Uri uri, string request)
+    private void ScriptLog(Stream stream, Uri uri, string request)
     {
       if (!this.EnablePrivateServlets)
       {
-        HttpForbidden(client);
+        HttpForbidden(stream);
         return;
       }
 
       int idx = request.IndexOf("\r\n\r\n", StringComparison.Ordinal);
       string msg = idx < 0 ? "" : request.Substring(idx + 4);
       if (!request.StartsWith("POST"))
-        HttpOk(client, "POST data with log message missing");
+        HttpOk(stream, "POST data with log message missing");
       else
       {
         Log("Script log:\r\n" + msg);
-        HttpOk(client, "");
+        HttpOk(stream, "");
       }
     }
 
@@ -349,7 +346,7 @@ namespace ExtraQL
     /// <summary>
     /// Download a script from an external URL and return a JSON with the meta information
     /// </summary>
-    private void AddScript(TcpClient client, Uri uri, string request)
+    private void AddScript(Stream stream, Uri uri, string request)
     {
 #if false
       var args = HttpUtility.ParseQueryString(uri.Query);
@@ -359,7 +356,7 @@ namespace ExtraQL
       var scriptInfo = string.IsNullOrEmpty(scriptId) ? null : this.scriptRepository.GetScriptByIdOrUrl(scriptId);
       if (scriptInfo == null)
       {
-        var writer = new StreamWriter(client.GetStream());
+        var writer = new StreamWriter(stream.GetStream());
         writer.WriteLine("HTTP/1.1 400 Not Found");
         writer.WriteLine("Access-Control-Allow-Origin: *");
         writer.WriteLine();
@@ -391,10 +388,29 @@ namespace ExtraQL
       if (args.Get("callback") != null)
         text = args.Get("callback") + "(" + text + ");";
 
-      this.HttpOk(client, text);
+      this.HttpOk(stream, text);
 #else
-      HttpNotImplemented(client);
+      HttpNotImplemented(stream);
 #endif
+    }
+    #endregion
+
+    #region BringToFront()
+    private void BringToFront(Stream stream, Uri uri, string request)
+    {
+      if (!this.EnablePrivateServlets)
+      {
+        HttpForbidden(stream);
+        return;
+      }
+
+      form.BeginInvoke((ThreadStart)(() =>
+      {
+        this.form.WindowState = FormWindowState.Normal;
+        this.form.BringToFront();
+        this.form.Activate();
+      }));
+      this.HttpOk(stream, "ok");
     }
     #endregion
 
@@ -404,7 +420,7 @@ namespace ExtraQL
     ///   The returned object contains the script ID in ._meta.id, the metadata in .headers[fieldname][]
     ///   and the actual script code in .content
     /// </summary>
-    private void RepositoryJson(TcpClient client, Uri uri, string request)
+    private void RepositoryJson(Stream stream, Uri uri, string request)
     {
       string text = "[";
       string sep = "";
@@ -429,26 +445,7 @@ namespace ExtraQL
         sep = ",";
       }
       text += "\n]";
-      this.HttpOk(client, text);
-    }
-    #endregion
-
-    #region BringToFront()
-    private void BringToFront(TcpClient client, Uri uri, string request)
-    {
-      if (!this.EnablePrivateServlets)
-      {
-        HttpForbidden(client);
-        return;
-      }
-
-      form.BeginInvoke((ThreadStart) (() =>
-      {
-        this.form.WindowState = FormWindowState.Normal;
-        this.form.BringToFront();
-        this.form.Activate();
-      }));
-      this.HttpOk(client, "ok");
+      this.HttpOk(stream, text);
     }
     #endregion
 
@@ -501,10 +498,10 @@ namespace ExtraQL
     /// <summary>
     ///   Delivers a directory listing or the contents of a local file (relative to the server root and an additional basePath)
     /// </summary>
-    private void DeliverFileOrDirectoryListing(TcpClient client, Uri uri, string basePath, string pattern = null)
+    private void DeliverFileOrDirectoryListing(Stream stream, Uri uri, string basePath, string pattern = null)
     {
       string absPath = this.GetFilePath(uri, basePath);
-      var writer = new StreamWriter(client.GetStream());
+      var writer = new StreamWriter(stream);
       byte[] data;
       if (absPath != null && Directory.Exists(absPath))
         data = this.GetDirectoryListing(uri, absPath, pattern);
@@ -522,7 +519,7 @@ namespace ExtraQL
       writer.WriteLine("Content-Length: " + data.Length);
       writer.WriteLine();
       writer.Flush();
-      client.GetStream().Write(data, 0, data.Length);
+      stream.Write(data, 0, data.Length);
     }
 
     #endregion
@@ -588,9 +585,9 @@ namespace ExtraQL
     /// <summary>
     ///   Write standard HTTP response
     /// </summary>
-    private void HttpOk(TcpClient client, string content = null, string headers = null)
+    private void HttpOk(Stream stream, string content = null, string headers = null)
     {
-      var writer = new StreamWriter(client.GetStream());
+      var writer = new StreamWriter(stream);
       writer.WriteLine("HTTP/1.1 200 OK");
       writer.WriteLine("Access-Control-Allow-Origin: *"); // allow QL scripts to request URLs from this server
       if (!string.IsNullOrEmpty(headers))
@@ -607,16 +604,16 @@ namespace ExtraQL
         writer.WriteLine("Content-Length: " + data.Length);
         writer.WriteLine();
         writer.Flush();
-        client.GetStream().Write(data, 0, data.Length);
+        stream.Write(data, 0, data.Length);
       }
     }
 
     #endregion
 
     #region HttpForbidden()
-    private void HttpForbidden(TcpClient client, string msg = null)
+    private void HttpForbidden(Stream stream, string msg = null)
     {
-      var writer = new StreamWriter(client.GetStream());
+      var writer = new StreamWriter(stream);
       writer.WriteLine("HTTP/1.1 403 Forbidden");
       writer.WriteLine("Access-Control-Allow-Origin: *");
       writer.WriteLine();
@@ -627,9 +624,9 @@ namespace ExtraQL
     #endregion
 
     #region HttpNotImplemented()
-    private static void HttpNotImplemented(TcpClient client)
+    private static void HttpNotImplemented(Stream stream)
     {
-      var writer = new StreamWriter(client.GetStream());
+      var writer = new StreamWriter(stream);
       writer.WriteLine("HTTP/1.1 501 Not Implemented");
       writer.WriteLine("Access-Control-Allow-Origin: *");
       writer.WriteLine();

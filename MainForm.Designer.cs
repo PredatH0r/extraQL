@@ -51,8 +51,6 @@ namespace ExtraQL
       this.cbStartMinimized = new System.Windows.Forms.CheckBox();
       this.cbSystemTray = new System.Windows.Forms.CheckBox();
       this.cbBindToAll = new System.Windows.Forms.CheckBox();
-      this.txtLog = new System.Windows.Forms.TextBox();
-      this.label2 = new System.Windows.Forms.Label();
       this.cbDisableScripts = new System.Windows.Forms.CheckBox();
       this.linkFocusForum = new System.Windows.Forms.LinkLabel();
       this.linkFocusLogin = new System.Windows.Forms.LinkLabel();
@@ -82,6 +80,12 @@ namespace ExtraQL
       this.miQuit = new System.Windows.Forms.ToolStripMenuItem();
       this.launcherPlayTimer = new System.Windows.Forms.Timer(this.components);
       this.updateCheckTimer = new System.Windows.Forms.Timer(this.components);
+      this.cbLog = new System.Windows.Forms.CheckBox();
+      this.panelLog = new System.Windows.Forms.Panel();
+      this.grpLog = new System.Windows.Forms.GroupBox();
+      this.txtLog = new System.Windows.Forms.TextBox();
+      this.cbFollowLog = new System.Windows.Forms.CheckBox();
+      this.btnClearLog = new System.Windows.Forms.Button();
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -91,6 +95,8 @@ namespace ExtraQL
       this.panelFocus.SuspendLayout();
       this.grpFocus.SuspendLayout();
       this.mnuTrayIcon.SuspendLayout();
+      this.panelLog.SuspendLayout();
+      this.grpLog.SuspendLayout();
       this.SuspendLayout();
       // 
       // label1
@@ -109,7 +115,7 @@ namespace ExtraQL
       this.txtLauncherExe.ForeColor = System.Drawing.Color.Black;
       this.txtLauncherExe.Location = new System.Drawing.Point(10, 37);
       this.txtLauncherExe.Name = "txtLauncherExe";
-      this.txtLauncherExe.Size = new System.Drawing.Size(359, 21);
+      this.txtLauncherExe.Size = new System.Drawing.Size(358, 21);
       this.txtLauncherExe.TabIndex = 2;
       // 
       // btnLauncherExe
@@ -117,7 +123,7 @@ namespace ExtraQL
       this.btnLauncherExe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.btnLauncherExe.BackColor = System.Drawing.SystemColors.ButtonFace;
       this.btnLauncherExe.ForeColor = System.Drawing.Color.Black;
-      this.btnLauncherExe.Location = new System.Drawing.Point(375, 37);
+      this.btnLauncherExe.Location = new System.Drawing.Point(374, 37);
       this.btnLauncherExe.Name = "btnLauncherExe";
       this.btnLauncherExe.Size = new System.Drawing.Size(23, 21);
       this.btnLauncherExe.TabIndex = 3;
@@ -163,10 +169,10 @@ namespace ExtraQL
       // 
       this.panelAdvanced.BackColor = System.Drawing.Color.Transparent;
       this.panelAdvanced.Controls.Add(this.grpAdvanced);
-      this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.panelAdvanced.Location = new System.Drawing.Point(0, 337);
+      this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Top;
+      this.panelAdvanced.Location = new System.Drawing.Point(0, 325);
       this.panelAdvanced.Name = "panelAdvanced";
-      this.panelAdvanced.Size = new System.Drawing.Size(430, 409);
+      this.panelAdvanced.Size = new System.Drawing.Size(429, 215);
       this.panelAdvanced.TabIndex = 2;
       // 
       // grpAdvanced
@@ -182,19 +188,17 @@ namespace ExtraQL
       this.grpAdvanced.Controls.Add(this.cbStartMinimized);
       this.grpAdvanced.Controls.Add(this.cbSystemTray);
       this.grpAdvanced.Controls.Add(this.cbBindToAll);
-      this.grpAdvanced.Controls.Add(this.txtLog);
       this.grpAdvanced.Controls.Add(this.label1);
-      this.grpAdvanced.Controls.Add(this.label2);
       this.grpAdvanced.Controls.Add(this.cbDisableScripts);
       this.grpAdvanced.Controls.Add(this.btnLauncherExe);
       this.grpAdvanced.Controls.Add(this.btnInstallHook);
       this.grpAdvanced.ForeColor = System.Drawing.Color.White;
       this.grpAdvanced.Location = new System.Drawing.Point(12, 7);
       this.grpAdvanced.Name = "grpAdvanced";
-      this.grpAdvanced.Size = new System.Drawing.Size(406, 386);
+      this.grpAdvanced.Size = new System.Drawing.Size(405, 196);
       this.grpAdvanced.TabIndex = 0;
       this.grpAdvanced.TabStop = false;
-      this.grpAdvanced.Text = "Advanced";
+      this.grpAdvanced.Text = "Options";
       // 
       // cbRunAsCommandLine
       // 
@@ -273,29 +277,6 @@ namespace ExtraQL
       this.cbBindToAll.UseVisualStyleBackColor = true;
       this.cbBindToAll.CheckedChanged += new System.EventHandler(this.cbBindAll_CheckedChanged);
       // 
-      // txtLog
-      // 
-      this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtLog.ForeColor = System.Drawing.Color.Black;
-      this.txtLog.Location = new System.Drawing.Point(10, 208);
-      this.txtLog.Multiline = true;
-      this.txtLog.Name = "txtLog";
-      this.txtLog.ReadOnly = true;
-      this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.txtLog.Size = new System.Drawing.Size(388, 172);
-      this.txtLog.TabIndex = 13;
-      // 
-      // label2
-      // 
-      this.label2.AutoSize = true;
-      this.label2.Location = new System.Drawing.Point(10, 192);
-      this.label2.Name = "label2";
-      this.label2.Size = new System.Drawing.Size(28, 13);
-      this.label2.TabIndex = 12;
-      this.label2.Text = "Log:";
-      // 
       // cbDisableScripts
       // 
       this.cbDisableScripts.AutoSize = true;
@@ -341,13 +322,14 @@ namespace ExtraQL
       this.comboRealm.FormattingEnabled = true;
       this.comboRealm.Location = new System.Drawing.Point(53, 24);
       this.comboRealm.Name = "comboRealm";
-      this.comboRealm.Size = new System.Drawing.Size(341, 21);
+      this.comboRealm.Size = new System.Drawing.Size(340, 21);
       this.comboRealm.TabIndex = 3;
       this.comboRealm.SelectedValueChanged += new System.EventHandler(this.comboRealm_SelectedValueChanged);
       // 
       // panelTop
       // 
       this.panelTop.BackColor = System.Drawing.Color.Transparent;
+      this.panelTop.Controls.Add(this.cbLog);
       this.panelTop.Controls.Add(this.picClose);
       this.panelTop.Controls.Add(this.picMinimize);
       this.panelTop.Controls.Add(this.lblVersion);
@@ -365,7 +347,7 @@ namespace ExtraQL
       this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
       this.panelTop.Location = new System.Drawing.Point(0, 0);
       this.panelTop.Name = "panelTop";
-      this.panelTop.Size = new System.Drawing.Size(430, 223);
+      this.panelTop.Size = new System.Drawing.Size(429, 223);
       this.panelTop.TabIndex = 0;
       // 
       // picClose
@@ -437,7 +419,7 @@ namespace ExtraQL
       this.comboEmail.FormattingEnabled = true;
       this.comboEmail.Location = new System.Drawing.Point(12, 100);
       this.comboEmail.Name = "comboEmail";
-      this.comboEmail.Size = new System.Drawing.Size(197, 21);
+      this.comboEmail.Size = new System.Drawing.Size(196, 21);
       this.comboEmail.TabIndex = 3;
       this.comboEmail.SelectedIndexChanged += new System.EventHandler(this.comboEmail_SelectedIndexChanged);
       this.comboEmail.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboEmail_KeyDown);
@@ -461,7 +443,7 @@ namespace ExtraQL
       this.linkAbout.AutoSize = true;
       this.linkAbout.LinkArea = new System.Windows.Forms.LinkArea(10, 22);
       this.linkAbout.LinkColor = System.Drawing.Color.Gold;
-      this.linkAbout.Location = new System.Drawing.Point(290, 188);
+      this.linkAbout.Location = new System.Drawing.Point(289, 188);
       this.linkAbout.Name = "linkAbout";
       this.linkAbout.Size = new System.Drawing.Size(128, 18);
       this.linkAbout.TabIndex = 10;
@@ -478,9 +460,9 @@ namespace ExtraQL
       this.cbAdvanced.CheckState = System.Windows.Forms.CheckState.Checked;
       this.cbAdvanced.Location = new System.Drawing.Point(135, 187);
       this.cbAdvanced.Name = "cbAdvanced";
-      this.cbAdvanced.Size = new System.Drawing.Size(74, 17);
+      this.cbAdvanced.Size = new System.Drawing.Size(63, 17);
       this.cbAdvanced.TabIndex = 9;
-      this.cbAdvanced.Text = "Advanced";
+      this.cbAdvanced.Text = "Options";
       this.cbAdvanced.UseVisualStyleBackColor = true;
       this.cbAdvanced.CheckedChanged += new System.EventHandler(this.cbAdvanced_CheckedChanged);
       // 
@@ -488,7 +470,7 @@ namespace ExtraQL
       // 
       this.txtPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.txtPassword.ForeColor = System.Drawing.Color.Black;
-      this.txtPassword.Location = new System.Drawing.Point(221, 100);
+      this.txtPassword.Location = new System.Drawing.Point(220, 100);
       this.txtPassword.Name = "txtPassword";
       this.txtPassword.PasswordChar = '☺';
       this.txtPassword.Size = new System.Drawing.Size(197, 21);
@@ -500,7 +482,7 @@ namespace ExtraQL
       // 
       this.lblPassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.lblPassword.AutoSize = true;
-      this.lblPassword.Location = new System.Drawing.Point(218, 84);
+      this.lblPassword.Location = new System.Drawing.Point(217, 84);
       this.lblPassword.Name = "lblPassword";
       this.lblPassword.Size = new System.Drawing.Size(106, 13);
       this.lblPassword.TabIndex = 4;
@@ -523,7 +505,7 @@ namespace ExtraQL
       this.btnStartSteam.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
       this.btnStartSteam.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
       this.btnStartSteam.ForeColor = System.Drawing.Color.Gold;
-      this.btnStartSteam.Location = new System.Drawing.Point(221, 134);
+      this.btnStartSteam.Location = new System.Drawing.Point(220, 134);
       this.btnStartSteam.Name = "btnStartSteam";
       this.btnStartSteam.Size = new System.Drawing.Size(197, 37);
       this.btnStartSteam.TabIndex = 7;
@@ -542,7 +524,7 @@ namespace ExtraQL
       this.btnStartLauncher.ForeColor = System.Drawing.Color.Gold;
       this.btnStartLauncher.Location = new System.Drawing.Point(12, 134);
       this.btnStartLauncher.Name = "btnStartLauncher";
-      this.btnStartLauncher.Size = new System.Drawing.Size(197, 37);
+      this.btnStartLauncher.Size = new System.Drawing.Size(196, 37);
       this.btnStartLauncher.TabIndex = 6;
       this.btnStartLauncher.Text = "Start Quake Live Launcher";
       this.btnStartLauncher.UseVisualStyleBackColor = false;
@@ -555,7 +537,7 @@ namespace ExtraQL
       this.panelFocus.Dock = System.Windows.Forms.DockStyle.Top;
       this.panelFocus.Location = new System.Drawing.Point(0, 223);
       this.panelFocus.Name = "panelFocus";
-      this.panelFocus.Size = new System.Drawing.Size(430, 114);
+      this.panelFocus.Size = new System.Drawing.Size(429, 102);
       this.panelFocus.TabIndex = 1;
       // 
       // grpFocus
@@ -570,7 +552,7 @@ namespace ExtraQL
       this.grpFocus.ForeColor = System.Drawing.Color.White;
       this.grpFocus.Location = new System.Drawing.Point(12, 7);
       this.grpFocus.Name = "grpFocus";
-      this.grpFocus.Size = new System.Drawing.Size(406, 89);
+      this.grpFocus.Size = new System.Drawing.Size(405, 84);
       this.grpFocus.TabIndex = 0;
       this.grpFocus.TabStop = false;
       this.grpFocus.Text = "QL Focus Members (Beta Testers)";
@@ -630,15 +612,90 @@ namespace ExtraQL
       this.updateCheckTimer.Interval = 600000;
       this.updateCheckTimer.Tick += new System.EventHandler(this.updateCheckTimer_Tick);
       // 
+      // cbLog
+      // 
+      this.cbLog.AutoSize = true;
+      this.cbLog.Checked = true;
+      this.cbLog.CheckState = System.Windows.Forms.CheckState.Checked;
+      this.cbLog.Location = new System.Drawing.Point(221, 187);
+      this.cbLog.Name = "cbLog";
+      this.cbLog.Size = new System.Drawing.Size(43, 17);
+      this.cbLog.TabIndex = 29;
+      this.cbLog.Text = "Log";
+      this.cbLog.UseVisualStyleBackColor = true;
+      this.cbLog.CheckedChanged += new System.EventHandler(this.cbLog_CheckedChanged);
+      // 
+      // panelLog
+      // 
+      this.panelLog.BackColor = System.Drawing.Color.Transparent;
+      this.panelLog.Controls.Add(this.grpLog);
+      this.panelLog.Dock = System.Windows.Forms.DockStyle.Right;
+      this.panelLog.Location = new System.Drawing.Point(429, 0);
+      this.panelLog.Name = "panelLog";
+      this.panelLog.Size = new System.Drawing.Size(495, 540);
+      this.panelLog.TabIndex = 3;
+      // 
+      // grpLog
+      // 
+      this.grpLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpLog.Controls.Add(this.btnClearLog);
+      this.grpLog.Controls.Add(this.cbFollowLog);
+      this.grpLog.Controls.Add(this.txtLog);
+      this.grpLog.ForeColor = System.Drawing.Color.White;
+      this.grpLog.Location = new System.Drawing.Point(12, 7);
+      this.grpLog.Name = "grpLog";
+      this.grpLog.Size = new System.Drawing.Size(471, 522);
+      this.grpLog.TabIndex = 0;
+      this.grpLog.TabStop = false;
+      this.grpLog.Text = "Log";
+      // 
+      // txtLog
+      // 
+      this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.txtLog.ForeColor = System.Drawing.Color.Black;
+      this.txtLog.Location = new System.Drawing.Point(10, 52);
+      this.txtLog.Multiline = true;
+      this.txtLog.Name = "txtLog";
+      this.txtLog.ReadOnly = true;
+      this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+      this.txtLog.Size = new System.Drawing.Size(453, 458);
+      this.txtLog.TabIndex = 13;
+      // 
+      // cbFollowLog
+      // 
+      this.cbFollowLog.AutoSize = true;
+      this.cbFollowLog.Location = new System.Drawing.Point(10, 24);
+      this.cbFollowLog.Name = "cbFollowLog";
+      this.cbFollowLog.Size = new System.Drawing.Size(122, 17);
+      this.cbFollowLog.TabIndex = 14;
+      this.cbFollowLog.Text = "Always Scroll to End";
+      this.cbFollowLog.UseVisualStyleBackColor = true;
+      // 
+      // btnClearLog
+      // 
+      this.btnClearLog.ForeColor = System.Drawing.Color.Black;
+      this.btnClearLog.Location = new System.Drawing.Point(367, 20);
+      this.btnClearLog.Name = "btnClearLog";
+      this.btnClearLog.Size = new System.Drawing.Size(96, 23);
+      this.btnClearLog.TabIndex = 15;
+      this.btnClearLog.Text = "Clear";
+      this.btnClearLog.UseVisualStyleBackColor = true;
+      this.btnClearLog.Click += new System.EventHandler(this.btnClearLog_Click);
+      // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-      this.ClientSize = new System.Drawing.Size(430, 746);
+      this.ClientSize = new System.Drawing.Size(924, 540);
       this.Controls.Add(this.panelAdvanced);
       this.Controls.Add(this.panelFocus);
       this.Controls.Add(this.panelTop);
+      this.Controls.Add(this.panelLog);
       this.Font = new System.Drawing.Font("Tahoma", 8.25F);
       this.ForeColor = System.Drawing.Color.White;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -660,6 +717,9 @@ namespace ExtraQL
       this.grpFocus.ResumeLayout(false);
       this.grpFocus.PerformLayout();
       this.mnuTrayIcon.ResumeLayout(false);
+      this.panelLog.ResumeLayout(false);
+      this.grpLog.ResumeLayout(false);
+      this.grpLog.PerformLayout();
       this.ResumeLayout(false);
 
     }
@@ -681,8 +741,6 @@ namespace ExtraQL
     private Label lblEmail;
     private Button btnStartSteam;
     private Button btnStartLauncher;
-    private TextBox txtLog;
-    private Label label2;
     private ComboBox comboRealm;
     private LinkLabel linkAbout;
     private LinkLabel linkFocusLogin;
@@ -713,6 +771,12 @@ namespace ExtraQL
     private CheckBox cbRunAsCommandLine;
     private Timer launcherPlayTimer;
     private Timer updateCheckTimer;
+    private CheckBox cbLog;
+    private Panel panelLog;
+    private GroupBox grpLog;
+    private TextBox txtLog;
+    private Button btnClearLog;
+    private CheckBox cbFollowLog;
   }
 }
 

@@ -6,6 +6,8 @@ namespace ExtraQL
 {
   static class Program
   {
+    public const bool UseHttps = true;
+
     #region Main()
     [STAThread]
     static void Main()
@@ -35,7 +37,7 @@ namespace ExtraQL
       {
         try
         {
-          var result = client.DownloadString("http://127.0.0.1:27963/bringToFront");
+          var result = client.DownloadString((UseHttps ? "https" : "http") + "://127.0.0.1:27963/bringToFront");
           if (result == "ok")
             return true;
         }

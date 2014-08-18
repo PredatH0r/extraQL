@@ -1,13 +1,17 @@
 ﻿// ==UserScript==
 // @id          esreality
 // @name        ESReality.com Integration
-// @version     1.1
+// @version     1.2
 // @author      PredatH0r
 // @description	Shows a list of esreality.com Quake Live forum posts
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.2
+- fixed URL parameters to only load QL forum posts
+- fixed accumulating update timers
 
 Version 1.1
 - ensuring consistent order of tabs in the chat bar
@@ -24,6 +28,7 @@ Version 1.0
 
   var URL_FORUM = "http://www.esreality.com/?a=post&forum=17";
   var UPDATE_INTERVAL = 60000;
+  var updateTimeoutHandle;
 
   function init() {
     if (!extraQL.BASE_URL) {
@@ -88,16 +93,20 @@ Version 1.0
     if (quakelive.IsGameRunning())
       return;
 
+    if (updateTimeoutHandle)
+      window.clearTimeout(updateTimeoutHandle);
+
     $.ajax({
-      url: extraQL.BASE_URL+"proxy?url=" + encodeURI(URL_FORUM),        
-      dataType: "html",
-      success: parseForum,
-      error: function() {
-        extraQL.rlog("Could not load esreality forum");
-      }
+      url: extraQL.BASE_URL + "proxy",
+      data: { url: URL_FORUM },
+      dataType: "text"
+    })
+    .done(parseForum)
+    .fail(function() {
+      extraQL.rlog("Could not load esreality forum");
     });
 
-    window.setTimeout(updateForums, UPDATE_INTERVAL);
+    updateTimeoutHandle = window.setTimeout(updateForums, UPDATE_INTERVAL);
   }
 
   function parseForum(html) {
