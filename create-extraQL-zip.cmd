@@ -9,10 +9,12 @@ if errorlevel 1 goto error
 mkdir extraQL
 mkdir extraQL\scripts
 mkdir extraQL\images
+mkdir extraQL\https
 xcopy "%abs%\bin\Debug\extraQL.exe" extraQL\ >nul
 xcopy "%abs%\scripts" extraQL\scripts >nul
 xcopy /s "%abs%\images" extraQL\images >nul
-%zipper% a -tzip extraQL.zip "extraQL"
+xcopy /s "%abs%\https" extraQL\https >nul
+%zipper% a -tzip extraQL.zip "extraQL" -x!extraQL\scripts\rosterGroup.usr.js
 if errorlevel 1 goto error
 rmdir /s /q extraQL
 

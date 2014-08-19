@@ -18,7 +18,7 @@ namespace ExtraQL
     private const string AddScriptRoute = "/addScript";
     private readonly HttpServer server;
     private readonly StringBuilder indexBuilder = new StringBuilder();
-    private string _fileBaseDir;
+    private readonly string baseDir;
     private readonly ScriptRepository scriptRepository;
     private readonly Form form;
 
@@ -26,7 +26,7 @@ namespace ExtraQL
     
     #region ctor()
 
-    public Servlets(HttpServer server, ScriptRepository scriptRepository, Action<string> logger, Form form)
+    public Servlets(HttpServer server, ScriptRepository scriptRepository, Action<string> logger, Form form, string baseDir)
     {
       this.server = server;
       this.scriptRepository = scriptRepository;
@@ -35,7 +35,7 @@ namespace ExtraQL
       this.EnablePrivateServlets = true;
       server.Log = logger;
       this.Log = server.Log;
-
+      this.baseDir = baseDir;
       RegisterServlets();
     }
 
@@ -567,14 +567,7 @@ namespace ExtraQL
       if (relPath.Contains(":") || relPath.Contains("..") || relPath.Replace('/', '\\').Contains("\\\\") || relPath.IndexOfAny(Path.GetInvalidPathChars()) > 0)
         return null;
 
-      if (_fileBaseDir == null)
-      {
-        _fileBaseDir = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
-        if (_fileBaseDir.EndsWith("\\bin\\Debug")) // when started from VisualStudio
-          _fileBaseDir = Path.GetDirectoryName(Path.GetDirectoryName(_fileBaseDir));
-      }
-
-      return _fileBaseDir + "\\" + basePath + "\\" + relPath;
+      return this.baseDir + "\\" + basePath + "\\" + relPath;
     }
 
     #endregion

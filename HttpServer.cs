@@ -32,31 +32,11 @@ namespace ExtraQL
     private readonly X509Certificate cert;
     private readonly PropertyInfo hresultGetter;
 
-    /*
-     * The embedded self-signed certificate was created using this command line:
-     * makecert.exe -r -a sha1 -n CN=localhost -sky exchange -pe -b 01/01/2000 -e 01/01/2100 -ss Root -sr localmachine -l http://sourceforge.net/projects/extraql/ -eku 1.3.6.1.5.5.7.3.1
-     * 
-    */
-
-    public HttpServer()
+    public HttpServer(string certFile)
     {
-      this.cert = this.LoadSslCertificate();
+      this.cert = new X509Certificate2(certFile);
       hresultGetter = typeof (Exception).GetProperty("HResult", BindingFlags.Instance | BindingFlags.NonPublic);
     }
-
-    #region LoadSslCertificate()
-    private X509Certificate LoadSslCertificate()
-    {
-      byte[] certData;
-      using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ExtraQL.resources.localhost.pfx"))
-      {
-        if (stream == null) return null; // never happens, but the check makes a ReSharper warning disappear
-        certData = new byte[stream.Length];
-        stream.Read(certData, 0, certData.Length);
-      }
-      return new X509Certificate2(certData);
-    }
-    #endregion
 
     #region BindToAllAddresses
     public bool BindToAllInterfaces
@@ -85,6 +65,10 @@ namespace ExtraQL
         this.useHttps = value;
       }
     }
+    #endregion
+
+    #region LogAllRequests
+    public bool LogAllRequests { get; set; }
     #endregion
 
     #region RegisterServlet()
@@ -156,6 +140,7 @@ namespace ExtraQL
           new IPEndPoint(IPAddress.Loopback, this.EndPoint.Port) : 
           this.EndPoint;
         client.Connect(localServiceEndPoint);
+        client.Send(new byte[] {0});
       }
       this.shutdownComplete.WaitOne();
       this.shutdownInProgress = false;
@@ -281,7 +266,10 @@ namespace ExtraQL
             return;
 
           url = new Uri(new Uri(this.EndPointUrl), data.Substring(4, idx - 4));
-          Log(url.ToString()); // ToString() displays the query string url-decoded, OriginalString doesn't
+
+          if (this.LogAllRequests)
+            Log(url.ToString()); // ToString() displays the query string url-decoded, OriginalString doesn't
+
           string urlPath = url.AbsolutePath;
           if (!ExecuteServlet(stream, urlPath, url, data))
           {
@@ -341,6 +329,8 @@ namespace ExtraQL
           var bufferSeg = new byte[8192];
           var chars = new char[8192];
           len = client.Read(bufferSeg, 0, bufferSeg.Length);
+          if (len == 0)
+            return null;
           int clen = dec.GetChars(bufferSeg, 0, len, chars, 0, false);
           sb.Append(chars, 0, clen);
 

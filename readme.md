@@ -24,6 +24,10 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.4
+- implemented HTTPS support
+- improved Log window
+
 Version 1.3
 ---
 - "Account Settings" page didn't open due to https/http scripting protection

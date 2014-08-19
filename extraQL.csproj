@@ -54,6 +54,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="Cypher.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -67,13 +68,13 @@
     <Compile Include="XWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
-    <EmbeddedResource Include="resources\localhost.cer" />
-    <EmbeddedResource Include="resources\localhost.pfx" />
+    <None Include="https\install.cmd" />
+    <None Include="https\localhost.cer" />
+    <None Include="https\localhost.pfx" />
     <None Include="scripts\autoExec.usr.js" />
     <None Include="scripts\openChat.usr.js" />
     <None Include="scripts\startpage.usr.js" />
     <Compile Include="Servlets.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="ScriptRepository.cs" />
     <Compile Include="Win32.cs" />
     <EmbeddedResource Include="MainForm.resx">

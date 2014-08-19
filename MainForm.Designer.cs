@@ -44,6 +44,7 @@ namespace ExtraQL
       this.btnInstallHook = new System.Windows.Forms.Button();
       this.panelAdvanced = new System.Windows.Forms.Panel();
       this.grpAdvanced = new System.Windows.Forms.GroupBox();
+      this.cbHttps = new System.Windows.Forms.CheckBox();
       this.cbRunAsCommandLine = new System.Windows.Forms.CheckBox();
       this.cbAutostartSteam = new System.Windows.Forms.CheckBox();
       this.cbAutostartLauncher = new System.Windows.Forms.CheckBox();
@@ -56,6 +57,7 @@ namespace ExtraQL
       this.linkFocusLogin = new System.Windows.Forms.LinkLabel();
       this.comboRealm = new System.Windows.Forms.ComboBox();
       this.panelTop = new System.Windows.Forms.Panel();
+      this.cbLog = new System.Windows.Forms.CheckBox();
       this.picClose = new System.Windows.Forms.PictureBox();
       this.picMinimize = new System.Windows.Forms.PictureBox();
       this.lblVersion = new System.Windows.Forms.Label();
@@ -80,12 +82,12 @@ namespace ExtraQL
       this.miQuit = new System.Windows.Forms.ToolStripMenuItem();
       this.launcherPlayTimer = new System.Windows.Forms.Timer(this.components);
       this.updateCheckTimer = new System.Windows.Forms.Timer(this.components);
-      this.cbLog = new System.Windows.Forms.CheckBox();
       this.panelLog = new System.Windows.Forms.Panel();
       this.grpLog = new System.Windows.Forms.GroupBox();
-      this.txtLog = new System.Windows.Forms.TextBox();
-      this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.btnClearLog = new System.Windows.Forms.Button();
+      this.cbFollowLog = new System.Windows.Forms.CheckBox();
+      this.txtLog = new System.Windows.Forms.TextBox();
+      this.cbLogAllRequests = new System.Windows.Forms.CheckBox();
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -169,10 +171,10 @@ namespace ExtraQL
       // 
       this.panelAdvanced.BackColor = System.Drawing.Color.Transparent;
       this.panelAdvanced.Controls.Add(this.grpAdvanced);
-      this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Top;
+      this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
       this.panelAdvanced.Location = new System.Drawing.Point(0, 325);
       this.panelAdvanced.Name = "panelAdvanced";
-      this.panelAdvanced.Size = new System.Drawing.Size(429, 215);
+      this.panelAdvanced.Size = new System.Drawing.Size(429, 240);
       this.panelAdvanced.TabIndex = 2;
       // 
       // grpAdvanced
@@ -180,6 +182,7 @@ namespace ExtraQL
       this.grpAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpAdvanced.Controls.Add(this.cbHttps);
       this.grpAdvanced.Controls.Add(this.txtLauncherExe);
       this.grpAdvanced.Controls.Add(this.cbRunAsCommandLine);
       this.grpAdvanced.Controls.Add(this.cbAutostartSteam);
@@ -195,10 +198,21 @@ namespace ExtraQL
       this.grpAdvanced.ForeColor = System.Drawing.Color.White;
       this.grpAdvanced.Location = new System.Drawing.Point(12, 7);
       this.grpAdvanced.Name = "grpAdvanced";
-      this.grpAdvanced.Size = new System.Drawing.Size(405, 196);
+      this.grpAdvanced.Size = new System.Drawing.Size(405, 221);
       this.grpAdvanced.TabIndex = 0;
       this.grpAdvanced.TabStop = false;
       this.grpAdvanced.Text = "Options";
+      // 
+      // cbHttps
+      // 
+      this.cbHttps.AutoSize = true;
+      this.cbHttps.Location = new System.Drawing.Point(10, 185);
+      this.cbHttps.Name = "cbHttps";
+      this.cbHttps.Size = new System.Drawing.Size(365, 17);
+      this.cbHttps.TabIndex = 12;
+      this.cbHttps.Text = "Use HTTPS  (requires setup through https\\install.cmd as Administrator)";
+      this.cbHttps.UseVisualStyleBackColor = true;
+      this.cbHttps.CheckedChanged += new System.EventHandler(this.cbHttps_CheckedChanged);
       // 
       // cbRunAsCommandLine
       // 
@@ -215,9 +229,9 @@ namespace ExtraQL
       this.cbAutostartSteam.AutoSize = true;
       this.cbAutostartSteam.Location = new System.Drawing.Point(209, 137);
       this.cbAutostartSteam.Name = "cbAutostartSteam";
-      this.cbAutostartSteam.Size = new System.Drawing.Size(105, 17);
+      this.cbAutostartSteam.Size = new System.Drawing.Size(132, 17);
       this.cbAutostartSteam.TabIndex = 10;
-      this.cbAutostartSteam.Text = "Autostart Steam";
+      this.cbAutostartSteam.Text = "Autostart QL in Steam";
       this.cbAutostartSteam.UseVisualStyleBackColor = true;
       this.cbAutostartSteam.CheckedChanged += new System.EventHandler(this.cbAutostart_CheckedChanged);
       // 
@@ -226,9 +240,9 @@ namespace ExtraQL
       this.cbAutostartLauncher.AutoSize = true;
       this.cbAutostartLauncher.Location = new System.Drawing.Point(10, 137);
       this.cbAutostartLauncher.Name = "cbAutostartLauncher";
-      this.cbAutostartLauncher.Size = new System.Drawing.Size(119, 17);
+      this.cbAutostartLauncher.Size = new System.Drawing.Size(135, 17);
       this.cbAutostartLauncher.TabIndex = 9;
-      this.cbAutostartLauncher.Text = "Autostart Launcher";
+      this.cbAutostartLauncher.Text = "Autostart QL Launcher";
       this.cbAutostartLauncher.UseVisualStyleBackColor = true;
       this.cbAutostartLauncher.CheckedChanged += new System.EventHandler(this.cbAutostart_CheckedChanged);
       // 
@@ -349,6 +363,19 @@ namespace ExtraQL
       this.panelTop.Name = "panelTop";
       this.panelTop.Size = new System.Drawing.Size(429, 223);
       this.panelTop.TabIndex = 0;
+      // 
+      // cbLog
+      // 
+      this.cbLog.AutoSize = true;
+      this.cbLog.Checked = true;
+      this.cbLog.CheckState = System.Windows.Forms.CheckState.Checked;
+      this.cbLog.Location = new System.Drawing.Point(221, 187);
+      this.cbLog.Name = "cbLog";
+      this.cbLog.Size = new System.Drawing.Size(43, 17);
+      this.cbLog.TabIndex = 29;
+      this.cbLog.Text = "Log";
+      this.cbLog.UseVisualStyleBackColor = true;
+      this.cbLog.CheckedChanged += new System.EventHandler(this.cbLog_CheckedChanged);
       // 
       // picClose
       // 
@@ -612,19 +639,6 @@ namespace ExtraQL
       this.updateCheckTimer.Interval = 600000;
       this.updateCheckTimer.Tick += new System.EventHandler(this.updateCheckTimer_Tick);
       // 
-      // cbLog
-      // 
-      this.cbLog.AutoSize = true;
-      this.cbLog.Checked = true;
-      this.cbLog.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbLog.Location = new System.Drawing.Point(221, 187);
-      this.cbLog.Name = "cbLog";
-      this.cbLog.Size = new System.Drawing.Size(43, 17);
-      this.cbLog.TabIndex = 29;
-      this.cbLog.Text = "Log";
-      this.cbLog.UseVisualStyleBackColor = true;
-      this.cbLog.CheckedChanged += new System.EventHandler(this.cbLog_CheckedChanged);
-      // 
       // panelLog
       // 
       this.panelLog.BackColor = System.Drawing.Color.Transparent;
@@ -632,7 +646,7 @@ namespace ExtraQL
       this.panelLog.Dock = System.Windows.Forms.DockStyle.Right;
       this.panelLog.Location = new System.Drawing.Point(429, 0);
       this.panelLog.Name = "panelLog";
-      this.panelLog.Size = new System.Drawing.Size(495, 540);
+      this.panelLog.Size = new System.Drawing.Size(495, 565);
       this.panelLog.TabIndex = 3;
       // 
       // grpLog
@@ -640,40 +654,17 @@ namespace ExtraQL
       this.grpLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpLog.Controls.Add(this.cbLogAllRequests);
       this.grpLog.Controls.Add(this.btnClearLog);
       this.grpLog.Controls.Add(this.cbFollowLog);
       this.grpLog.Controls.Add(this.txtLog);
       this.grpLog.ForeColor = System.Drawing.Color.White;
       this.grpLog.Location = new System.Drawing.Point(12, 7);
       this.grpLog.Name = "grpLog";
-      this.grpLog.Size = new System.Drawing.Size(471, 522);
+      this.grpLog.Size = new System.Drawing.Size(471, 547);
       this.grpLog.TabIndex = 0;
       this.grpLog.TabStop = false;
       this.grpLog.Text = "Log";
-      // 
-      // txtLog
-      // 
-      this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtLog.ForeColor = System.Drawing.Color.Black;
-      this.txtLog.Location = new System.Drawing.Point(10, 52);
-      this.txtLog.Multiline = true;
-      this.txtLog.Name = "txtLog";
-      this.txtLog.ReadOnly = true;
-      this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.txtLog.Size = new System.Drawing.Size(453, 458);
-      this.txtLog.TabIndex = 13;
-      // 
-      // cbFollowLog
-      // 
-      this.cbFollowLog.AutoSize = true;
-      this.cbFollowLog.Location = new System.Drawing.Point(10, 24);
-      this.cbFollowLog.Name = "cbFollowLog";
-      this.cbFollowLog.Size = new System.Drawing.Size(122, 17);
-      this.cbFollowLog.TabIndex = 14;
-      this.cbFollowLog.Text = "Always Scroll to End";
-      this.cbFollowLog.UseVisualStyleBackColor = true;
       // 
       // btnClearLog
       // 
@@ -686,12 +677,47 @@ namespace ExtraQL
       this.btnClearLog.UseVisualStyleBackColor = true;
       this.btnClearLog.Click += new System.EventHandler(this.btnClearLog_Click);
       // 
+      // cbFollowLog
+      // 
+      this.cbFollowLog.AutoSize = true;
+      this.cbFollowLog.Location = new System.Drawing.Point(10, 24);
+      this.cbFollowLog.Name = "cbFollowLog";
+      this.cbFollowLog.Size = new System.Drawing.Size(122, 17);
+      this.cbFollowLog.TabIndex = 14;
+      this.cbFollowLog.Text = "Always Scroll to End";
+      this.cbFollowLog.UseVisualStyleBackColor = true;
+      // 
+      // txtLog
+      // 
+      this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.txtLog.ForeColor = System.Drawing.Color.Black;
+      this.txtLog.Location = new System.Drawing.Point(10, 52);
+      this.txtLog.Multiline = true;
+      this.txtLog.Name = "txtLog";
+      this.txtLog.ReadOnly = true;
+      this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+      this.txtLog.Size = new System.Drawing.Size(453, 483);
+      this.txtLog.TabIndex = 13;
+      // 
+      // cbLogAllRequests
+      // 
+      this.cbLogAllRequests.AutoSize = true;
+      this.cbLogAllRequests.Location = new System.Drawing.Point(154, 24);
+      this.cbLogAllRequests.Name = "cbLogAllRequests";
+      this.cbLogAllRequests.Size = new System.Drawing.Size(104, 17);
+      this.cbLogAllRequests.TabIndex = 16;
+      this.cbLogAllRequests.Text = "Log all Requests";
+      this.cbLogAllRequests.UseVisualStyleBackColor = true;
+      this.cbLogAllRequests.CheckedChanged += new System.EventHandler(this.cbLogAllRequests_CheckedChanged);
+      // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-      this.ClientSize = new System.Drawing.Size(924, 540);
+      this.ClientSize = new System.Drawing.Size(924, 565);
       this.Controls.Add(this.panelAdvanced);
       this.Controls.Add(this.panelFocus);
       this.Controls.Add(this.panelTop);
@@ -777,6 +803,8 @@ namespace ExtraQL
     private TextBox txtLog;
     private Button btnClearLog;
     private CheckBox cbFollowLog;
+    private CheckBox cbHttps;
+    private CheckBox cbLogAllRequests;
   }
 }
 
