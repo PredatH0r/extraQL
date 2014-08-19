@@ -313,7 +313,7 @@ var console = window.console;
     } else if (!enable && storage.scripts.enabled[id]) {
       storage.scripts.enabled[id] = false;
       storage.save();
-      log("^7'^5" + id + "^7' has been disabled. You must /web_restart for the change to take effect.");
+      log("^7'^5" + id + "^7' has been disabled. You must /web_reload for the change to take effect.");
       return true;
     }
     return false;
