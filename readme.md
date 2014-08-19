@@ -25,6 +25,7 @@ Changelog
 =========
 
 Version 1.4
+---
 - implemented HTTPS support
 - improved Log window
 

@@ -196,6 +196,7 @@ namespace ExtraQL
     {
       try
       {
+        //Log("incoming connection from " + client.Client.RemoteEndPoint);
         Stream stream;
         if (this.useHttps)
         {
@@ -248,7 +249,7 @@ namespace ExtraQL
         {
           Dictionary<string, string> header;
           string data = ReadAllBytes(stream, out header);
-          if (data == null)
+          if (string.IsNullOrEmpty(data))
             return;
 
           string conn;
