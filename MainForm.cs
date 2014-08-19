@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -14,21 +13,21 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.3";
+    public const string Version = "1.4";
 
+    private readonly Config config;
     private int timerCount;
-    private readonly Dictionary<string, string> passwordByEmail = new Dictionary<string, string>();
     private readonly HttpServer server;
     private readonly Servlets servlets;
     private readonly ScriptRepository scriptRepository;
-    private string masterServer = "ql.beham.biz:27963";
     private Size windowDragOffset;
 
     #region ctor()
-    public MainForm()
+    public MainForm(Config config)
     {
       InitializeComponent();
 
+      this.config = config;
       this.LoadSettings();
       base.Text = base.Text + " " + Version;
       this.lblVersion.Text = Version;
@@ -36,13 +35,17 @@ namespace ExtraQL
       this.lblVersion.Parent = this.picLogo;
       this.trayIcon.Icon = this.Icon;
 
-      this.server = new HttpServer();
+      this.server = new HttpServer(config.AppBaseDir + @"\https\localhost.pfx");
       this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
+      this.server.UseHttps = this.cbHttps.Checked;
+      this.server.LogAllRequests = this.cbLogAllRequests.Checked;
 
-      this.scriptRepository = new ScriptRepository();
+      this.scriptRepository = new ScriptRepository(config.AppBaseDir);
       this.scriptRepository.Log = this.Log;
 
-      this.servlets = new Servlets(this.server, this.scriptRepository, this.Log, this);
+      this.servlets = new Servlets(this.server, this.scriptRepository, this.Log, this, config.AppBaseDir);
+
+      this.ActiveControl = this.comboEmail;
     }
     #endregion
 
@@ -57,7 +60,7 @@ namespace ExtraQL
       if (this.cbCheckUpdate.Checked)
       {
         this.CheckForUpdate();
-        this.scriptRepository.UpdateScripts(this.cbBindToAll.Checked, this.masterServer);
+        this.scriptRepository.UpdateScripts(this.cbBindToAll.Checked, this.config.GetString("masterServer"));
       }
 
       if (this.cbAutostartLauncher.Checked)
@@ -129,7 +132,7 @@ namespace ExtraQL
     private void comboEmail_SelectedIndexChanged(object sender, EventArgs e)
     {
       string pwd;
-      this.passwordByEmail.TryGetValue(this.comboEmail.Text, out pwd);
+      this.config.Accounts.TryGetValue(this.comboEmail.Text, out pwd);
       this.txtPassword.Text = pwd ?? "";
     }
     #endregion
@@ -160,7 +163,7 @@ namespace ExtraQL
     private void txtPassword_Validating(object sender, CancelEventArgs e)
     {
       if (this.comboEmail.Text.Length > 0)
-        this.passwordByEmail[this.comboEmail.Text] = this.txtPassword.Text;
+        this.config.Accounts[this.comboEmail.Text] = this.txtPassword.Text;
     }
     #endregion
 
@@ -189,6 +192,19 @@ namespace ExtraQL
         this.panelAdvanced.Visible = false;
         this.Height -= panelAdvanced.Height;
       }
+    }
+    #endregion
+
+    #region cbLog_CheckedChanged
+    private void cbLog_CheckedChanged(object sender, EventArgs e)
+    {
+      this.SuspendLayout();
+      this.panelLog.Visible = this.cbLog.Checked;
+      if (!cbLog.Checked)
+        this.Width -= this.panelLog.Width;
+      else
+        this.Width += this.panelLog.Width;
+      this.ResumeLayout();
     }
     #endregion
 
@@ -339,111 +355,68 @@ namespace ExtraQL
     #region updateCheckTimer_Tick
     private void updateCheckTimer_Tick(object sender, EventArgs e)
     {
-      this.scriptRepository.UpdateScripts(true, this.masterServer);
+      this.scriptRepository.UpdateScripts(true, this.config.GetString("masterServer"));
     }
     #endregion
 
-
-    #region ConfigFile
-    private string ConfigFile
+    #region cbHttps_CheckedChanged
+    private void cbHttps_CheckedChanged(object sender, EventArgs e)
     {
-      get
-      {
-        var path = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
-        if (path.EndsWith(("Debug")))
-          path = Path.GetDirectoryName(Path.GetDirectoryName(path)) ?? "";
-        return Path.Combine(path, "extraQL.ini");
-      }
+      this.RestartHttpServer();
     }
     #endregion
+
+    #region btnClearLog_Click
+    private void btnClearLog_Click(object sender, EventArgs e)
+    {
+      this.txtLog.Clear();
+    }
+    #endregion
+
+    #region cbLogAllRequests_CheckedChanged
+    private void cbLogAllRequests_CheckedChanged(object sender, EventArgs e)
+    {
+      if (this.server != null)
+        this.server.LogAllRequests = this.cbLogAllRequests.Checked;
+    }
+    #endregion
+
+
 
     #region LoadSettings()
     private void LoadSettings()
     {
-      string email = "";
-      string pwd = "";
-      string lastEmail = "";
-      string launcherExe = "";
-      string realmHistory = "";
-      string lastRealm = "";
-      bool advanced = false;
-      bool focus = false;
-      bool bindToAll = false;
-      bool systemTray = false;
-      bool startMinimized = false;
-      bool checkUpdates = true;
-      bool runAsCommandLine = false;
-      int autostart = 0;
+      foreach (var account in this.config.Accounts)
+        this.comboEmail.Items.Add(account.Key);
 
-      var configFile = this.ConfigFile;
-      if (File.Exists(configFile))
-      {
-        var lines = File.ReadAllLines(configFile);
-        foreach (var line in lines)
-        {
-          var parts = line.Split(new[] {'='}, 2);
-          if (parts.Length < 2) continue;
-          var value = parts[1].Trim();
-          switch (parts[0].Trim())
-          {
-            case "email": email = value; break;
-            case "password": pwd = value; break;
-            case "lastEmail": lastEmail = value; break;
-            case "launcherExe": launcherExe = value; break;
-            case "realmHistory": realmHistory = value; break;
-            case "realm": lastRealm = value; break;
-            case "advanced": advanced = value == "1"; break;
-            case "focus": focus = value == "1"; break;
-            case "bindToAll": bindToAll = value == "1"; break;
-            case "systemTray": systemTray = value == "1"; break;
-            case "startMinimized": startMinimized = value == "1"; break;
-            case "checkUpdates": checkUpdates = value == "1"; break;
-            case "autostart": autostart = int.Parse(value); break;
-            case "runAsCommandLine": runAsCommandLine = value == "1"; break;
-            case "masterServer": this.masterServer = value; break;
-          }
-        }
-      }
+      string lastEmail = config.GetString("lastEmail");
+      if (!String.IsNullOrEmpty(lastEmail))
+        this.comboEmail.Text = lastEmail;
+      else if (this.comboEmail.Items.Count > 0)
+        this.comboEmail.SelectedIndex = 0;
 
-      var pwds = string.IsNullOrEmpty(pwd) ? new string[0] : Cypher.DecryptString(pwd).Split('\t');
-      if (!String.IsNullOrEmpty(email))
-      {
-        int i = 0;
-        foreach (var mail in email.Split('\t'))
-        {
-          this.comboEmail.Items.Add(mail);
-          this.passwordByEmail[mail] = i < pwds.Length ? pwds[i++] : "";
-        }
-        if (!String.IsNullOrEmpty(lastEmail))
-          this.comboEmail.Text = lastEmail;
-        else if (this.comboEmail.Items.Count > 0)
-          this.comboEmail.SelectedIndex = 0;
-      }
+      this.txtLauncherExe.Text = config.GetString("launcherExe");
 
-      this.txtLauncherExe.Text = launcherExe;
-      if (String.IsNullOrEmpty(this.txtLauncherExe.Text))
-        this.txtLauncherExe.Text = this.GetDefaultLauncherPath();
+      this.comboRealm.Items.Add("");
+      foreach (var realm in config.RealmHistory)
+        this.comboRealm.Items.Add(realm);
+      this.comboRealm.Text = config.GetString("realm");
 
-      if (!String.IsNullOrEmpty(realmHistory))
-      {
-        this.comboRealm.Items.Add("");
-        foreach (var realm in realmHistory.Trim().Split('\t'))
-          this.comboRealm.Items.Add(realm);
-      }
-      this.comboRealm.Text = lastRealm;
-
-      this.cbAdvanced.Checked = advanced;
-      this.cbFocus.Checked = focus;
-      this.cbBindToAll.Checked = bindToAll;
-      this.cbSystemTray.Checked = systemTray;
-      this.cbStartMinimized.Checked = startMinimized;
-      if (startMinimized)
+      this.cbAdvanced.Checked = config.GetBool("advanced");
+      this.cbFocus.Checked = config.GetBool("focus");
+      this.cbBindToAll.Checked = config.GetBool("bindToAll");
+      this.cbSystemTray.Checked = config.GetBool("systemTray");
+      this.cbStartMinimized.Checked = config.GetBool("startMinimized");
+      if (this.cbStartMinimized.Checked)
         this.WindowState = FormWindowState.Minimized;
-      this.cbCheckUpdate.Checked = checkUpdates;
-      this.cbAutostartLauncher.Checked = autostart == 1;
-      this.cbAutostartSteam.Checked = autostart == 2;
-      this.cbRunAsCommandLine.Checked = runAsCommandLine;
-      this.ActiveControl = this.comboEmail;
+      this.cbCheckUpdate.Checked = config.GetBool("checkUpdates");
+      this.cbAutostartLauncher.Checked = config.GetString("autostart") == "1";
+      this.cbAutostartSteam.Checked = config.GetString("autostart") == "2";
+      this.cbRunAsCommandLine.Checked = config.GetBool("runAsCommandLine");
+      this.cbLog.Checked = config.GetBool("log");
+      this.cbFollowLog.Checked = config.GetBool("followLog");
+      this.cbHttps.Checked = config.GetBool("https");
+      this.cbLogAllRequests.Checked = config.GetBool("logAllRequests");
     }
 
     #endregion
@@ -455,41 +428,30 @@ namespace ExtraQL
       {
         if (!this.comboEmail.Items.Contains(this.comboEmail.Text))
           this.comboEmail.Items.Add(this.comboEmail.Text);
-        this.passwordByEmail[this.comboEmail.Text] = this.txtPassword.Text;
+        this.config.Accounts[this.comboEmail.Text] = this.txtPassword.Text;
 
-        string emails = "";
-        string pwds = "";
-        foreach (string email in this.comboEmail.Items)
-        {
-          emails += "\t" + email;
-          pwds += "\t" + this.passwordByEmail[email];
-        }
-
-        string realmHistory = "";
         string realmUrl = this.comboRealm.Text.Trim();
         if (!this.comboRealm.Items.Contains(realmUrl))
+        {
           this.comboRealm.Items.Add(realmUrl);
-        foreach (var realm in this.comboRealm.Items)
-          realmHistory += realm + "\t";
-
-        StringBuilder config = new StringBuilder();
-        config.AppendLine("[extraQL]");
-        config.AppendLine("email=" + (emails.Length == 0 ? "" : emails.Substring(1)));
-        config.AppendLine("password=" + Cypher.EncryptString(pwds.Length == 0 ? "" : pwds.Substring(1)));
-        config.AppendLine("lastEmail=" + this.comboEmail.Text);
-        config.AppendLine("focus=" + (this.cbFocus.Checked ? 1 : 0));
-        config.AppendLine("advanced=" + (this.cbAdvanced.Checked ? 1 : 0));
-        config.AppendLine("realm=" + this.comboRealm.Text);
-        config.AppendLine("realmHistory=" + realmHistory.Trim());
-        config.AppendLine("launcherExe=" + this.txtLauncherExe.Text);
-        config.AppendLine("bindToAll=" + (this.cbBindToAll.Checked ? 1 : 0));
-        config.AppendLine("systemTray=" + (this.cbSystemTray.Checked ? 1 : 0));
-        config.AppendLine("startMinimized=" + (this.cbStartMinimized.Checked ? 1 : 0));
-        config.AppendLine("checkUpdates=" + (this.cbCheckUpdate.Checked ? 1 : 0));
-        config.AppendLine("autostart=" + (this.cbAutostartLauncher.Checked ? 1 : this.cbAutostartSteam.Checked ? 2 : 0));
-        config.AppendLine("runAsCommandLine=" + (this.cbRunAsCommandLine.Checked ? 1 : 0));
-        config.AppendLine("masterServer=" + this.masterServer);
-        File.WriteAllText(this.ConfigFile, config.ToString(), Encoding.UTF8);
+          this.config.RealmHistory.Add(realmUrl);
+        }
+        config.Set("lastEmail", this.comboEmail.Text);
+        config.Set("focus", this.cbFocus.Checked);
+        config.Set("advanced", this.cbAdvanced.Checked);
+        config.Set("realm", this.comboRealm.Text);
+        config.Set("launcherExe", this.txtLauncherExe.Text);
+        config.Set("bindToAll", this.cbBindToAll.Checked);
+        config.Set("systemTray", this.cbSystemTray.Checked);
+        config.Set("startMinimized", this.cbStartMinimized.Checked);
+        config.Set("checkUpdates", this.cbCheckUpdate.Checked);
+        config.Set("autostart", this.cbAutostartLauncher.Checked ? "1" : this.cbAutostartSteam.Checked ? "2" : "0");
+        config.Set("runAsCommandLine", this.cbRunAsCommandLine.Checked);        
+        config.Set("log", this.cbLog.Checked);
+        config.Set("followLog", this.cbFollowLog.Checked);
+        config.Set("https", this.cbHttps.Checked);
+        config.Set("logAllRequests", this.cbLogAllRequests.Checked);
+        config.SaveSettings();
       }
       catch (Exception ex)
       {
@@ -515,20 +477,13 @@ namespace ExtraQL
         if (text.Length > 10000) // truncate log after 10k chars
           text = ""; 
         this.txtLog.Text = text + "[" + DateTime.Now.ToString("T") + "] " + msg + "\r\n";
+        if (this.cbFollowLog.Checked)
+        {
+          this.txtLog.SelectionStart = this.txtLog.TextLength;
+          this.txtLog.SelectionLength = 0;
+          this.txtLog.ScrollToCaret();
+        }
       }
-    }
-    #endregion
-
-    #region GetDefaultLauncherPath()
-    private string GetDefaultLauncherPath()
-    {
-      string path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\id Software\Quake Live", null, null) as string;
-      if (path != null && File.Exists(path += "\\Launcher.exe"))
-        return path;
-      path = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Quake Live", "UninstallString", null) as string;
-      if (path != null && File.Exists(path = path.Replace("uninstall.exe", "Launcher.exe")))
-        return path;
-      return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\Quake Live\\Launcher.exe";
     }
     #endregion
 
@@ -593,11 +548,12 @@ namespace ExtraQL
         return;
       this.server.Stop();
       this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
+      this.server.UseHttps = this.cbHttps.Checked;
       this.servlets.EnablePrivateServlets = !this.cbBindToAll.Checked;
       if (this.server.Start())
-        this.Log("extraQL server listening on http://" + this.server.EndPoint);
+        this.Log("extraQL server listening on " + this.server.EndPointUrl);
       else
-        this.Log("extraQL server failed to start on http://" + this.server.EndPoint +". Scripts are disabled!");
+        this.Log("extraQL server failed to start on " + this.server.EndPointUrl +". Scripts are disabled!");
     }
     #endregion
 
@@ -646,10 +602,7 @@ namespace ExtraQL
         return;
       }
 
-      var bundledHook = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
-      if (bundledHook.EndsWith("\\bin\\Debug"))
-        bundledHook = Path.GetDirectoryName(Path.GetDirectoryName(bundledHook));
-      bundledHook += "/scripts/hook.js";
+      string bundledHook = this.config.AppBaseDir + "/scripts/hook.js";
 
       try
       {
@@ -906,6 +859,7 @@ document.loginform.submit();";
       }
     }
     #endregion
+
 
   }
 }

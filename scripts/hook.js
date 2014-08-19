@@ -1,11 +1,15 @@
 ﻿/*
 // @name        extraQL Script Manager
-// @version     1.3
+// @version     1.4
 // @author      wn, PredatH0r
 // @description	Manages the installation and execution of QuakeLive userscripts
 
 This script is a stripped down version of wn's QuakeLive Hook Manager (QLHM),
 which is designed to work with a local or remote extraQL.exe script server.
+
+Version 1.4
+- HTTPS compatibility
+- code cleanup, now allows an array of BASE_URLS to probe through
 
 Version 1.3
 - Account Settings page failed to open when hook.js was installed
@@ -47,8 +51,8 @@ function main_hook() {
     return;
   if (location.protocol == "https:") // Account Settings uses https which doesn't allow running scripts from a http server
     return;
-  
-  HOOK_MANAGER.init();  
+
+  HOOK_MANAGER.init();
 }
 
 // referenced globals
@@ -65,11 +69,11 @@ var console = window.console;
   // it is probably only in the config object below.
   // !!!
   var config = {
-    version: "1.3",
+    version: "1.4",
     consoleCaption: "hook.js v",
     menuCaption: "Userscripts",
-    BASE_URL: "http://127.0.0.1:27963/",
-    REMOTE_URL: "http://ql.beham.biz:27963/",
+    BASE_URLS: [ "http://localhost:27963/", "https://localhost:27963/", "http://ql.beham.biz:27963/" ],
+    BASE_URL: null,
     SOURCE_URL: "http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/hook.js?format=raw",
     reset: false,
     autoEnableAllScripts: true,
@@ -145,34 +149,30 @@ var console = window.console;
     log("^2Initializing " + config.consoleCaption + config.version);
     storage.init();
     this.hud = new HudManager(this);
-    this.loadRepository();
+    this.loadRepository(0);
   };
 
-  HookManager.prototype.loadRepository = function() {
-    // try a local extraQL HTTP server
-    var self = this;
-    $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 1000 })
-      .done(function(repo) { self.initRepository(repo); })
-      .fail(this.tryRemoteRepository.bind(this));
-  };
+  HookManager.prototype.loadRepository = function (baseUrlIndex) {
+    if (baseUrlIndex >= config.BASE_URLS.length) {
+      this.tryLocalScriptCache();
+      return;
+    }
 
-  HookManager.prototype.tryRemoteRepository = function() {
-    // try remote extraQL HTTP server
+    config.BASE_URL = config.BASE_URLS[baseUrlIndex];
     var self = this;
-    config.BASE_URL = config.REMOTE_URL;
-    $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 1000 })
+    $.ajax({ url: config.BASE_URL + "repository.json", dataType: "json", timeout: 3000 })
       .done(function(repo) { self.initRepository(repo); })
-      .fail(this.tryLocalScriptCache.bind(this));
+      .fail(function () { self.loadRepository(baseUrlIndex + 1); });
   };
 
   HookManager.prototype.tryLocalScriptCache = function() {
-    // try local script cache
     if (!storage.repository) {
       log("^1Failed to load scripts from extraQL server or local cache.^7 Scripts are unavailable!");
       return;
     }
     config.BASE_URL = null;
     log("^1Could not connected to an extraQL server^7, some cached scripts will not work.");
+    $.globalEval(storage.scripts.code["extraQL"]);
     this.loadScripts();
   };
 
@@ -180,8 +180,13 @@ var console = window.console;
     log("Loading userscripts from ^2" + config.BASE_URL + "^7");
 
     var self = this;
-    $.ajax({ url: config.BASE_URL + "scripts/extraQL.js", dataType: "script" })
-      .done(function () { self.runScripts(repo); })
+    $.ajax({ url: config.BASE_URL + "scripts/extraQL.js", dataType: "text" })
+      .done(function (code) {
+        storage.scripts.code["extraQL"] = code;
+        storage.save();
+        $.globalEval(code);
+        self.runScripts(repo);
+      })
       .fail(function() {
         config.BASE_URL = null;
         log("^1Could not load extraQL.js library.^7 Scripts are unavailable!");
@@ -203,7 +208,12 @@ var console = window.console;
   };
 
   HookManager.prototype.checkForUpdatedHookJs = function() {
-    $.ajax({ url: config.BASE_URL + "proxy?url=" + encodeURI(config.SOURCE_URL), dataType: "html", timeout: 10000 })
+    $.ajax({
+      url: config.BASE_URL + "proxy",
+      data: { url: config.SOURCE_URL },
+      dataType: "text",
+      timeout: 10000
+      })
       .done(function(code) {
         var match = /@version\s*(\S+)/.exec(code);
         if (match.length < 2) return;
@@ -233,8 +243,10 @@ var console = window.console;
       })
       .fail(function(x, y, err) { console.log("update check failed: " + err); });
   };
+
   HookManager.prototype.loadScripts = function() {
     var self = this;
+    extraQL.BASE_URL = config.BASE_URL;
 
     // get sorted list of enabled script IDs (to make execution order a bit less random)
     var scriptIds = [];
@@ -265,7 +277,7 @@ var console = window.console;
 
     if (config.BASE_URL) {
       var url = config.BASE_URL + "scripts/" + repoScript.filename;
-      $.ajax({ url: url, dataType: "text", timeout: config.async ? 5000 : 1000, async: config.async })
+      $.ajax({ url: url, dataType: "text", timeout: config.async ? 10000 : 10000, async: config.async })
         .done(function(remotecode) {
           storage.scripts.code[id] = remotecode;
           storage.save();

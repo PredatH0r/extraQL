@@ -5,7 +5,6 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Timers;
-using System.Windows.Forms;
 
 namespace ExtraQL
 {
@@ -22,14 +21,10 @@ namespace ExtraQL
     private string masterServer;
 
     #region ctor()
-    public ScriptRepository()
+    public ScriptRepository(string baseDir)
     {
       this.Log = txt => { };
-
-      this.ScriptDir = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
-      if (this.ScriptDir.Replace('\\','/').EndsWith("/bin/Debug"))
-        this.ScriptDir = Path.GetDirectoryName(Path.GetDirectoryName(ScriptDir));
-      this.ScriptDir += "/scripts";
+      this.ScriptDir = baseDir + "/scripts";
       updateTimer.AutoReset = true;
       updateTimer.Elapsed += ProcessNextItemInUpdateQueue;
     }

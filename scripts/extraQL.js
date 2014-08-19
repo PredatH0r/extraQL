@@ -180,12 +180,12 @@ Version 0.102
 
   // public: test if the local extraQL HTTP server is running
   function isLocalServerRunning() {
-    if (!this.BASE_URL)
+    if (!extraQL.BASE_URL || !(extraQL.BASE_URL.indexOf("://127.0.0.1:")>=0 || extraQL.BASE_URL.indexOf("://localhost:")>=0))
       return false;
     if (new Date().getTime() - lastServerCheckTimestamp < 5000)
       return lastServerCheckResult;
     $.ajax({
-      url: "http://127.0.0.1:27963/version",
+      url: extraQL.BASE_URL + "version",
       async: false,
       dataType: "json",
       success: function(version) {

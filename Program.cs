@@ -15,11 +15,13 @@ namespace ExtraQL
 
       try
       {
-        if (ActivateRunningInstance()) 
+        Config config = new Config();
+        config.LoadSettings();
+        if (ActivateRunningInstance(config.GetBool("https"))) 
           return;
 
         Application.EnableVisualStyles();
-        Application.Run(new MainForm());
+        Application.Run(new MainForm(config));
       }
       catch (Exception ex)
       {
@@ -29,13 +31,13 @@ namespace ExtraQL
     #endregion
 
     #region ActivateRunningInstance()
-    private static bool ActivateRunningInstance()
+    private static bool ActivateRunningInstance(bool useHttps)
     {
       using (WebClient client = new WebClient())
       {
         try
         {
-          var result = client.DownloadString("http://127.0.0.1:27963/bringToFront");
+          var result = client.DownloadString((useHttps ? "https" : "http") + "://127.0.0.1:27963/bringToFront");
           if (result == "ok")
             return true;
         }

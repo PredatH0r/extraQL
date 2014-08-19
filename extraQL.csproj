@@ -11,7 +11,8 @@
     <AssemblyName>extraQL</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -53,6 +54,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="Cypher.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -66,12 +68,13 @@
     <Compile Include="XWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
+    <None Include="https\install.cmd" />
+    <None Include="https\localhost.cer" />
+    <None Include="https\localhost.pfx" />
     <None Include="scripts\autoExec.usr.js" />
     <None Include="scripts\openChat.usr.js" />
     <None Include="scripts\startpage.usr.js" />
     <Compile Include="Servlets.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="TcpServer.cs" />
     <Compile Include="ScriptRepository.cs" />
     <Compile Include="Win32.cs" />
     <EmbeddedResource Include="MainForm.resx">
@@ -112,8 +115,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="scripts\links.usr.js" />
-    <Content Include="scripts\extraQL.js" />
-    <Content Include="scripts\rosterGroup.usr.js" />
+    <None Include="scripts\extraQL.js" />
+    <None Include="scripts\rosterGroup.usr.js" />
     <None Include="resources\background.png" />
     <Content Include="c:\users\hbeham\appdata\locallow\id software\focus\home\baseq3\hook.js">
       <Link>focus\hook.js</Link>
