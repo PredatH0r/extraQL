@@ -1,13 +1,16 @@
 // ==UserScript==
 // @id          links
 // @name        Links to QL related Websites
-// @version     4.0
+// @version     5.0
 // @author      PredatH0r
 // @description	Adds a "Links" menu with links to important QL related websites
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 5.0
+- added http://qlmm.gameboni.com/
 
 Version 4.0
 - added http://qlhud.net/
@@ -41,6 +44,7 @@ Version 1.0
         "Quake History": { newwindow: "http://www.quakehistory.com/" },
         "QLRanks": { newwindow: "http://www.qlranks.com/", "class": "sep" },
         "QLStats": { newwindow: "http://ql.leeto.fi/#/" },
+        "Duel Match Maker": { newwindow: "http://qlmm.gameboni.com/" },
         "FaceIt Cups": { newwindow: "http://play.faceit.com/" },
         "125fps League": { newwindow: "https://twitter.com/125fps" },
         "vHUD Editor": { newwindow: "http://visualhud.pk69.com/", "class": "sep" },
