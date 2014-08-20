@@ -24,6 +24,13 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.6
+---
+- to prevent startup crashes, the Windows Crypto API is no longer used, when not running in HTTPS mode
+- fixed web requests timing out on Vista/Win7 64bit (workaround for a .NET bug on that OS)
+- fixed UI scaling when using large system fonts or DPI settings
+- fixed "jumping" window when moving it under Linux/Wine (thx [id]Sponge for the solution!)
+
 Version 1.5
 ---
 - extraQL.exe can now update itself

@@ -29,12 +29,13 @@ namespace ExtraQL
     private readonly ManualResetEvent startupComplete = new ManualResetEvent(false);
     private readonly ManualResetEvent shutdownComplete = new ManualResetEvent(false);
     private Action<string> log = msg => { };
-    private readonly X509Certificate cert;
+    private readonly string certPath;
+    private X509Certificate cert;
     private readonly PropertyInfo hresultGetter;
 
     public HttpServer(string certFile)
     {
-      this.cert = new X509Certificate2(certFile, "extraQL"); // windows XP fails if the .pxf file has no password
+      this.certPath = certFile;
       hresultGetter = typeof (Exception).GetProperty("HResult", BindingFlags.Instance | BindingFlags.NonPublic);
     }
 
@@ -63,6 +64,8 @@ namespace ExtraQL
         if (this.IsRunning)
           throw new InvalidOperationException("Cannot change UseHttps while server is running");
         this.useHttps = value;
+        if (this.useHttps && cert == null)
+          this.cert = new X509Certificate2(this.certPath, "extraQL", X509KeyStorageFlags.MachineKeySet); // windows XP fails if the .pxf file has no password
       }
     }
     #endregion

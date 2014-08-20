@@ -116,7 +116,7 @@ namespace ExtraQL
 
     private void RepositoryJsonDownloadCompleted(object sender, DownloadStringCompletedEventArgs e)
     {
-      var client = (XWebClient) sender;
+      var client = (WebClient) sender;
       var state = (WebRequestState) e.UserState;
 
       if (e.Error == null)
@@ -190,7 +190,7 @@ namespace ExtraQL
 
         try
         {
-          WebClient client = new XWebClient(1000);
+          var client = new XWebClient(1000);
           client.DownloadDataCompleted += ScriptFile_DownloadDataCompleted;
           client.DownloadDataAsync(queueItem.Uri, queueItem);
         }
@@ -349,7 +349,7 @@ namespace ExtraQL
       return null;
 #if false
   // download script from external URL
-      using (var webRequest = new WebClient())
+      using (var webRequest = new XWebClient())
       {
         webRequest.Encoding = Encoding.UTF8;
         string url = scriptIdOrUrl;

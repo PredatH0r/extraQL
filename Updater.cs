@@ -35,7 +35,7 @@ namespace ExtraQL
       {
         using (var client = new XWebClient())
         {
-          client.Timeout = 2000;
+          client.Timeout = 1000;
           client.Encoding = Encoding.UTF8;
 
           string url = config.GetString("masterServer") + "/version";

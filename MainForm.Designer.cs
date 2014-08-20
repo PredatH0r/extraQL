@@ -408,7 +408,6 @@ namespace ExtraQL
       this.lblVersion.Size = new System.Drawing.Size(36, 17);
       this.lblVersion.TabIndex = 1;
       this.lblVersion.Text = "0.00";
-      this.lblVersion.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseDown);
       this.lblVersion.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseMove);
       // 
       // lblExtra
@@ -421,7 +420,6 @@ namespace ExtraQL
       this.lblExtra.TabIndex = 0;
       this.lblExtra.Text = "extraQL";
       this.lblExtra.Visible = false;
-      this.lblExtra.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseDown);
       this.lblExtra.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseMove);
       // 
       // picLogo
@@ -435,7 +433,6 @@ namespace ExtraQL
       this.picLogo.TabIndex = 24;
       this.picLogo.TabStop = false;
       this.picLogo.Paint += new System.Windows.Forms.PaintEventHandler(this.picLogo_Paint);
-      this.picLogo.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseDown);
       this.picLogo.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseMove);
       // 
       // comboEmail
@@ -715,8 +712,8 @@ namespace ExtraQL
       // 
       // MainForm
       // 
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
       this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
       this.ClientSize = new System.Drawing.Size(924, 565);
       this.Controls.Add(this.panelAdvanced);

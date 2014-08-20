@@ -498,7 +498,7 @@ namespace ExtraQL
     {
       try
       {
-        using (var webRequest = new WebClient())
+        using (var webRequest = new XWebClient())
         {
           webRequest.Encoding = Encoding.UTF8;
           return webRequest.DownloadString(url);

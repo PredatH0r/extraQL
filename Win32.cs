@@ -34,6 +34,8 @@ namespace ExtraQL
     [DllImport("user32.dll")]
     public static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
 
+    [DllImportAttribute("user32.dll")]
+    public static extern bool ReleaseCapture();
 
     public delegate bool EnumWindowProc(IntPtr hWnd, IntPtr lParam);
 
@@ -41,6 +43,7 @@ namespace ExtraQL
     public const int WM_LBUTTONDOWN = 0x0201;
     public const int WM_LBUTTONUP = 0x0202;
     public const int WM_SETTEXT = 0x000C;
+    public const int WM_NCLBUTTONDOWN = 0x00A1;
     public const int WM_EXITSIZEMOVE = 0x0232;
     public const int WM_SYSKEYDOWN = 0x0104;
     public const int WM_SYSKEYUP = 0x0105;
@@ -53,6 +56,8 @@ namespace ExtraQL
     public const int GWL_STYLE = -16;
 
     public const int WS_DISABLED = 0x08000000;
+
+    public const int HT_CAPTION = 2;
 
     #region struct RECT
 

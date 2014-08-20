@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Windows.Forms;
 
 namespace ExtraQL
@@ -42,7 +41,7 @@ namespace ExtraQL
     #region ActivateRunningInstance()
     private static bool ActivateRunningInstance(bool useHttps)
     {
-      using (WebClient client = new WebClient())
+      using (var client = new XWebClient(500))
       {
         try
         {

@@ -14,6 +14,9 @@ namespace ExtraQL
     public XWebClient(int timeout)
     {
       this.Timeout = timeout;
+
+      // https://stackoverflow.com/questions/1698031/httpwebrequest-getresponse-delay-on-64bit-windows/2155976#2155976
+      base.Proxy = null; // workaround for Vista and Win7 64bit that causes massive delays
     }
 
     protected override WebRequest GetWebRequest(Uri address)

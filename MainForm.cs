@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -13,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.5";
+    public const string Version = "1.6";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -21,7 +20,6 @@ namespace ExtraQL
     private readonly HttpServer server;
     private readonly Servlets servlets;
     private readonly ScriptRepository scriptRepository;
-    private Size windowDragOffset;
 
     #region ctor()
     public MainForm(Config config, Updater updater)
@@ -95,20 +93,13 @@ namespace ExtraQL
     }
     #endregion
 
-    #region picLogo_MouseDown
-    private void picLogo_MouseDown(object sender, MouseEventArgs e)
-    {
-      var mouseCoord = MousePosition;
-      this.windowDragOffset = new Size(mouseCoord.X - this.Left, mouseCoord.Y - this.Top);
-    }
-    #endregion
-
     #region picLogo_MouseMove
     private void picLogo_MouseMove(object sender, MouseEventArgs e)
     {
       if ((e.Button & MouseButtons.Left) == 0)
         return;
-      this.Location = MousePosition - this.windowDragOffset;
+      Win32.ReleaseCapture();
+      Win32.SendMessage(this.Handle, Win32.WM_NCLBUTTONDOWN, Win32.HT_CAPTION, 0);
     }
     #endregion
 
@@ -805,7 +796,7 @@ namespace ExtraQL
     #region LoginToQlFocus()
     private void LoginToQlFocus()
     {
-      using (var webRequest = new WebClient())
+      using (var webRequest = new XWebClient())
       {
         webRequest.Encoding = Encoding.UTF8;
         var html = webRequest.DownloadString("http://focus.quakelive.com/focusgate/");
@@ -832,7 +823,5 @@ document.loginform.submit();";
       }
     }
     #endregion
-
-
   }
 }
