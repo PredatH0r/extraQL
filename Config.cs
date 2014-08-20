@@ -19,7 +19,7 @@ namespace ExtraQL
     public Config()
     {
       AppBaseDir = Path.GetDirectoryName(Application.ExecutablePath) ?? "";
-      if (AppBaseDir.EndsWith("\\bin\\Debug"))
+      if (AppBaseDir.ToLower().EndsWith("\\bin\\debug"))
         AppBaseDir = Path.GetDirectoryName(Path.GetDirectoryName(AppBaseDir));      
     }
     #endregion
@@ -65,7 +65,7 @@ namespace ExtraQL
       if (!String.IsNullOrEmpty(email))
       {
         string pass = settings["password"];
-        string[] pwds = !String.IsNullOrEmpty(pass) ? Cypher.DecryptString(pass).Split('\t') : new string[0];
+        string[] pwds = String.IsNullOrEmpty(pass) ? new string[0] : Cypher.DecryptString(pass).Split('\t');
 
         int i = 0;
         foreach (var mail in email.Split('\t'))
@@ -81,6 +81,10 @@ namespace ExtraQL
         foreach (var realm in realms.Trim().Split('\t'))
           this.RealmHistory.Add(realm);
       }
+
+      string masterServer = settings["masterServer"];
+      if (!masterServer.StartsWith("http"))
+        this.Set("masterServer", "http://" + masterServer);
     }
     #endregion
 
@@ -121,13 +125,13 @@ namespace ExtraQL
         emails += "\t" + entry.Key;
         pwds += "\t" + entry.Value;
       }
-      this.settings["email"] = emails.Length == 0 ? "" : emails.Substring(1);
-      this.settings["password"] = pwds.Length == 0 ? "" : Cypher.EncryptString(pwds.Substring(1));
+      this.Set("email", emails.Substring(1));
+      this.Set("password", Cypher.EncryptString(pwds.Substring(1)));
 
       string realmHistory = "";
       foreach (var realm in this.RealmHistory)
         realmHistory += realm + "\t";
-      this.settings["realmHistory"] = realmHistory;
+      this.Set("realmHistory", realmHistory);
 
       StringBuilder config = new StringBuilder();
       config.AppendLine("[extraQL]");

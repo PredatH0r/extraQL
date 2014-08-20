@@ -84,10 +84,10 @@ namespace ExtraQL
       this.updateCheckTimer = new System.Windows.Forms.Timer(this.components);
       this.panelLog = new System.Windows.Forms.Panel();
       this.grpLog = new System.Windows.Forms.GroupBox();
+      this.cbLogAllRequests = new System.Windows.Forms.CheckBox();
       this.btnClearLog = new System.Windows.Forms.Button();
       this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.txtLog = new System.Windows.Forms.TextBox();
-      this.cbLogAllRequests = new System.Windows.Forms.CheckBox();
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -253,9 +253,9 @@ namespace ExtraQL
       this.cbCheckUpdate.CheckState = System.Windows.Forms.CheckState.Checked;
       this.cbCheckUpdate.Location = new System.Drawing.Point(10, 91);
       this.cbCheckUpdate.Name = "cbCheckUpdate";
-      this.cbCheckUpdate.Size = new System.Drawing.Size(115, 17);
+      this.cbCheckUpdate.Size = new System.Drawing.Size(116, 17);
       this.cbCheckUpdate.TabIndex = 6;
-      this.cbCheckUpdate.Text = "Check for Updates";
+      this.cbCheckUpdate.Text = "Download Updates";
       this.cbCheckUpdate.UseVisualStyleBackColor = true;
       this.cbCheckUpdate.CheckedChanged += new System.EventHandler(this.cbCheckUpdate_CheckedChanged);
       // 
@@ -666,15 +666,27 @@ namespace ExtraQL
       this.grpLog.TabStop = false;
       this.grpLog.Text = "Log";
       // 
+      // cbLogAllRequests
+      // 
+      this.cbLogAllRequests.AutoSize = true;
+      this.cbLogAllRequests.Location = new System.Drawing.Point(154, 24);
+      this.cbLogAllRequests.Name = "cbLogAllRequests";
+      this.cbLogAllRequests.Size = new System.Drawing.Size(104, 17);
+      this.cbLogAllRequests.TabIndex = 16;
+      this.cbLogAllRequests.Text = "Log all Requests";
+      this.cbLogAllRequests.UseVisualStyleBackColor = true;
+      this.cbLogAllRequests.CheckedChanged += new System.EventHandler(this.cbLogAllRequests_CheckedChanged);
+      // 
       // btnClearLog
       // 
+      this.btnClearLog.BackColor = System.Drawing.SystemColors.ButtonFace;
       this.btnClearLog.ForeColor = System.Drawing.Color.Black;
       this.btnClearLog.Location = new System.Drawing.Point(367, 20);
       this.btnClearLog.Name = "btnClearLog";
       this.btnClearLog.Size = new System.Drawing.Size(96, 23);
       this.btnClearLog.TabIndex = 15;
       this.btnClearLog.Text = "Clear";
-      this.btnClearLog.UseVisualStyleBackColor = true;
+      this.btnClearLog.UseVisualStyleBackColor = false;
       this.btnClearLog.Click += new System.EventHandler(this.btnClearLog_Click);
       // 
       // cbFollowLog
@@ -700,17 +712,6 @@ namespace ExtraQL
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.txtLog.Size = new System.Drawing.Size(453, 483);
       this.txtLog.TabIndex = 13;
-      // 
-      // cbLogAllRequests
-      // 
-      this.cbLogAllRequests.AutoSize = true;
-      this.cbLogAllRequests.Location = new System.Drawing.Point(154, 24);
-      this.cbLogAllRequests.Name = "cbLogAllRequests";
-      this.cbLogAllRequests.Size = new System.Drawing.Size(104, 17);
-      this.cbLogAllRequests.TabIndex = 16;
-      this.cbLogAllRequests.Text = "Log all Requests";
-      this.cbLogAllRequests.UseVisualStyleBackColor = true;
-      this.cbLogAllRequests.CheckedChanged += new System.EventHandler(this.cbLogAllRequests_CheckedChanged);
       // 
       // MainForm
       // 

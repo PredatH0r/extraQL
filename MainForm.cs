@@ -13,9 +13,10 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.4";
+    public const string Version = "1.5";
 
     private readonly Config config;
+    private readonly Updater updater;
     private int timerCount;
     private readonly HttpServer server;
     private readonly Servlets servlets;
@@ -23,11 +24,12 @@ namespace ExtraQL
     private Size windowDragOffset;
 
     #region ctor()
-    public MainForm(Config config)
+    public MainForm(Config config, Updater updater)
     {
       InitializeComponent();
 
       this.config = config;
+      this.updater = updater;
       this.LoadSettings();
       base.Text = base.Text + " " + Version;
       this.lblVersion.Text = Version;
@@ -57,11 +59,7 @@ namespace ExtraQL
 
       this.scriptRepository.RegisterScripts();
       this.RestartHttpServer();
-      if (this.cbCheckUpdate.Checked)
-      {
-        this.CheckForUpdate();
-        this.scriptRepository.UpdateScripts(this.cbBindToAll.Checked, this.config.GetString("masterServer"));
-      }
+      this.CheckForUpdate();
 
       if (this.cbAutostartLauncher.Checked)
         this.Launch(false);
@@ -236,7 +234,15 @@ namespace ExtraQL
     private void cbCheckUpdate_CheckedChanged(object sender, EventArgs e)
     {
       if (this.cbCheckUpdate.Checked)
+      {
+        if (this.updater.UpdateAvailable != null)
+        {
+          this.SaveSettings();
+          this.updater.Run();
+          // if Run() succeeds, the .exe will terminate and start the new downloaded version
+        }
         this.CheckForUpdate();
+      }
     }
     #endregion
 
@@ -355,7 +361,7 @@ namespace ExtraQL
     #region updateCheckTimer_Tick
     private void updateCheckTimer_Tick(object sender, EventArgs e)
     {
-      this.scriptRepository.UpdateScripts(true, this.config.GetString("masterServer"));
+      this.scriptRepository.UpdateScripts(true, true, this.config.GetString("masterServer"));
     }
     #endregion
 
@@ -492,52 +498,19 @@ namespace ExtraQL
     {
       try
       {
-        WebClient client = new WebClient();
-        client.OpenReadCompleted += CheckForUpdate_OpenReadCompleted;
-        client.OpenReadAsync(new Uri("http://sourceforge.net/p/extraql/source/ci/master/tree/MainForm.cs?format=raw"));
+        this.Log(this.updater.LogBuffer.ToString());
+        this.updater.LogBuffer.Remove(0, this.updater.LogBuffer.Length);
+
+        string newerVersion = this.updater.UpdateAvailable;
+        if (newerVersion != null)
+          Log("An update for extraQL.exe version " + newerVersion + " is available. Enable  \"Download Updates\" to get the latest version");
+
+        this.scriptRepository.UpdateScripts(this.cbCheckUpdate.Checked, this.cbBindToAll.Checked, this.config.GetString("masterServer"));
       }
       catch (Exception ex)
       {
         Log("Failed to check for latest extraQL.exe version: " + ex.Message);
       }
-    }
-
-    private void CheckForUpdate_OpenReadCompleted(object sender, OpenReadCompletedEventArgs e)
-    {
-      Exception error = e.Error;
-      if (error == null)
-      {
-        try
-        {
-          var buffer = new byte[1024];
-          int len = e.Result.Read(buffer, 0, buffer.Length);
-          var code = Encoding.UTF8.GetString(buffer, 0, len);
-          var match = System.Text.RegularExpressions.Regex.Match(code, @".*Version\s*=\s*" + "\"([0-9.a-z]*)\"");
-          if (match.Success)
-          {
-            var remoteVersion = match.Groups[1].Value;
-            if (ScriptRepository.IsNewer(remoteVersion, Version))
-            {
-              Log("Update for extraQL.exe version " + remoteVersion + " is available");
-              if (MessageBox.Show(this, "Version " + remoteVersion + " of extraQL.exe is available!\n\nDo you want to open the download page?",
-                "Update Check", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-              {
-                Process.Start("http://sourceforge.net/projects/extraql/files/");
-              }
-            }
-            else
-              Log("extraQL.exe is up-to-date");
-          }
-          ((WebClient) sender).Dispose();
-        }
-        catch (Exception ex)
-        {
-          error = ex;
-        }
-      }
-
-      if (error != null)
-        Log("Failed to check for latest extraQL.exe version: " + error.Message);
     }
     #endregion
 

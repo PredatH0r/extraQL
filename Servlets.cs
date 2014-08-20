@@ -62,6 +62,7 @@ namespace ExtraQL
       RegisterServlet(AddScriptRoute, AddScript);
       RegisterServlet("/bringToFront", BringToFront);
       RegisterServlet("/repository.json", RepositoryJson);
+      RegisterServlet("/extraQL.exe", ExtraQlExe);
     }
 
     #endregion
@@ -116,7 +117,7 @@ namespace ExtraQL
     /// <param name="request"></param>
     private void GetLocalScript(Stream stream, Uri uri, string request)
     {
-      DeliverFileOrDirectoryListing(stream, uri, "scripts", @".*\.usr\.js$");
+      DeliverFileOrDirectoryListing(stream, uri, "scripts", @".*\.usr\.js$", "text/javascript");
     }
 
     #endregion
@@ -128,7 +129,7 @@ namespace ExtraQL
     /// </summary>
     private void GetImage(Stream stream, Uri uri, string request)
     {
-      DeliverFileOrDirectoryListing(stream, uri, "images");
+      DeliverFileOrDirectoryListing(stream, uri, "images", "*", "image/png");
     }
 
     #endregion
@@ -449,6 +450,25 @@ namespace ExtraQL
     }
     #endregion
 
+    #region ExtraQlExe()
+    /// <summary>
+    /// Deliver the .exe binary (for auto-update of downstream extraQL.exe clients)
+    /// </summary>
+    private void ExtraQlExe(Stream stream, Uri uri, string request)
+    {
+      var data = File.ReadAllBytes(Application.ExecutablePath);
+
+      var writer = new StreamWriter(stream);
+      writer.WriteLine("HTTP/1.1 200 OK");
+      writer.WriteLine("Access-Control-Allow-Origin: *"); // allow QL scripts to request URLs from this server
+      writer.WriteLine("Content-Length: " + data.Length);
+      writer.WriteLine("Content-Type: application/octet-stream");
+      writer.WriteLine();
+      writer.Flush();
+      stream.Write(data, 0, data.Length);
+    }
+    #endregion
+
     // internal methods
 
     #region EnableScripts
@@ -498,7 +518,7 @@ namespace ExtraQL
     /// <summary>
     ///   Delivers a directory listing or the contents of a local file (relative to the server root and an additional basePath)
     /// </summary>
-    private void DeliverFileOrDirectoryListing(Stream stream, Uri uri, string basePath, string pattern = null)
+    private void DeliverFileOrDirectoryListing(Stream stream, Uri uri, string basePath, string pattern, string contentType)
     {
       string absPath = this.GetFilePath(uri, basePath);
       var writer = new StreamWriter(stream);
@@ -517,6 +537,8 @@ namespace ExtraQL
       writer.WriteLine("HTTP/1.1 200 OK");
       writer.WriteLine("Access-Control-Allow-Origin: *"); // allow QL scripts to request URLs from this server
       writer.WriteLine("Content-Length: " + data.Length);
+      if (contentType != null)
+        writer.WriteLine("Content-Type: " + contentType);
       writer.WriteLine();
       writer.Flush();
       stream.Write(data, 0, data.Length);

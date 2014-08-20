@@ -24,6 +24,13 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.5
+---
+- extraQL.exe can now update itself
+- fixed startup error on Windows XP/2003 (caused by Crypto API limitations)
+- fixed slow script update/download
+- changed "Check for Updates" into "Download updates" (extraQL will now always check if there are updates)
+
 Version 1.4
 ---
 - implemented HTTPS support

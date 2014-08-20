@@ -48,10 +48,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
@@ -65,9 +67,19 @@
     <Compile Include="HttpServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UpdateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UpdateForm.Designer.cs">
+      <DependentUpon>UpdateForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Updater.cs" />
     <Compile Include="XWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
+    <EmbeddedResource Include="UpdateForm.resx">
+      <DependentUpon>UpdateForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="https\install.cmd" />
     <None Include="https\localhost.cer" />
     <None Include="https\localhost.pfx" />
@@ -133,6 +145,7 @@
     <None Include="resources\minimize.png" />
     <None Include="scripts\autoInvite.usr.js" />
     <None Include="scripts\escaper.usr.js" />
+    <None Include="scripts\altBrowser.usr.js" />
     <Content Include="scripts\attic\extGraphHist.usr.js" />
     <None Include="scripts\extStats.usr.js" />
     <None Include="scripts\friendCommands.usr.js" />

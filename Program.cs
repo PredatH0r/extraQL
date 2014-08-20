@@ -6,6 +6,8 @@ namespace ExtraQL
 {
   static class Program
   {
+    public const string PostUpdateSwitch = "-postupdate";
+
     #region Main()
     [STAThread]
     static void Main()
@@ -15,13 +17,20 @@ namespace ExtraQL
 
       try
       {
+        bool isPostUpdate = Environment.CommandLine == PostUpdateSwitch;
+
         Config config = new Config();
         config.LoadSettings();
-        if (ActivateRunningInstance(config.GetBool("https"))) 
+        if (!isPostUpdate && ActivateRunningInstance(config.GetBool("https"))) 
           return;
 
         Application.EnableVisualStyles();
-        Application.Run(new MainForm(config));
+
+        var updater = new Updater(config);
+        if (!isPostUpdate)
+          updater.Run();
+
+        Application.Run(new MainForm(config, updater));
       }
       catch (Exception ex)
       {

@@ -34,7 +34,7 @@ namespace ExtraQL
 
     public HttpServer(string certFile)
     {
-      this.cert = new X509Certificate2(certFile);
+      this.cert = new X509Certificate2(certFile, "extraQL"); // windows XP fails if the .pxf file has no password
       hresultGetter = typeof (Exception).GetProperty("HResult", BindingFlags.Instance | BindingFlags.NonPublic);
     }
 
@@ -127,6 +127,7 @@ namespace ExtraQL
     #endregion
 
     #region Stop()
+
     public void Stop()
     {
       if (!this.started || this.shutdownInProgress)
@@ -134,13 +135,20 @@ namespace ExtraQL
       this.shutdownInProgress = true;
       this.shutdownComplete.Reset();
       // connect to the service port so that the AcceptLoop thread unblocks and can terminate
-      using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+      try
       {
-        IPEndPoint localServiceEndPoint = this.EndPoint.Address.ToString()  == "0.0.0.0" ? 
-          new IPEndPoint(IPAddress.Loopback, this.EndPoint.Port) : 
-          this.EndPoint;
-        client.Connect(localServiceEndPoint);
-        client.Send(new byte[] {0});
+        using (Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+        {
+          IPEndPoint localServiceEndPoint = this.EndPoint.Address.ToString() == "0.0.0.0"
+            ? new IPEndPoint(IPAddress.Loopback, this.EndPoint.Port)
+            : this.EndPoint;
+          client.Connect(localServiceEndPoint);
+          client.Send(new byte[] {0});
+        }
+      }
+      catch (SocketException)
+      {
+        // happens when Stop() is called through the finalizer
       }
       this.shutdownComplete.WaitOne();
       this.shutdownInProgress = false;
