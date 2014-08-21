@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.96
+// @version        1.97
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -14,6 +14,9 @@
 // ==/UserScript==
 
 /*
+
+Version 1.97
+- fixed duplicated player rows
 
 Version 1.96
 - added average team elo to server browser details
@@ -1843,6 +1846,7 @@ $("body").on("mouseover", "a", function() {
     oldRenderMatchDetails.call(quakelive.matchcolumn, node, server);
     if (busy)
       return;
+
     $("#browser_details button.join-server").attr("id", "joinServerButton");
     busy = true;
     try {
@@ -1867,6 +1871,7 @@ $("body").on("mouseover", "a", function() {
         sortStyle = "";
 
       QLRD.waitFor(playerList, server.gt.name, function(error, players, gt) {
+        busy = false;
         if (error) return;
         $.each(nodeByName, function(name, elem) {
           var $node = $(elem);
@@ -1890,6 +1895,7 @@ $("body").on("mouseover", "a", function() {
 
         if (sortStyle) {
           // reorder players
+          $("#browser_details ul.players").empty(); // prevent double-fill
           playerSortInfos.sort(function(player1, player2) {
             var key1 = sortCriteria(player1, sortStyle);
             var key2 = sortCriteria(player2, sortStyle);
@@ -1933,7 +1939,7 @@ $("body").on("mouseover", "a", function() {
       console.log(e);
     }
     finally {
-      busy = false;
+
     }
 
     function sortCriteria(player, sortPref) {
