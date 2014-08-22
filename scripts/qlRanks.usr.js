@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.97
+// @version        1.98
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -14,6 +14,9 @@
 // ==/UserScript==
 
 /*
+
+Version 1.98
+- fixed timing issue when delayed QLRanks data arrives and a different server has been selected in the meantime
 
 Version 1.97
 - fixed duplicated player rows
@@ -1840,115 +1843,115 @@ $("body").on("mouseover", "a", function() {
     "#joinServerButton.eloMatch { border: 3px solid #2F4 !important; color: #2F4 !important; }"
   ]);
   var oldRenderMatchDetails = quakelive.matchcolumn.RenderMatchDetails;
-  var busy = false;
+  var currentServer;
 
   quakelive.matchcolumn.RenderMatchDetails = function(node, server) {
+    currentServer = server;
     oldRenderMatchDetails.call(quakelive.matchcolumn, node, server);
-    if (busy)
+
+    var playerList = [];
+    var nodeByName = {};
+    $("#browser_details ul.players li").each(function() {
+      var $this = $(this);
+      var res = RE_profile.exec($this.find("a").attr("href"));
+      if (res && res[1]) {
+        var name = res[1].toLowerCase();
+        playerList.push({ "name": name });
+        nodeByName[name] = this;
+      }
+    });
+    if (playerList.length == 0)
       return;
 
     $("#browser_details button.join-server").attr("id", "joinServerButton");
-    busy = true;
-    try {
-      var playerList = [];
-      var nodeByName = {};
-      var playerSortInfos = [];
-      $("#browser_details ul.players li").each(function() {
-        var $this = $(this);
-        var res = RE_profile.exec($this.find("a").attr("href"));
-        if (res && res[1]) {
-          var name = res[1].toLowerCase();
-          playerList.push({ "name": name });
-          nodeByName[name] = this;
-        }
-      });
-      if (playerList.length == 0)
+
+    requestQlranksData(server, nodeByName, playerList);
+  }
+
+  function requestQlranksData(requestedServer, nodeByName, playerList) {
+    QLRD.waitFor(playerList, requestedServer.gt.name, function(error, players, gt) {
+      if (error) 
         return;
+
+      if (requestedServer != currentServer) // data arrived after user already selected another server
+        return;
+
       var sortStyle = quakelive.cvars.Get("_qlrd_browserSort");
-      if (sortStyle) 
+      if (sortStyle)
         sortStyle = sortStyle.value;
       if (sortStyle != "elo" && sortStyle != "team")
         sortStyle = "";
 
-      QLRD.waitFor(playerList, server.gt.name, function(error, players, gt) {
-        busy = false;
-        if (error) return;
-        $.each(nodeByName, function(name, elem) {
-          var $node = $(elem);
-          if (sortStyle)
-            $node.detach();
-          var player = QLRD.PLAYERS[name];
-          var elo = player && player[gt] && player[gt].elo ? player[gt].elo : "???";
-          player.rating = elo;
-          $node.append("<div class='elo'><a href='http://www.qlranks.com/" + gt + "/player/" + name + "' target='_blank'>" + elo + "</a></div>");
+      var playerSortInfos = [];
+      $.each(nodeByName, function(name, elem) {
+        var $node = $(elem);
+        var player = QLRD.PLAYERS[name];
+        var elo = player && player[gt] && player[gt].elo ? player[gt].elo : "???";
+        player.rating = elo;
+        $node.append("<div class='elo'><a href='http://www.qlranks.com/" + gt + "/player/" + name + "' target='_blank'>" + elo + "</a></div>");
+        if (sortStyle)
+          $node.detach();
 
-          var team = 0;
-          var $img = $node.children("img");
-          if ($img.hasClass("lgi_bordercolor_1"))
-            team = 1;
-          else if ($img.hasClass("lgi_bordercolor_2"))
-            team = 2;
-          else if ($img.hasClass("lgi_bordercolor_3"))
-            team = 3;
-          playerSortInfos.push({ "name": name, "rating": elo, "team": team });
+        var team = 0;
+        var $img = $node.children("img");
+        if ($img.hasClass("lgi_bordercolor_1"))
+          team = 1;
+        else if ($img.hasClass("lgi_bordercolor_2"))
+          team = 2;
+        else if ($img.hasClass("lgi_bordercolor_3"))
+          team = 3;
+        playerSortInfos.push({ "name": name, "rating": elo, "team": team });
+      });
+
+      if (sortStyle) {
+        // reorder players
+        $("#browser_details ul.players").empty(); // prevent double-fill
+        playerSortInfos.sort(function(player1, player2) {
+          var key1 = sortCriteria(player1, sortStyle);
+          var key2 = sortCriteria(player2, sortStyle);
+          return key1 < key2 ? -1 : key1 == key2 ? 0 : +1;
         });
-
-        if (sortStyle) {
-          // reorder players
-          $("#browser_details ul.players").empty(); // prevent double-fill
-          playerSortInfos.sort(function(player1, player2) {
-            var key1 = sortCriteria(player1, sortStyle);
-            var key2 = sortCriteria(player2, sortStyle);
-            return key1 < key2 ? -1 : key1 == key2 ? 0 : +1;
-          });
-          window.debugVal = players;
-        }
-        var $list = $("#browser_details ul.players");
-        var avgScoreSum = 0, avgRedSum = 0, avgBlueSum = 0;
-        var avgScoreCount = 0, avgRedCount = 0, avgBlueCount = 0;
-        $.each(playerSortInfos, function(idx, player) {
-          if (sortStyle)
-            $list.append(nodeByName[player.name]);
-          var rating = player.rating;
-          if (rating > 0) {
-            if (player.team == 1) {
-              ++avgRedCount;
-              avgRedSum += rating;
-            }
-            else if (player.team == 2) {
-              ++avgBlueCount;
-              avgBlueSum += rating;
-            }
-            if (player.team != 3) {
-              ++avgScoreCount;
-              avgScoreSum += rating;              
-            }
+      }
+      var $list = $("#browser_details ul.players");
+      var avgScoreSum = 0, avgRedSum = 0, avgBlueSum = 0;
+      var avgScoreCount = 0, avgRedCount = 0, avgBlueCount = 0;
+      $.each(playerSortInfos, function(idx, player) {
+        if (sortStyle)
+          $list.append(nodeByName[player.name]);
+        var rating = player.rating;
+        if (rating > 0) {
+          if (player.team == 1) {
+            ++avgRedCount;
+            avgRedSum += rating;
+          } else if (player.team == 2) {
+            ++avgBlueCount;
+            avgBlueSum += rating;
           }
-        });
-        if (avgScoreCount > 0) {
-          var avg = Math.floor(avgScoreSum / avgScoreCount);
-          var red = avgRedCount > 0 ? "<span class='eloSumRed'>Red: " + Math.floor(avgRedSum/avgRedCount) + "</span>" : "";
-          var blue = avgBlueCount > 0 ? "<span class='eloSumBlue'>Blue: " + Math.floor(avgBlueSum/avgBlueCount) + "</span>" : "";
-          $list.append("<li class='eloSummary'><span class='eloSumAvg'>Avg:</span>" + red + blue + "<b id='qlrdBrowserSort' title='use \"/elo help\" and \"/elo sort=x\" to set a sort criteria'>[sort]</b><div class='elo'>" + avg + "</div><li>");
-          var me = QLRD.PLAYERS[quakelive.username.toLowerCase()];
-          if (me && me[gt] && me[gt].elo && Math.abs(avg - me[gt].elo) <= ELO_DIFF_FOR_GREEN_JOIN_BUTTON)
-            $("#joinServerButton").addClass("eloMatch");
+          if (player.team != 3) {
+            ++avgScoreCount;
+            avgScoreSum += rating;
+          }
         }
       });
-    } catch (e) {
-      console.log(e);
-    }
-    finally {
 
-    }
-
-    function sortCriteria(player, sortPref) {
-      var score = player.rating;
-      score = isNaN(parseInt(score)) ? "9999" : ("0000" + (10000 - score)).substr(-4);
-      var isSpec = player.team == 3 ? "1" : "0";
-      var crit = sortPref == "team" ? player.team + score + player.name : isSpec + score + player.name;
-      return crit;
-    }
-
+      if (avgScoreCount > 0) {
+        var avg = Math.floor(avgScoreSum / avgScoreCount);
+        var red = avgRedCount > 0 ? "<span class='eloSumRed'>Red: " + Math.floor(avgRedSum / avgRedCount) + "</span>" : "";
+        var blue = avgBlueCount > 0 ? "<span class='eloSumBlue'>Blue: " + Math.floor(avgBlueSum / avgBlueCount) + "</span>" : "";
+        $list.append("<li class='eloSummary'><span class='eloSumAvg'>Avg:</span>" + red + blue + "<b id='qlrdBrowserSort' title='use \"/elo help\" and \"/elo sort=x\" to set a sort criteria'>[sort]</b><div class='elo'>" + avg + "</div><li>");
+        var me = QLRD.PLAYERS[quakelive.username.toLowerCase()];
+        if (me && me[gt] && me[gt].elo && Math.abs(avg - me[gt].elo) <= ELO_DIFF_FOR_GREEN_JOIN_BUTTON)
+          $("#joinServerButton").addClass("eloMatch");
+      }
+    });
   }
+
+  function sortCriteria(player, sortPref) {
+    var score = player.rating;
+    score = isNaN(parseInt(score)) ? "9999" : ("0000" + (10000 - score)).substr(-4);
+    var isSpec = player.team == 3 ? "1" : "0";
+    var crit = sortPref == "team" ? player.team + score + player.name : isSpec + score + player.name;
+    return crit;
+  }
+
 })();
