@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.98
+// @version        1.99
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -14,6 +14,10 @@
 // ==/UserScript==
 
 /*
+
+Version 1.99
+- fixed sorting of "/elo score" with format=list
+- changed colors for format=table
 
 Version 1.98
 - fixed timing issue when delayed QLRanks data arrives and a different server has been selected in the meantime
@@ -1268,7 +1272,7 @@ function announce(val) {
         if (newStyle) {
           for (var i = 0, out = [], len = players_copy.length; i < len; ++i) {
 
-            var color = "^7";
+            var color = "^5";
 
             if (players_copy[i].team == 2) {
               color = "^4";
@@ -1278,13 +1282,13 @@ function announce(val) {
               reds.push(players_copy[i].elo);
             }
 
-            out.push(color + pad(players_copy[i].name.replace(/\_nova$/i, "sexy!nova"), 10).substr(0,10) + "^7 " + pad(players_copy[i].elo, -4));
+            out.push(color + pad(players_copy[i].name.replace(/\_nova$/i, "sexy!nova"), 10).substr(0,10) + " " + pad(players_copy[i].elo, -4));
 
             // Group by 4, delaying commands as needed
             if ((i + 1) % 4 == 0 || (i + 1) == len) {
               setTimeout(function(txt, isLast) {
                 qz_instance.SendGameCommand(currentOut + " \"" + txt + "\";");
-              }.bind(null, out.join("|"), (i + 1) == len), mul++ * step);
+              }.bind(null, out.join("^3|"), (i + 1) == len), mul++ * step);
               out = [];
             }
           }
@@ -1332,8 +1336,8 @@ function announce(val) {
           }
 
           qz_instance.SendGameCommand(currentOut + " ^2[QLRD] " + gt.toUpperCase() + " results:;");
-          for (var i = 0, out = [], len = players.length; i < len; ++i) {
-            out.push("^5" + players[i].name + " ^7(^3" + players[i].elo + "^7)");
+          for (var i = 0, out = [], len = players_copy.length; i < len; ++i) {
+            out.push("^5" + players_copy[i].name + " ^3" + players_copy[i].elo + "^7");
 
             // Group by 4, delaying commands as needed
             if ((i+1) % 4 == 0 || (i+1) == len) {
