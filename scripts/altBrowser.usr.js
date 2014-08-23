@@ -707,8 +707,8 @@ function serverMatchesFilter(aServer, aFilter) {
 
 // Filters servers to those matching the include, and not matching the exclude, criteria
 AltServerListView.prototype.FilterServerList = function(aServers) {
-  var includeTxt = (localStorage[config.filters.include.id] || "").trim()
-    , excludeTxt = (localStorage[config.filters.exclude.id] ||  "").trim()
+  var includeTxt = (localStorage[config.filters.include.id] || "").trim().toLowerCase()
+    , excludeTxt = (localStorage[config.filters.exclude.id] ||  "").trim().toLowerCase()
     ;
 
   // Filter format:  keyword1, keyword2 + keyword3, , keyword5 + keyword6 + keyword7
