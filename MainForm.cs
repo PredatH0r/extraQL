@@ -650,7 +650,7 @@ namespace ExtraQL
         si.FileName = cmd;
       }
 
-      if (!String.IsNullOrEmpty(realmUrl))
+      if (this.cbFocus.Checked && !String.IsNullOrEmpty(realmUrl))
         si.Arguments += "--realm=\"" + realmUrl + "\"";
 
       try
