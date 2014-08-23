@@ -644,6 +644,13 @@ function componentMatchesServer(aComponent, aServer) {
   // Match premium
   if (aServer.premium && "premium" === aComponent) return true;
 
+  // Match ranked/unranked
+  if (aServer.ranked && "ranked" === aComponent) return true;
+  if (!aServer.ranked && "unranked" === aComponent) return true;
+
+  // Match password(ed)
+  if (aServer.g_needpass && ("password" === aComponent || "passworded" === aComponent || "password protected" === aComponent)) return true;
+
   // Match a specific modification or special modification keywords
   var usesMods = !!aServer.owner && (1 !== aServer.ruleset || 0 !== aServer.g_customSettings);
   if (usesMods) {
