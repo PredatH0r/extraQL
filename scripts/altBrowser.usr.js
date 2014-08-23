@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             qlAltBrowser
 // @name           Quake Live Alt Browser
-// @version        0.02
+// @version        0.12
 // @description    A different Quake Live server browser with filtering and other tweaks
 // @namespace      phob.net
 // @author         wn
@@ -136,11 +136,15 @@ var TMPL_row = [
 var TMPL_help = [
     "<p>Enter comma-delimited values (partial or complete) that servers must meet to be included or excluded.  Supported value types include:</p>"
   , "<ul>"
-  ,   "<li><b>Location:</b> 'New York' or 'Frankfurt'</li>"
-  ,   "<li><b>Map name:</b> 'Campgrounds'</li>"
-  ,   "<li><b>Game mode:</b> 'ffa'</li>"
-  ,   "<li><b>Server size:</b> '/16'</li>"
-  ,   "<li><b>Keywords:</b> 'qlab.open' (playable slots available), 'mods' (server modifications)</li>"
+  ,   "<li><b>Location:</b> 'New York', 'Frankfurt', 'Russia', etc. (country or city; hover over column)</li>"
+  ,   "<li><b>Map name:</b> 'Campgrounds', 'Blood Run', etc.</li>"
+  ,   "<li><b>Game mode:</b> 'ffa', 'ctf', 'clan arena', etc. (hover over icons)</li>"
+  ,   "<li><b>Server size:</b> '/16', '/4', etc.</li>"
+  ,   "<li><b>Ranking:</b> 'ranked', 'unranked'</li>"
+  ,   "<li><b>Skill level:</b> 'Unrestricted', 'Skill Matched', etc. (hover over icons)</li>"
+  ,   "<li><b>Passworded:</b> 'password', 'passworded', 'password protected'</li>"
+  ,   "<li><b>Modifications:</b> 'mods', 'modifications', 'air control', 'headshots', etc. (hover over icons)</li>"
+  ,   "<li><b>Special keywords:</b> 'qlab.open' (playable slots available)</li>"
   , "</ul>"
   , "<p>It is possible to combine keywords to make a filter segment more specific.  For example:</p>"
   , "<p><code>New York + Campgrounds, Warsaw + qlab.open, ffa, /16</code><p>"
