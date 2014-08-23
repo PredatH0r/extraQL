@@ -73,7 +73,7 @@ var console = window.console;
   // it is probably only in the config object below.
   // !!!
   var config = {
-    version: "1.4",
+    version: "1.6",
     consoleCaption: "hook.js v",
     menuCaption: "Userscripts",
     BASE_URLS: [ "http://localhost:27963/", "https://localhost:27963/", "http://ql.beham.biz:27963/" ],
