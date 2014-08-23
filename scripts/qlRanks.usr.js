@@ -5,6 +5,7 @@
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
+// @screenshot     http://beham.biz/extraql/qlranks2.png
 // @author         wn,szr,syncore,simonov,PredatH0r,ecs
 // @contributor    szr
 // @contributor    syncore

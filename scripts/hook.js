@@ -1,11 +1,15 @@
 ﻿/*
 // @name        extraQL Script Manager
-// @version     1.4
+// @version     1.6
 // @author      wn, PredatH0r
 // @description	Manages the installation and execution of QuakeLive userscripts
 
 This script is a stripped down version of wn's QuakeLive Hook Manager (QLHM),
 which is designed to work with a local or remote extraQL.exe script server.
+
+Version 1.6
+- added link to Wiki page in Script Management / Script details
+- showing screenshot in Script Management / Script details
 
 Version 1.4
 - HTTPS compatibility
@@ -568,6 +572,9 @@ var console = window.console;
     var author = e(repoScript.author);
     var version = e(repoScript.version || "<i>not installed</i>");
     var descr = e(repoScript.description || "");
+    var scriptName = repoScript.filename.replace(".usr.js", "");
+    var wikiUrl = "http://sourceforge.net/p/extraql/wiki/" + scriptName + "/";
+    var screenshot = repoScript.screenshot || "http://beham.biz/extraql/" + scriptName.toLowerCase() + "1.png";
 
     if (repoScript && repoScript.note)
       descr = descr + (!descr ? "" : "<br><br>") + "<b>NOTE:</b><br>" + repoScript.note;
@@ -579,9 +586,12 @@ var console = window.console;
       + "</div>"
       + "<div class='row'><div class='cell'><b>Author:</b></div><div class='cell'>" + author + "</div></div>"
       + "<div class='row'><div class='cell'><b>Version:</b></div><div class='cell'>" + version + "</div></div>"
+      + "<div class='row'><div class='cell'><b>Wiki:</b></div><div class='cell'><a href='" + wikiUrl + "' target='_blank'>" + e(scriptName) + "</a></div></div>"
       + "</div>"
       + "<br>" + (descr ? ("<p>" + descr + "</p><br>") : "")
+      + "<a href='" + wikiUrl + "' target='_blank'><img id='scriptDetailScreenshot' src='" + screenshot + "' style='margin-top: 30px; max-width: 260px; max-height: 280px' alt='" + e(scriptName) + "'></a>"
     );
+    $("#scriptDetailScreenshot").error(function() { $(this).hide(); });
   };
 
   HudManager.prototype.handleConsoleOk = function() {
