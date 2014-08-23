@@ -597,6 +597,17 @@ var RE_comma = /\s*,\s*/
     , RE_ping = /(?:\-|ping<(\d+))/i
     ;
 
+// SkillSettings.desc => [skillDelta]
+var skills = {
+    "Your Skill Too Low": [-3]
+  , "Your Skill Too High": [-2]
+  , "Unrestricted Match": [-1]
+  , "Your Skill Higher": [0]
+  , "Skill Matched": [1]
+  , "More Challenging": [2]
+  , "Very Difficult": [3,4]
+}
+
 // ["a +  b", "c+d", "", "e"] --> [["a","b"],["c","d], ["e"]]
 function parseFilter(aFilter) {
   var subfilters = [];
@@ -650,6 +661,15 @@ function componentMatchesServer(aComponent, aServer) {
 
   // Match password(ed)
   if (aServer.g_needpass && ("password" === aComponent || "passworded" === aComponent || "password protected" === aComponent)) return true;
+
+  // Match skill/rank
+  for (var s in skills) {
+    if (s.match(RE_component)) {
+      for (var i = 0, e = skills[s].length; i < e; ++i) {
+        if (aServer.skillDelta === skills[s][i]) return true;
+      }
+    }
+  }
 
   // Match a specific modification or special modification keywords
   var usesMods = !!aServer.owner && (1 !== aServer.ruleset || 0 !== aServer.g_customSettings);
