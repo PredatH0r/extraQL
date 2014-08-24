@@ -18,6 +18,7 @@
 /*
 
 Version 1.100
+- /elo shuffle now ignores specs, but allows overrides using /elo shuffle,+name1,-name2,...
 - code cleanup, so there are no more warnings in VisualStudio 2013 with ReSharper
 - minor bux fixes
 - added @unwrap, so that javascript error messages show correct file name and line info (when cvar eql_unwrap=1)
@@ -83,6 +84,7 @@ var console = window.console;
 var document = window.document;
 var localStorage = window.localStorage;
 var mapdb = window.mapdb;
+var extraQL = window.extraQL;
 
 (function() {
   // Don't bother if Quake Live is down for maintenance
@@ -229,7 +231,7 @@ var mapdb = window.mapdb;
         return;
       }
 
-      var msg = (aIsError ? "^1[QLRD ERROR]" : "^2[QLRD]") + " ^7" + aMsg + ";";
+      var msg = (aIsError ? "^1[QLRD]" : "^2[QLRD]") + " ^7" + aMsg + ";";
       qz_instance.SendGameCommand("echo " + msg);
 
       if (aIsError) {
@@ -1037,10 +1039,10 @@ var mapdb = window.mapdb;
       quakelive.cvars.Set("_qlrd_browserSort", val.substr(5, val.length - 5));
     else if (val == "games")
       games("1");
-    else if (val == "shuffle")
-      shuffle("1", false);
-    else if (val == "shuffle!")
-      shuffle("1", true);
+    else if (val.indexOf("shuffle!") == 0)
+      shuffle("1", true, val.substr(8));
+    else if (val.indexOf("shuffle") == 0)
+      shuffle("1", false, val.substr(7));
     else
       qz_instance.SendGameCommand("echo " + CMD_USAGE);
     qz_instance.SendGameCommand("set " + CMD_NAME + "\"\"");
@@ -1346,7 +1348,7 @@ var mapdb = window.mapdb;
 
   }
 
-  function shuffle(val, doit) {
+  function shuffle(val, doit, args) {
     if (1 !== parseInt(val) || !quakelive.IsGameRunning()) {
       return;
     }
@@ -1387,12 +1389,10 @@ var mapdb = window.mapdb;
           return;
         }
 
-        QLRD.igAnnounce("Collecting QLRanks.com data (" + server.players.length
-          + " players)...", false);
+        QLRD.igAnnounce("Collecting QLRanks.com data...", false);
 
         // Wait for all server players to be available in the QLRD cache.
         var names = $.map(server.players, function(p) { return { "name": p.name } });
-
         QLRD.waitFor(names, gt, function(error, players) {
           // Always clear the active request flag.
           QLRD.activeServerReq = false;
@@ -1403,34 +1403,34 @@ var mapdb = window.mapdb;
             return;
           }
 
-          var index = 0;
-
           function getQlmPlayerByName(players, name) {
             for (var p = 0; p < players.length; p++)
               if (players[p].name == name) return players[p];
-            return undefined;
+            return {};
           }
 
-          var players_copy = $.map(server.players,
-            function(p) {
-              return {
+          args = "," + args + ",";
+          var index = 0;
+          var players_copy = [];
+          $.each(server.players, function (i, p) {
+            var name = p.name.toLowerCase();
+            // skip specs by default, but allow overrides via comma separated +playername and -playername args
+            if (args.indexOf(",+" + name + ",") >= 0 || (args.indexOf(",-" + name + ",") < 0 && p.team >= 1 && p.team <= 2)) {
+              players_copy.push({
                 "name": p.name,
                 "elo": parseInt(getQlmPlayerByName(players, p.name).elo),
                 "team": p.team,
                 "index": index++,
                 "candidateTeam": -1
-              }
-            });
+              });
+            }
+          });
 
-          //extraQL.log("Mapped players_copy");
-          //extraQL.log("shuffle func");
-
-          if (players_copy.length % 2 != 0
-            || players_copy.length < 2) {
-            QLRD.igAnnounce(("Need at least 2 people and an even number of people, currently " + players_copy.length + " people"), true);
+          if (players_copy.length % 2 != 0 || players_copy.length < 2) {
+            QLRD.igAnnounce(("Shuffle needs an even number of players, currently " + players_copy.length), true);
+            QLRD.igAnnounce(("Use ^3/elo shuffle,+player1,-player2^7 to add/remove players"), true);
             return;
           }
-
 
           var bestdiff = 1e8;
           var best_shuff = null;
@@ -1539,23 +1539,6 @@ var mapdb = window.mapdb;
 
           //extraQL.log("sort done");
 
-          var players = best_shuff;
-
-          // Display the results.
-          // NOTE: mul is "1" to separate the header from the results
-          var mul = 1,
-            currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value,
-            step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
-
-          // Show the chat pane for 10 seconds if output method is 'print',
-          // otherwise it will be difficult to notice.
-          if ("print" == currentOut) {
-            qz_instance.SendGameCommand("+chat;");
-            window.setTimeout(function() {
-              qz_instance.SendGameCommand("-chat;");
-            }, 10E3);
-          }
-
           blues = [];
           reds = [];
           for (var i = 0; i < best_shuff.length; i++) {
@@ -1584,42 +1567,61 @@ var mapdb = window.mapdb;
 
           var redsavg = Math.round(redcount / reds.length);
 
-          //extraQL.log("final");
+          // Display the results.
+          // NOTE: mul is "1" to separate the header from the results
+          var mul = 1,
+            currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value,
+            step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
+
+          // Show the chat pane for 10 seconds if output method is 'print',
+          // otherwise it will be difficult to notice.
+          if ("print" == currentOut) {
+            qz_instance.SendGameCommand("+chat;");
+            window.setTimeout(function () {
+              qz_instance.SendGameCommand("-chat;");
+            }, 10E3);
+          }
 
           var delta = Math.floor(Math.abs(redsavg - blueavg));
 
-          var desc = "^1ragequit^7";
-          if (delta < 300) desc = "^1unplayable^7";
-          if (delta < 200) desc = "^1very unbalanced^7";
-          if (delta < 150) desc = "unbalanced";
-          if (delta < 100) desc = "challenging^7";
-          if (delta < 80) desc = "^4balanced";
-          if (delta < 40) desc = "^4very balanced^7";
+          var desc = "^1ragequit";
+          if (delta < 300) desc = "^1unplayable";
+          if (delta < 200) desc = "^1very unbalanced";
+          if (delta < 150) desc = "^6unbalanced";
+          if (delta < 100) desc = "^3challenging";
+          if (delta < 80) desc = "^2balanced";
+          if (delta < 40) desc = "^2very balanced";
 
           var desc_word = "optimum";
           if (doit) desc_word = "performing";
 
-          qz_instance.SendGameCommand(currentOut + " ^4*^7 " + desc_word + " elo shuffle ^4* ^1" + reds.length + "@" + redsavg + "elo ^4" + blues.length + "@" + blueavg + "elo ^7Gap: " + delta + " (" + desc + ");");
+          qz_instance.SendGameCommand(currentOut + " \"^3" + desc_word + " elo shuffle: ^1" + redsavg + "(" + reds.length + ") " + "^4" +blueavg + "(" + blues.length + ") ^3Gap: " + delta + " ^7(" + desc + "^7)\"");
 
-          for (var i = 0, out = [], len = players.length; i < len; ++i) {
+          var prevTeam = best_shuff[0].team;
+          var teamMemberCount = 0;
+          for (var i = 0, out = [], len = best_shuff.length; i <= len; ++i) {
+            // Group by 6, delaying commands as needed
+            var curTeam = i == len ? prevTeam : best_shuff[i].team;
+            if (++teamMemberCount % 6 == 0 || i == len || curTeam != prevTeam) {
+              window.setTimeout(function (txt) {
+                qz_instance.SendGameCommand(currentOut + " \"" + txt + "\"");
+              }.bind(null, out.join("^7 ")), mul++ * step);
+              out = [];
+            }
+            if (i == len)
+              break;
+
+            if (curTeam != prevTeam)
+              teamMemberCount = 0;
+            prevTeam = curTeam;
 
             var color = "^7";
-
             if (best_shuff[i].team == 2) {
               color = "^4";
             } else if (best_shuff[i].team == 1) {
               color = "^1";
             }
-
-            out.push(color + best_shuff[i].name.replace(/.nova/i, "sexyBiTcHnova"));
-
-            // Group by 4, delaying commands as needed
-            if ((i + 1) % 4 == 0 || (i + 1) == len) {
-              window.setTimeout(function(txt) {
-                qz_instance.SendGameCommand(currentOut + " " + txt + "; ");
-              }.bind(null, out.join("^7 "), (i + 1) == len), mul++ * step);
-              out = [];
-            }
+            out.push(color + pad(best_shuff[i].name.substr(0,12), 12, " ") + "^7|");
           }
         });
       },
@@ -1629,7 +1631,6 @@ var mapdb = window.mapdb;
       }
     });
   }
-
 
   function pad(text, minLength, paddingChar) {
     if (text === undefined || text == null) text = "";
