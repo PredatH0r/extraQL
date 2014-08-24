@@ -1,13 +1,16 @@
 // ==UserScript==
 // @id          links
 // @name        Links to QL related Websites
-// @version     5.0
+// @version     6
 // @author      PredatH0r
 // @description	Adds a "Links" menu with links to important QL related websites
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 6
+- replaced link for "Duel Spawn Logic"
 
 Version 5.0
 - added http://qlmm.gameboni.com/
@@ -53,7 +56,7 @@ Version 1.0
         "Yakumo's QL Guide": { newwindow: "http://www.quakelive.com/forum/showthread.php?831-The-Ultimate-Quake-Live-Guide", "class": "sep" },
         "QL Console Guide": { newwindow: "http://www.regurge.at/ql/" },
         "Strafing Theory": { newwindow: "http://www.funender.com/quake/articles/strafing_theory.html" },
-        "Duel Spawn Logic": { newwindow: "http://graphics.ethz.ch/~gnoris/ql-spawns/aerowalkFakeDist.html" }
+        "Duel Spawn Logic": { newwindow: "http://www.esreality.com/wiki/Quake_Live:_Strategy:_Duel:_Spawn_Control" }
       }
     };
   }
