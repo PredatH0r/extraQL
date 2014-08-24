@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.6";
+    public const string Version = "1.7";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -20,6 +20,7 @@ namespace ExtraQL
     private readonly HttpServer server;
     private readonly Servlets servlets;
     private readonly ScriptRepository scriptRepository;
+    private bool autoQuitQlIsRunning;
 
     #region ctor()
     public MainForm(Config config, Updater updater)
@@ -75,6 +76,8 @@ namespace ExtraQL
       base.OnClosed(e);
     }
     #endregion
+
+    // controls in basic view
 
     #region picLogo_Paint
     private void picLogo_Paint(object sender, PaintEventArgs e)
@@ -156,6 +159,20 @@ namespace ExtraQL
     }
     #endregion
 
+    #region btnStartLauncher_Click
+    private void btnStartLauncher_Click(object sender, EventArgs e)
+    {
+      this.Launch(false);
+    }
+    #endregion
+
+    #region btnStartSteam_Click
+    private void btnStartSteam_Click(object sender, EventArgs e)
+    {
+      this.Launch(true);
+    }
+    #endregion
+
     #region cbFocus_CheckedChanged
     private void cbFocus_CheckedChanged(object sender, EventArgs e)
     {
@@ -197,99 +214,20 @@ namespace ExtraQL
     }
     #endregion
 
+    #region linkAbout_LinkClicked
+    private void linkAbout_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      Process.Start("https://sourceforge.net/projects/extraql");
+    }
+    #endregion
+
+    // controls in Focus view
+
     #region comboRealm_SelectedValueChanged
     private void comboRealm_SelectedValueChanged(object sender, EventArgs e)
     {
       this.btnStartSteam.Enabled = this.comboRealm.Text == "" && this.GetBaseq3Path(true) != null;
       this.miStartSteam.Enabled = this.btnStartSteam.Enabled;
-    }
-    #endregion
-
-    #region cbDisableScripts_CheckedChanged
-    private void cbDisableScripts_CheckedChanged(object sender, EventArgs e)
-    {
-      this.servlets.EnableScripts = !this.cbDisableScripts.Checked;
-      this.btnInstallHook.Text = this.cbDisableScripts.Checked ? "Delete hook.js" : "Re-install hook.js";
-    }
-    #endregion
-
-    #region cbSystemTray_CheckedChanged
-    private void cbSystemTray_CheckedChanged(object sender, EventArgs e)
-    {
-      this.ShowInTaskbar = !this.cbSystemTray.Checked;
-      this.trayIcon.Visible = cbSystemTray.Checked;
-    }
-    #endregion
-
-    #region cbCheckUpdate_CheckedChanged
-    private void cbCheckUpdate_CheckedChanged(object sender, EventArgs e)
-    {
-      if (this.cbCheckUpdate.Checked)
-      {
-        if (this.updater.UpdateAvailable != null)
-        {
-          this.SaveSettings();
-          this.updater.Run();
-          // if Run() succeeds, the .exe will terminate and start the new downloaded version
-        }
-        this.CheckForUpdate();
-      }
-    }
-    #endregion
-
-    #region btnLauncherExe_Click
-    private void btnLauncherExe_Click(object sender, EventArgs e)
-    {
-      string path = "";
-      string file = "Launcher.exe";
-      try { path = Path.GetDirectoryName(this.txtLauncherExe.Text); } catch { }
-      try { file = Path.GetFileName(this.txtLauncherExe.Text); } catch { }
-      this.openFileDialog1.FileName = file;
-      this.openFileDialog1.InitialDirectory = path;
-      if (this.openFileDialog1.ShowDialog(this) == DialogResult.OK)
-        this.txtLauncherExe.Text = this.openFileDialog1.FileName;
-    }
-    #endregion
-
-    #region btnInstallHook_Click
-    private void btnInstallHook_Click(object sender, EventArgs e)
-    {
-      this.InstallHookJs(false, force: true);
-    }
-    #endregion
-
-    #region btnStartLauncher_Click
-    private void btnStartLauncher_Click(object sender, EventArgs e)
-    {
-      this.Launch(false);
-    }
-    #endregion
-
-    #region btnStartSteam_Click
-    private void btnStartSteam_Click(object sender, EventArgs e)
-    {
-      this.Launch(true);
-    }
-    #endregion
-
-    #region miStartLauncher_Click
-    private void miStartLauncher_Click(object sender, EventArgs e)
-    {
-      this.Launch(false);
-    }
-    #endregion
-
-    #region miStartSteam_Click
-    private void miStartSteam_Click(object sender, EventArgs e)
-    {
-      this.Launch(true);
-    }
-    #endregion
-
-    #region linkAbout_LinkClicked
-    private void linkAbout_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-    {
-      Process.Start("https://sourceforge.net/projects/extraql");
     }
     #endregion
 
@@ -307,33 +245,62 @@ namespace ExtraQL
     }
     #endregion
 
-    #region cbBindAll_CheckedChanged
-    private void cbBindAll_CheckedChanged(object sender, EventArgs e)
+    // controls in Options view
+
+    #region btnLauncherExe_Click
+    private void btnLauncherExe_Click(object sender, EventArgs e)
     {
-      this.RestartHttpServer();
-      if (this.cbBindToAll.Checked)
-        this.updateCheckTimer.Start();
-      else
-        this.updateCheckTimer.Stop();
+      string path = "";
+      string file = "Launcher.exe";
+      try { path = Path.GetDirectoryName(this.txtLauncherExe.Text); }
+      catch { }
+      try { file = Path.GetFileName(this.txtLauncherExe.Text); }
+      catch { }
+      this.openFileDialog1.FileName = file;
+      this.openFileDialog1.InitialDirectory = path;
+      if (this.openFileDialog1.ShowDialog(this) == DialogResult.OK)
+        this.txtLauncherExe.Text = this.openFileDialog1.FileName;
     }
     #endregion
 
-    #region trayIcon_MouseUp
-    private void trayIcon_MouseUp(object sender, MouseEventArgs e)
+    #region cbDisableScripts_CheckedChanged
+    private void cbDisableScripts_CheckedChanged(object sender, EventArgs e)
     {
-      if (e.Button == MouseButtons.Left)
+      this.servlets.EnableScripts = !this.cbDisableScripts.Checked;
+      this.btnInstallHook.Text = this.cbDisableScripts.Checked ? "Delete hook.js" : "Re-install hook.js";
+    }
+    #endregion
+
+    #region btnInstallHook_Click
+    private void btnInstallHook_Click(object sender, EventArgs e)
+    {
+      this.InstallHookJs(false, force: true);
+    }
+    #endregion
+
+    #region cbDownloadUpdates_CheckedChanged
+    private void cbDownloadUpdates_CheckedChanged(object sender, EventArgs e)
+    {
+      if (this.cbDownloadUpdates.Checked)
       {
-        this.WindowState = FormWindowState.Normal;
-        this.BringToFront();
-        this.Activate();
+        this.CheckForUpdate();
+        if (this.updater.UpdateAvailable != null)
+        {
+          this.SaveSettings();
+          this.updater.Run();
+          // if Run() succeeds, the .exe will terminate and start the new downloaded version
+        }
       }
+
+      this.updateCheckTimer.Enabled = this.cbBindToAll.Checked && this.cbDownloadUpdates.Checked;
     }
     #endregion
-
-    #region miQuit_Click
-    private void miQuit_Click(object sender, EventArgs e)
+    
+    #region cbSystemTray_CheckedChanged
+    private void cbSystemTray_CheckedChanged(object sender, EventArgs e)
     {
-      this.Close();
+      this.ShowInTaskbar = !this.cbSystemTray.Checked;
+      this.trayIcon.Visible = cbSystemTray.Checked;
     }
     #endregion
 
@@ -349,10 +316,20 @@ namespace ExtraQL
     }
     #endregion
 
-    #region updateCheckTimer_Tick
-    private void updateCheckTimer_Tick(object sender, EventArgs e)
+    #region cbAutoQuit_CheckedChanged()
+    private void cbAutoQuit_CheckedChanged(object sender, EventArgs e)
     {
-      this.scriptRepository.UpdateScripts(true, true, this.config.GetString("masterServer"));
+      if (this.cbAutoQuit.Checked)
+        this.autoQuitQlIsRunning = false;
+      this.autoQuitTimer.Enabled = this.cbAutoQuit.Checked;
+    }
+    #endregion
+
+    #region cbBindAll_CheckedChanged
+    private void cbBindAll_CheckedChanged(object sender, EventArgs e)
+    {
+      this.RestartHttpServer();
+      this.updateCheckTimer.Enabled = this.cbBindToAll.Checked && this.cbDownloadUpdates.Checked;
     }
     #endregion
 
@@ -363,6 +340,16 @@ namespace ExtraQL
     }
     #endregion
 
+    // controls in Log view
+
+    #region cbLogAllRequests_CheckedChanged
+    private void cbLogAllRequests_CheckedChanged(object sender, EventArgs e)
+    {
+      if (this.server != null)
+        this.server.LogAllRequests = this.cbLogAllRequests.Checked;
+    }
+    #endregion
+
     #region btnClearLog_Click
     private void btnClearLog_Click(object sender, EventArgs e)
     {
@@ -370,11 +357,58 @@ namespace ExtraQL
     }
     #endregion
 
-    #region cbLogAllRequests_CheckedChanged
-    private void cbLogAllRequests_CheckedChanged(object sender, EventArgs e)
+    // controls in System Tray
+
+    #region trayIcon_MouseUp
+    private void trayIcon_MouseUp(object sender, MouseEventArgs e)
     {
-      if (this.server != null)
-        this.server.LogAllRequests = this.cbLogAllRequests.Checked;
+      if (e.Button == MouseButtons.Left)
+      {
+        this.WindowState = FormWindowState.Normal;
+        this.BringToFront();
+        this.Activate();
+      }
+    }
+    #endregion
+
+    #region miStartLauncher_Click
+    private void miStartLauncher_Click(object sender, EventArgs e)
+    {
+      this.Launch(false);
+    }
+    #endregion
+
+    #region miStartSteam_Click
+    private void miStartSteam_Click(object sender, EventArgs e)
+    {
+      this.Launch(true);
+    }
+    #endregion
+
+    #region miQuit_Click
+    private void miQuit_Click(object sender, EventArgs e)
+    {
+      this.Close();
+    }
+    #endregion
+
+    // timers
+
+    #region updateCheckTimer_Tick
+    private void updateCheckTimer_Tick(object sender, EventArgs e)
+    {
+      this.scriptRepository.UpdateScripts(true, true, this.config.GetString("masterServer"));
+    }
+    #endregion
+
+    #region autoQuitTimer_Tick
+    private void autoQuitTimer_Tick(object sender, EventArgs e)
+    {
+      int count = Process.GetProcessesByName("quakelive").Length;
+      if (this.autoQuitQlIsRunning && count == 0)
+        this.Close();
+      else if (count > 0)
+        this.autoQuitQlIsRunning = true;
     }
     #endregion
 
@@ -406,7 +440,7 @@ namespace ExtraQL
       this.cbStartMinimized.Checked = config.GetBool("startMinimized");
       if (this.cbStartMinimized.Checked)
         this.WindowState = FormWindowState.Minimized;
-      this.cbCheckUpdate.Checked = config.GetBool("checkUpdates");
+      this.cbDownloadUpdates.Checked = config.GetBool("checkUpdates");
       this.cbAutostartLauncher.Checked = config.GetString("autostart") == "1";
       this.cbAutostartSteam.Checked = config.GetString("autostart") == "2";
       this.cbRunAsCommandLine.Checked = config.GetBool("runAsCommandLine");
@@ -414,6 +448,7 @@ namespace ExtraQL
       this.cbFollowLog.Checked = config.GetBool("followLog");
       this.cbHttps.Checked = config.GetBool("https");
       this.cbLogAllRequests.Checked = config.GetBool("logAllRequests");
+      this.cbAutoQuit.Checked = config.GetBool("autoquit");
     }
 
     #endregion
@@ -441,13 +476,14 @@ namespace ExtraQL
         config.Set("bindToAll", this.cbBindToAll.Checked);
         config.Set("systemTray", this.cbSystemTray.Checked);
         config.Set("startMinimized", this.cbStartMinimized.Checked);
-        config.Set("checkUpdates", this.cbCheckUpdate.Checked);
+        config.Set("checkUpdates", this.cbDownloadUpdates.Checked);
         config.Set("autostart", this.cbAutostartLauncher.Checked ? "1" : this.cbAutostartSteam.Checked ? "2" : "0");
         config.Set("runAsCommandLine", this.cbRunAsCommandLine.Checked);        
         config.Set("log", this.cbLog.Checked);
         config.Set("followLog", this.cbFollowLog.Checked);
         config.Set("https", this.cbHttps.Checked);
         config.Set("logAllRequests", this.cbLogAllRequests.Checked);
+        config.Set("autoquit", this.cbAutoQuit.Checked);
         config.SaveSettings();
       }
       catch (Exception ex)
@@ -496,7 +532,7 @@ namespace ExtraQL
         if (newerVersion != null)
           Log("An update for extraQL.exe version " + newerVersion + " is available. Enable  \"Download Updates\" to get the latest version");
 
-        this.scriptRepository.UpdateScripts(this.cbCheckUpdate.Checked, this.cbBindToAll.Checked, this.config.GetString("masterServer"));
+        this.scriptRepository.UpdateScripts(this.cbDownloadUpdates.Checked, this.cbBindToAll.Checked, this.config.GetString("masterServer"));
       }
       catch (Exception ex)
       {
@@ -823,5 +859,6 @@ document.loginform.submit();";
       }
     }
     #endregion
+
   }
 }

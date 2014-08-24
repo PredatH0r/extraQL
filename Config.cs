@@ -47,6 +47,7 @@ namespace ExtraQL
       this.settings["followLog"] = "0";
       this.settings["https"] = "0";
       this.settings["logAllRequests"] = "0";
+      this.settings["autoquit"] = "0";
 
       var configFile = this.ConfigFile;
       if (File.Exists(configFile))

@@ -44,11 +44,12 @@ namespace ExtraQL
       this.btnInstallHook = new System.Windows.Forms.Button();
       this.panelAdvanced = new System.Windows.Forms.Panel();
       this.grpAdvanced = new System.Windows.Forms.GroupBox();
+      this.cbAutoQuit = new System.Windows.Forms.CheckBox();
       this.cbHttps = new System.Windows.Forms.CheckBox();
       this.cbRunAsCommandLine = new System.Windows.Forms.CheckBox();
       this.cbAutostartSteam = new System.Windows.Forms.CheckBox();
       this.cbAutostartLauncher = new System.Windows.Forms.CheckBox();
-      this.cbCheckUpdate = new System.Windows.Forms.CheckBox();
+      this.cbDownloadUpdates = new System.Windows.Forms.CheckBox();
       this.cbStartMinimized = new System.Windows.Forms.CheckBox();
       this.cbSystemTray = new System.Windows.Forms.CheckBox();
       this.cbBindToAll = new System.Windows.Forms.CheckBox();
@@ -88,6 +89,7 @@ namespace ExtraQL
       this.btnClearLog = new System.Windows.Forms.Button();
       this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.txtLog = new System.Windows.Forms.TextBox();
+      this.autoQuitTimer = new System.Windows.Forms.Timer(this.components);
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -174,7 +176,7 @@ namespace ExtraQL
       this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
       this.panelAdvanced.Location = new System.Drawing.Point(0, 325);
       this.panelAdvanced.Name = "panelAdvanced";
-      this.panelAdvanced.Size = new System.Drawing.Size(429, 240);
+      this.panelAdvanced.Size = new System.Drawing.Size(429, 260);
       this.panelAdvanced.TabIndex = 2;
       // 
       // grpAdvanced
@@ -182,12 +184,13 @@ namespace ExtraQL
       this.grpAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpAdvanced.Controls.Add(this.cbAutoQuit);
       this.grpAdvanced.Controls.Add(this.cbHttps);
       this.grpAdvanced.Controls.Add(this.txtLauncherExe);
       this.grpAdvanced.Controls.Add(this.cbRunAsCommandLine);
       this.grpAdvanced.Controls.Add(this.cbAutostartSteam);
       this.grpAdvanced.Controls.Add(this.cbAutostartLauncher);
-      this.grpAdvanced.Controls.Add(this.cbCheckUpdate);
+      this.grpAdvanced.Controls.Add(this.cbDownloadUpdates);
       this.grpAdvanced.Controls.Add(this.cbStartMinimized);
       this.grpAdvanced.Controls.Add(this.cbSystemTray);
       this.grpAdvanced.Controls.Add(this.cbBindToAll);
@@ -198,18 +201,29 @@ namespace ExtraQL
       this.grpAdvanced.ForeColor = System.Drawing.Color.White;
       this.grpAdvanced.Location = new System.Drawing.Point(12, 7);
       this.grpAdvanced.Name = "grpAdvanced";
-      this.grpAdvanced.Size = new System.Drawing.Size(405, 221);
+      this.grpAdvanced.Size = new System.Drawing.Size(405, 241);
       this.grpAdvanced.TabIndex = 0;
       this.grpAdvanced.TabStop = false;
       this.grpAdvanced.Text = "Options";
       // 
+      // cbAutoQuit
+      // 
+      this.cbAutoQuit.AutoSize = true;
+      this.cbAutoQuit.Location = new System.Drawing.Point(10, 160);
+      this.cbAutoQuit.Name = "cbAutoQuit";
+      this.cbAutoQuit.Size = new System.Drawing.Size(138, 17);
+      this.cbAutoQuit.TabIndex = 11;
+      this.cbAutoQuit.Text = "Autoquit when QL quits";
+      this.cbAutoQuit.UseVisualStyleBackColor = true;
+      this.cbAutoQuit.CheckedChanged += new System.EventHandler(this.cbAutoQuit_CheckedChanged);
+      // 
       // cbHttps
       // 
       this.cbHttps.AutoSize = true;
-      this.cbHttps.Location = new System.Drawing.Point(10, 185);
+      this.cbHttps.Location = new System.Drawing.Point(10, 207);
       this.cbHttps.Name = "cbHttps";
       this.cbHttps.Size = new System.Drawing.Size(365, 17);
-      this.cbHttps.TabIndex = 12;
+      this.cbHttps.TabIndex = 13;
       this.cbHttps.Text = "Use HTTPS  (requires setup through https\\install.cmd as Administrator)";
       this.cbHttps.UseVisualStyleBackColor = true;
       this.cbHttps.CheckedChanged += new System.EventHandler(this.cbHttps_CheckedChanged);
@@ -246,18 +260,18 @@ namespace ExtraQL
       this.cbAutostartLauncher.UseVisualStyleBackColor = true;
       this.cbAutostartLauncher.CheckedChanged += new System.EventHandler(this.cbAutostart_CheckedChanged);
       // 
-      // cbCheckUpdate
+      // cbDownloadUpdates
       // 
-      this.cbCheckUpdate.AutoSize = true;
-      this.cbCheckUpdate.Checked = true;
-      this.cbCheckUpdate.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbCheckUpdate.Location = new System.Drawing.Point(10, 91);
-      this.cbCheckUpdate.Name = "cbCheckUpdate";
-      this.cbCheckUpdate.Size = new System.Drawing.Size(116, 17);
-      this.cbCheckUpdate.TabIndex = 6;
-      this.cbCheckUpdate.Text = "Download Updates";
-      this.cbCheckUpdate.UseVisualStyleBackColor = true;
-      this.cbCheckUpdate.CheckedChanged += new System.EventHandler(this.cbCheckUpdate_CheckedChanged);
+      this.cbDownloadUpdates.AutoSize = true;
+      this.cbDownloadUpdates.Checked = true;
+      this.cbDownloadUpdates.CheckState = System.Windows.Forms.CheckState.Checked;
+      this.cbDownloadUpdates.Location = new System.Drawing.Point(10, 91);
+      this.cbDownloadUpdates.Name = "cbDownloadUpdates";
+      this.cbDownloadUpdates.Size = new System.Drawing.Size(116, 17);
+      this.cbDownloadUpdates.TabIndex = 6;
+      this.cbDownloadUpdates.Text = "Download Updates";
+      this.cbDownloadUpdates.UseVisualStyleBackColor = true;
+      this.cbDownloadUpdates.CheckedChanged += new System.EventHandler(this.cbDownloadUpdates_CheckedChanged);
       // 
       // cbStartMinimized
       // 
@@ -283,10 +297,10 @@ namespace ExtraQL
       // cbBindToAll
       // 
       this.cbBindToAll.AutoSize = true;
-      this.cbBindToAll.Location = new System.Drawing.Point(10, 162);
+      this.cbBindToAll.Location = new System.Drawing.Point(10, 184);
       this.cbBindToAll.Name = "cbBindToAll";
       this.cbBindToAll.Size = new System.Drawing.Size(310, 17);
-      this.cbBindToAll.TabIndex = 11;
+      this.cbBindToAll.TabIndex = 12;
       this.cbBindToAll.Text = "Allow other computers to access your extraQL HTTP server";
       this.cbBindToAll.UseVisualStyleBackColor = true;
       this.cbBindToAll.CheckedChanged += new System.EventHandler(this.cbBindAll_CheckedChanged);
@@ -643,7 +657,7 @@ namespace ExtraQL
       this.panelLog.Dock = System.Windows.Forms.DockStyle.Right;
       this.panelLog.Location = new System.Drawing.Point(429, 0);
       this.panelLog.Name = "panelLog";
-      this.panelLog.Size = new System.Drawing.Size(495, 565);
+      this.panelLog.Size = new System.Drawing.Size(495, 585);
       this.panelLog.TabIndex = 3;
       // 
       // grpLog
@@ -658,7 +672,7 @@ namespace ExtraQL
       this.grpLog.ForeColor = System.Drawing.Color.White;
       this.grpLog.Location = new System.Drawing.Point(12, 7);
       this.grpLog.Name = "grpLog";
-      this.grpLog.Size = new System.Drawing.Size(471, 547);
+      this.grpLog.Size = new System.Drawing.Size(471, 567);
       this.grpLog.TabIndex = 0;
       this.grpLog.TabStop = false;
       this.grpLog.Text = "Log";
@@ -707,15 +721,20 @@ namespace ExtraQL
       this.txtLog.Name = "txtLog";
       this.txtLog.ReadOnly = true;
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.txtLog.Size = new System.Drawing.Size(453, 483);
+      this.txtLog.Size = new System.Drawing.Size(453, 503);
       this.txtLog.TabIndex = 13;
+      // 
+      // autoQuitTimer
+      // 
+      this.autoQuitTimer.Interval = 2000;
+      this.autoQuitTimer.Tick += new System.EventHandler(this.autoQuitTimer_Tick);
       // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
       this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-      this.ClientSize = new System.Drawing.Size(924, 565);
+      this.ClientSize = new System.Drawing.Size(924, 585);
       this.Controls.Add(this.panelAdvanced);
       this.Controls.Add(this.panelFocus);
       this.Controls.Add(this.panelTop);
@@ -787,7 +806,7 @@ namespace ExtraQL
     private ToolStripMenuItem miStartLauncher;
     private ToolStripMenuItem miStartSteam;
     private CheckBox cbStartMinimized;
-    private CheckBox cbCheckUpdate;
+    private CheckBox cbDownloadUpdates;
     private ToolStripSeparator quitToolStripMenuItem;
     private ToolStripMenuItem miQuit;
     private CheckBox cbAutostartSteam;
@@ -803,6 +822,8 @@ namespace ExtraQL
     private CheckBox cbFollowLog;
     private CheckBox cbHttps;
     private CheckBox cbLogAllRequests;
+    private CheckBox cbAutoQuit;
+    private Timer autoQuitTimer;
   }
 }
 
