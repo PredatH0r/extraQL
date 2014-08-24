@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.100
+// @version        1.101
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,10 @@
 // ==/UserScript==
 
 /*
+
+Version 1.101
+- /elo shuffle now supports format=table and format=list
+- /elo shuffle and /elo score output is now always formatted as list, when the output method is not set to "echo"
 
 Version 1.100
 - /elo shuffle now ignores specs, but allows overrides using /elo shuffle,+name1,-name2,...
@@ -1164,13 +1168,11 @@ var extraQL = window.extraQL;
           // Sort players by Elo (descending).
           players_copy.sort(function(a, b) { return b.elo - a.elo; });
 
-          var newStyle = quakelive.cvars.Get("_qlrd_outputFormat");
-          newStyle = !newStyle || newStyle.value == "table";
-          if (newStyle) {
+          var tableFormat = quakelive.cvars.Get("_qlrd_outputFormat");
+          tableFormat = currentOut == "echo" && (!tableFormat || tableFormat.value == "table");
+          if (tableFormat) {
             for (var i = 0, out = [], len = players_copy.length; i < len; ++i) {
-
               var color = "^5";
-
               if (players_copy[i].team == 2) {
                 color = "^4";
                 blues.push(players_copy[i].elo);
@@ -1179,7 +1181,7 @@ var extraQL = window.extraQL;
                 reds.push(players_copy[i].elo);
               }
 
-              out.push(color + pad(players_copy[i].name.replace(/\_nova$/i, "sexy!nova"), 10).substr(0, 10) + " " + pad(players_copy[i].elo, -4));
+              out.push(color + pad(players_copy[i].name, 10).substr(0, 10) + " " + pad(players_copy[i].elo, -4));
 
               // Group by 4, delaying commands as needed
               if ((i + 1) % 4 == 0 || (i + 1) == len) {
@@ -1599,13 +1601,14 @@ var extraQL = window.extraQL;
 
           var prevTeam = best_shuff[0].team;
           var teamMemberCount = 0;
+          var tableFormat = currentOut == "echo" && quakelive.cvars.Get("_qlrd_outputFormat").value == "table";
           for (var i = 0, out = [], len = best_shuff.length; i <= len; ++i) {
             // Group by 6, delaying commands as needed
             var curTeam = i == len ? prevTeam : best_shuff[i].team;
-            if (++teamMemberCount % 6 == 0 || i == len || curTeam != prevTeam) {
+            if (curTeam != prevTeam || i == len || (tableFormat && ++teamMemberCount % 5 == 0)) {
               window.setTimeout(function (txt) {
                 qz_instance.SendGameCommand(currentOut + " \"" + txt + "\"");
-              }.bind(null, out.join("^7 ")), mul++ * step);
+              }.bind(null, out.join(tableFormat ? "^7|" : "^7, ")), mul++ * step);
               out = [];
             }
             if (i == len)
@@ -1621,7 +1624,10 @@ var extraQL = window.extraQL;
             } else if (best_shuff[i].team == 1) {
               color = "^1";
             }
-            out.push(color + pad(best_shuff[i].name.substr(0,12), 12, " ") + "^7|");
+            if (tableFormat)
+              out.push(color + pad(best_shuff[i].name.substr(0, 12), 12, " "));
+            else
+              out.push(color + best_shuff[i].name);
           }
         });
       },

@@ -24,6 +24,11 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.7
+---
+- added option "Autoquit when QL quits"
+- includes updated versions of userscripts
+
 Version 1.6
 ---
 - to prevent startup crashes, the Windows Crypto API is no longer used, when not running in HTTPS mode
