@@ -42,14 +42,24 @@ Version 0.102
   function log(msg) {
     if (msg instanceof Error && msg.fileName)
       msg = msg.fileName + "," + msg.lineNumber + ": " + msg.name + ": " + msg.message;
-    //if (quakelive.IsGameRunning())
-    //  qz_instance.SendGameCommand("echo \"" + msg.replace('"', "'") + "\"");
-    //else
     console.log(msg);
   }
 
+  function debug(msg) {
+    var enabled = quakelive.cvars.Get("eql_debug");
+    if (!enabled || enabled.value == "0")
+      return;
+    if (msg instanceof Error && msg.fileName)
+      msg = msg.fileName + "," + msg.lineNumber + ": " + msg.name + ": " + msg.message;
+    msg = "^6" + msg;
+    if (quakelive.IsGameRunning())
+      qz_instance.SendGameCommand("echo \"" + msg.replace('"', "'").replace("\\", "\\\\") + "\"");
+    else
+      console.log(msg);
+  }
+
   function echo(text) {
-    qz_instance.SendGameCommand("echo \"" + text.replace("\"", "'") + "\"");
+    qz_instance.SendGameCommand("echo \"" + text.replace('"', "'").replace("\\", "\\\\") + "\"");
   }
 
   // public: escape special HTML characters in the provided string
@@ -231,6 +241,7 @@ Version 0.102
     log: log,
     rlog: rlog,
     echo: echo,
+    debug: debug,
     addStyle: addStyle,
     escapeHtml: escapeHtml,
     store: store,
