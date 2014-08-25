@@ -1392,12 +1392,16 @@ var extraQL = window.extraQL;
           }
 
           args = "," + args + ",";
-          var index = 0;
+          var index = -1;
           var players_copy = [];
+          var addAll = args.indexOf(",+all,") >= 0;
           $.each(server.players, function (i, p) {
+            ++index;
             var name = p.name.toLowerCase();
-            // skip specs by default, but allow overrides via comma separated +playername and -playername args
-            if (args.indexOf(",+" + name + ",") >= 0 || (args.indexOf(",-" + name + ",") < 0 && p.team >= 1 && p.team <= 2)) {
+            if (args.indexOf(",-" + name + ",") >= 0)
+              return;
+            // skip specs by default, but allow overrides via comma separated +playername or +all
+            if (addAll || args.indexOf(",+" + name + ",") >= 0 || p.team >= 1 && p.team <= 2) {
               players_copy.push({
                 "name": p.name,
                 "elo": parseInt(getQlmPlayerByName(players, p.name).elo),
@@ -1406,12 +1410,11 @@ var extraQL = window.extraQL;
                 "candidateTeam": -1
               });
             }
-            ++index;
           });
 
           if (players_copy.length % 2 != 0 || players_copy.length < 2) {
             QLRD.igAnnounce(("Shuffle needs an even number of players, currently " + players_copy.length), true);
-            QLRD.igAnnounce(("Use ^3/elo shuffle,+player1,-player2^7 to add/remove players"), true);
+            QLRD.igAnnounce(("Use ^3/elo shuffle,+all,+player1,-player2^7 to add/remove players"), true);
             return;
           }
 
