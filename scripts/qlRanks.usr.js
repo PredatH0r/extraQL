@@ -1115,7 +1115,7 @@ var extraQL = window.extraQL;
 
         // Wait for all server players to be available in the QLRD cache.
         var names = $.map(server.players, function(p) { return { "name": p.name } });
-        QLRD.waitFor(names, gt, function(error, players, gt) {
+        QLRD.waitFor(names, gt, function(error, players) {
           // Always clear the active request flag.
           QLRD.activeServerReq = false;
 
@@ -1140,117 +1140,55 @@ var extraQL = window.extraQL;
             }, 10E3);
           }
 
-          var blues = [];
-          var reds = [];
-
           function getQlmEloByName(players, name) {
             for (var p = 0; p < players.length; p++) {
-
               if (players[p].name == name)
                 return parseInt(players[p].elo);
             }
-
             return -1;
           }
 
           var index = 0;
 
-          var players_copy = $.map(server.players,
-            function(p) {
-              return {
-                "name": p.name,
-                "team": p.team,
-                "elo": getQlmEloByName(players, p.name),
-                "index": index++
-              }
-            });
+          var players_copy = $.map(server.players, function(p) {
+            return {
+              "name": p.name,
+              "team": p.team,
+              "elo": getQlmEloByName(players, p.name),
+              "index": index++
+            }
+          });
 
           // Sort players by Elo (descending).
           players_copy.sort(function(a, b) { return b.elo - a.elo; });
 
+          // display team stats
+          var stats = calcStats(players_copy);
+          var hasTeams = stats.redcount > 0 || stats.blucount > 0;
+          var avgInfo = "^3Avg rating: " + stats.allavg + "(" + stats.allcount + ")";
+          if (hasTeams)
+            avgInfo +=" ^1" + stats.redavg + "(" + stats.redcount + ") ^4" + stats.bluavg + ":" + stats.blucount + " ^3Gap: " + stats.gap + "  " + stats.descr + "^7";
+          qz_instance.SendGameCommand(currentOut + "\"" + avgInfo + "\"");
+
           var tableFormat = quakelive.cvars.Get("_qlrd_outputFormat");
           tableFormat = currentOut == "echo" && (!tableFormat || tableFormat.value == "table");
-          if (tableFormat) {
-            for (var i = 0, out = [], len = players_copy.length; i < len; ++i) {
-              var color = "^5";
-              if (players_copy[i].team == 2) {
-                color = "^4";
-                blues.push(players_copy[i].elo);
-              } else if (players_copy[i].team == 1) {
-                color = "^1";
-                reds.push(players_copy[i].elo);
-              }
+          var scoreColor = hasTeams ? "" : "^3";
+          for (var i = 0, out = [], len = players_copy.length; i <= len; ++i) {
+            // Group by 4, delaying commands as needed
+            if (i && i % 4 == 0 || i == len) {
+              window.setTimeout(function (txt) {
+                qz_instance.SendGameCommand(currentOut + " \"" + txt + "\";");
+              }.bind(null, out.join(tableFormat ? "^3|" : "^7, ")), mul++ * step);
+              out = [];
+            }
+            if (i == len)
+              break;
 
+            var color = getTeamColor(players_copy[i].team);
+            if (tableFormat)
               out.push(color + pad(players_copy[i].name, 10).substr(0, 10) + " " + pad(players_copy[i].elo, -4));
-
-              // Group by 4, delaying commands as needed
-              if ((i + 1) % 4 == 0 || (i + 1) == len) {
-                window.setTimeout(function(txt) {
-                  qz_instance.SendGameCommand(currentOut + " \"" + txt + "\";");
-                }.bind(null, out.join("^3|"), (i + 1) == len), mul++ * step);
-                out = [];
-              }
-            }
-
-            var bluecount = 0;
-            for (var b = 0; b < blues.length; b++) {
-              bluecount += blues[b];
-            }
-
-            var blueavg = Math.round(bluecount / blues.length);
-
-            var redcount = 0;
-            for (b = 0; b < reds.length; b++) {
-              redcount += reds[b];
-            }
-
-            var redsavg = Math.round(redcount / reds.length);
-
-            var delta = Math.floor(Math.abs(redsavg - blueavg));
-
-            var desc = "^1ragequit^7";
-            if (delta < 300) desc = "^1unplayable^7";
-            if (delta < 200) desc = "^1very unbalanced^7";
-            if (delta < 150) desc = "unbalanced";
-            if (delta < 100) desc = "challenging^7";
-            if (delta < 80) desc = "^4balanced^7";
-            if (delta < 40) desc = "^4very balanced^7";
-
-            if (reds.length == blues.length && reds.length != 0)
-              qz_instance.SendGameCommand(currentOut + " ^3Team rating: ^1" + redsavg + "^7(" + reds.length + ") ^4" + blueavg + "^7(" + blues.length + ") ^3Gap:^7 " + delta + " (" + desc + "^7)");
-          } else {
-            // Display the results.
-            // NOTE: mul is "1" to separate the header from the results
-            var mul = 1,
-              currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value,
-              step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
-
-            // Show the chat pane for 10 seconds if output method is 'print',
-            // otherwise it will be difficult to notice.
-            if ("print" == currentOut) {
-              qz_instance.SendGameCommand("+chat;");
-              window.setTimeout(function() {
-                qz_instance.SendGameCommand("-chat;");
-              }, 10E3);
-            }
-
-            qz_instance.SendGameCommand(currentOut + " ^2[QLRD] " + gt.toUpperCase() + " results:;");
-            for (var i = 0, out = [], len = players_copy.length; i < len; ++i) {
-              out.push("^5" + players_copy[i].name + " ^3" + players_copy[i].elo + "^7");
-
-              // Group by 4, delaying commands as needed
-              if ((i + 1) % 4 == 0 || (i + 1) == len) {
-                window.setTimeout(function(txt, isLast) {
-                  qz_instance.SendGameCommand(currentOut + " \"^2[QLRD] " + txt + "\";");
-                  if (isLast) {
-                    window.setTimeout(function() {
-                      QLRD.igAnnounce("Done.", false);
-                    }, step);
-                  }
-                }.bind(null, out.join(", "), (i + 1) == len), mul++ * step);
-                out = [];
-              }
-            }
+            else
+              out.push(color + players_copy[i].name + " " + scoreColor + players_copy[i].elo);
           }
         });
       },
@@ -1259,6 +1197,48 @@ var extraQL = window.extraQL;
         QLRD.activeServerReq = false;
       }
     });
+  }
+
+  function calcStats(players) {
+    var counts = [ {count:0, sum: 0}];
+
+    $.each(players, function(index, player) {
+      if (!counts[player.team])
+        counts[player.team] = { count: 0, sum: 0 };
+      counts[player.team].count++;
+      counts[player.team].sum += player.elo;
+      if (player.team == 1 || player.team == 2) {
+        counts[0].count++;
+        counts[0].sum += player.elo;
+      }
+    });
+
+    var redavg = counts[1].count == 0 ? 0 : Math.round(counts[1].sum / counts[1].count);
+    var bluavg = counts[2].count == 0 ? 0 : Math.round(counts[2].sum / counts[2].count);
+    var delta = Math.abs(redavg - bluavg);
+
+    var desc = "^1ragequit";
+    if (delta < 300) desc = "^1unplayable";
+    if (delta < 200) desc = "^6very unbalanced";
+    if (delta < 150) desc = "^3unbalanced";
+    if (delta < 100) desc = "^3challenging";
+    if (delta < 80) desc = "^2balanced";
+    if (delta < 40) desc = "^2very balanced";
+
+    return {
+      allavg: counts[0].count == 0 ? 0 : Math.round(counts[0].sum / counts[0].count),
+      allcount : counts[0].count,
+      redavg: redavg,
+      redcount: counts[1].count,
+      bluavg: bluavg,
+      blucount: counts[2].count,
+      gap: delta,
+      descr: desc
+    }
+  }
+
+  function getTeamColor(team) {
+    return team==0 ? "^5" : team == 1 ? "^1" : team == 2 ? "^4" : "^7";
   }
 
   function games(val) {
