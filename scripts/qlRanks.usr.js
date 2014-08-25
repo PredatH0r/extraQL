@@ -1165,9 +1165,7 @@ var extraQL = window.extraQL;
           // display team stats
           var stats = calcStats(players_copy);
           var hasTeams = stats.redcount > 0 || stats.blucount > 0;
-          var avgInfo = "^3Avg rating: " + stats.allavg + "(" + stats.allcount + ")";
-          if (hasTeams)
-            avgInfo +=" ^1" + stats.redavg + "(" + stats.redcount + ") ^4" + stats.bluavg + ":" + stats.blucount + " ^3Gap: " + stats.gap + "  " + stats.descr + "^7";
+          var avgInfo = "^3Avg rating: " + stats.allavg + "(" + stats.allcount + ")" + stats.teamSummary;
           qz_instance.SendGameCommand(currentOut + "\"" + avgInfo + "\"");
 
           var tableFormat = quakelive.cvars.Get("_qlrd_outputFormat");
@@ -1200,11 +1198,11 @@ var extraQL = window.extraQL;
   }
 
   function calcStats(players) {
-    var counts = [ {count:0, sum: 0}];
+    var counts = [ { count: 0, sum: 0 }, { count: 0, sum: 0 }, { count: 0, sum: 0 }, { count: 0, sum: 0 } ];
 
-    $.each(players, function(index, player) {
-      if (!counts[player.team])
-        counts[player.team] = { count: 0, sum: 0 };
+    $.each(players, function (index, player) {
+      if (!parseInt(player.elo))
+        return;
       counts[player.team].count++;
       counts[player.team].sum += player.elo;
       if (player.team == 1 || player.team == 2) {
@@ -1215,16 +1213,17 @@ var extraQL = window.extraQL;
 
     var redavg = counts[1].count == 0 ? 0 : Math.round(counts[1].sum / counts[1].count);
     var bluavg = counts[2].count == 0 ? 0 : Math.round(counts[2].sum / counts[2].count);
-    var delta = Math.abs(redavg - bluavg);
+    var gap = Math.abs(redavg - bluavg);
 
-    var desc = "^1ragequit";
-    if (delta < 300) desc = "^1unplayable";
-    if (delta < 200) desc = "^6very unbalanced";
-    if (delta < 150) desc = "^3unbalanced";
-    if (delta < 100) desc = "^3challenging";
-    if (delta < 80) desc = "^2balanced";
-    if (delta < 40) desc = "^2very balanced";
+    var descr = "^1ragequit";
+    if (gap < 300) descr = "^1unplayable";
+    if (gap < 200) descr = "^6very unbalanced";
+    if (gap < 150) descr = "^3unbalanced";
+    if (gap < 100) descr = "^3challenging";
+    if (gap < 80) descr = "^2balanced";
+    if (gap < 40) descr = "^2very balanced";
 
+    var teamSummary = redavg && bluavg ? redavg + "(" + counts[1].count + ") " + "^4" + bluavg + "(" + counts[2].count + ") ^3Gap: " + gap + "  " + descr : "";
     return {
       allavg: counts[0].count == 0 ? 0 : Math.round(counts[0].sum / counts[0].count),
       allcount : counts[0].count,
@@ -1232,13 +1231,14 @@ var extraQL = window.extraQL;
       redcount: counts[1].count,
       bluavg: bluavg,
       blucount: counts[2].count,
-      gap: delta,
-      descr: desc
+      gap: gap,
+      descr: descr,
+      teamSummary: teamSummary
     }
   }
 
   function getTeamColor(team) {
-    return team==0 ? "^5" : team == 1 ? "^1" : team == 2 ? "^4" : "^7";
+    return team == 0 ? "^5" : team == 1 ? "^1" : team == 2 ? "^4" : "^7";
   }
 
   function games(val) {
@@ -1402,10 +1402,11 @@ var extraQL = window.extraQL;
                 "name": p.name,
                 "elo": parseInt(getQlmPlayerByName(players, p.name).elo),
                 "team": p.team,
-                "index": index++,
+                "index": index,
                 "candidateTeam": -1
               });
             }
+            ++index;
           });
 
           if (players_copy.length % 2 != 0 || players_copy.length < 2) {
@@ -1521,33 +1522,6 @@ var extraQL = window.extraQL;
 
           //extraQL.log("sort done");
 
-          blues = [];
-          reds = [];
-          for (var i = 0; i < best_shuff.length; i++) {
-            var color = "^7";
-
-            if (best_shuff[i].team == 2) {
-              color = "^4";
-              blues.push(best_shuff[i].elo);
-            } else if (best_shuff[i].team == 1) {
-              color = "^1";
-              reds.push(best_shuff[i].elo);
-            }
-          }
-
-          var bluecount = 0;
-          for (var b = 0; b < blues.length; b++) {
-            bluecount += blues[b];
-          }
-
-          var blueavg = Math.round(bluecount / blues.length);
-
-          var redcount = 0;
-          for (b = 0; b < reds.length; b++) {
-            redcount += reds[b];
-          }
-
-          var redsavg = Math.round(redcount / reds.length);
 
           // Display the results.
           // NOTE: mul is "1" to separate the header from the results
@@ -1564,26 +1538,16 @@ var extraQL = window.extraQL;
             }, 10E3);
           }
 
-          var delta = Math.floor(Math.abs(redsavg - blueavg));
 
-          var desc = "^1ragequit";
-          if (delta < 300) desc = "^1unplayable";
-          if (delta < 200) desc = "^1very unbalanced";
-          if (delta < 150) desc = "^6unbalanced";
-          if (delta < 100) desc = "^3challenging";
-          if (delta < 80) desc = "^2balanced";
-          if (delta < 40) desc = "^2very balanced";
-
-          var desc_word = "optimum";
-          if (doit) desc_word = "performing";
-
-          qz_instance.SendGameCommand(currentOut + " \"^3" + desc_word + " elo shuffle: ^1" + redsavg + "(" + reds.length + ") " + "^4" +blueavg + "(" + blues.length + ") ^3Gap: " + delta + " ^7(" + desc + "^7)\"");
+          var stats = calcStats(best_shuff);
+          var desc_word = doit ? "Performing" : "Optimum";
+          qz_instance.SendGameCommand(currentOut + " \"^3" + desc_word + " Elo shuffle: ^1" + stats.teamSummary + "\"");
 
           var prevTeam = best_shuff[0].team;
           var teamMemberCount = 0;
           var tableFormat = currentOut == "echo" && quakelive.cvars.Get("_qlrd_outputFormat").value == "table";
           for (var i = 0, out = [], len = best_shuff.length; i <= len; ++i) {
-            // Group by 6, delaying commands as needed
+            // Group by 5, delaying commands as needed
             var curTeam = i == len ? prevTeam : best_shuff[i].team;
             if (curTeam != prevTeam || i == len || (tableFormat && ++teamMemberCount % 5 == 0)) {
               window.setTimeout(function (txt) {
@@ -1598,12 +1562,7 @@ var extraQL = window.extraQL;
               teamMemberCount = 0;
             prevTeam = curTeam;
 
-            var color = "^7";
-            if (best_shuff[i].team == 2) {
-              color = "^4";
-            } else if (best_shuff[i].team == 1) {
-              color = "^1";
-            }
+            var color = getTeamColor(best_shuff[i].team);
             if (tableFormat)
               out.push(color + pad(best_shuff[i].name.substr(0, 12), 12, " "));
             else
