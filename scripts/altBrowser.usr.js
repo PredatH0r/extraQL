@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             qlAltBrowser
 // @name           Quake Live Alt Browser
-// @version        0.12
+// @version        0.15
 // @description    A different Quake Live server browser with filtering and other tweaks
 // @namespace      phob.net
 // @author         wn
@@ -84,6 +84,7 @@ addStyle(
   , "#qlab-help-prompt #modal-content strong { font-weight: bold; }"
   , "#qlab-help-prompt #modal-content code { display: block; padding: 5px; }"
   , "#qlab-help-prompt #modal-content ul { margin: 10px 0; padding-left: 20px; list-style: disc outside none; }"
+  , "#qlab-customColumns-prompt .column { display: inline-block; padding: 5px; margin: 0 5px; border: 1px solid #ccc; font-weight: bold; background: #eee; color: #000; cursor: col-resize !important; }"
   , "#qlv_postlogin_matches > table { width: "+config.list.width+"px; color: black; background-color: rgba(255, 255, 255, 0.4); }"
   , "#qlv_postlogin_matches > table > thead > tr { background: black; }"
   , "#qlv_postlogin_matches > table > thead > tr > th { padding: 4px 0; cursor: pointer; color: white !important; font-weight: bold; text-shadow: 1px 1px 5px #666; filter: dropshadow(color=#666, offx=1, offy=1); }"
@@ -112,26 +113,8 @@ addStyle(
 
 
 /**
- * Template strings
+ * Common strings
  */
-// Server row
- // TODO fix icon fixed block size... currently just setting img visibility to 'hidden'... seems hacky
-var TMPL_row = [
-    "<td class='qlab-col-location' title='<%= fullLocation %>\n<%= hostAddress %>'><img src='<%= flagIconURL %>'/> <%= cityName %></td>"
-  , "<td class='qlab-col-ping'><img src='<%= pingQualityURL %>'/> <span><%= ping %></span></td>"
-  , "<td class='qlab-col-gametype'><img class='qlab-gametype-icon' src='<%= gtIconURL %>' title='<%= gtIconTitle %>'/></td>"
-  , "<td class='qlab-col-main'><%= mapinfo.name %> (<span class='qlab-hostname'><%= server.host_name %></span>)</td>"
-  , "<td class='qlab-col-icons'>"
-  ,   "<img src='<%= skill.iconURL %>' title='<%= skill.desc %>'/>"
-  ,   "<img src='" + quakelive.resource("/images/lgi/premium_icon.png") + "' title='Premium Match' class='<%= server.premium ? '' : 'hidden' %>'/>"
-  ,   "<img src='" + quakelive.resource("/images/modules/browser/unrank_icon.png") + "' title='Unranked Match' class='<%= !server.ranked ? '' : 'hidden' %>'/>"
-  ,   "<img src='" + quakelive.resource("/images/modules/browser/modified_icon.png") + "' title='<%= modifiedInfo %>' class='<%= isModified ? '' : 'hidden' %>'/>"
-  ,   //"<img src='" + quakelive.resource("/images/modules/browser/locked_icon.png") + "' title='Password Protected' class='<% server.g_needpass ? '' : 'hidden' %>'/>"
-  ,   "<img src='" + quakelive.resource("/images/lgi/server_details_ranked.png") + "' title='Password Protected' class='<%= server.g_needpass ? '' : 'hidden' %>'/>"
-  , "</td>"
-  , "<td class='qlab-col-players'><%= num_players %>/<%= max_size %></td>"
-].join("\n");
-
 // Help text
 var TMPL_help = [
     "<p>Enter comma-delimited values (partial or complete) that servers must meet to be included or excluded.  Supported value types include:</p>"
@@ -153,6 +136,67 @@ var TMPL_help = [
 
 
 /**
+ * Custom column stuff
+ */
+var colDisplay = {
+    "location": "Location"
+  , "ping": "Ping"
+  , "gametype": "Gametype"
+  , "main": "Map (Hostname)"
+  , "icons": "Details"
+  , "players": "Players"
+};
+var defaultColOrder = ["location", "ping", "gametype", "main", "icons", "players"];
+var _rowTemplate = _headerRow = undefined;
+var _colOrder = defaultColOrder;
+try {
+  _colOrder = JSON.parse(localStorage["qlab-customCols"]);
+}
+catch(e) {}
+
+HOOK_MANAGER.addMenuItem("Custom Columns", function() {
+  var body = "<div class='columns'>";
+  for (var i = 0, e = _colOrder.length; i < e; ++i) {
+    body += "<span class='column' data-col='" + _colOrder[i] + "'>" + colDisplay[_colOrder[i]] + "</span>";
+  }
+  body += "<br><br><a href='#' class='reset'>reset</a></div>";
+
+  qlPrompt({
+      id: "qlab-customColumns-prompt"
+    , title: config.name.long + ": Customize Columns"
+    , body: body
+    , alert: true
+    , ok: function() {
+        $("#qlab-customColumns-prompt").jqmHide();
+        fullRefresh();
+      }
+  });
+
+  setTimeout(function() {
+    $("#qlab-customColumns-prompt .reset").on("click", function() {
+      $("#qlab-customColumns-prompt").jqmHide();
+      _colOrder = defaultColOrder;
+      localStorage["qlab-customCols"] = JSON.stringify(_colOrder);
+      _rowTemplate = _headerRow = undefined;
+      // TODO: just update the column ordering, rather than doing a refresh
+      fullRefresh();
+      return false;
+    });
+
+    $("#qlab-customColumns-prompt .columns").dragsort({
+        dragSelector: ".column"
+      , placeHolderTemplate: "<span class='column'></span>"
+      , dragEnd: function() {
+          _colOrder = $("#qlab-customColumns-prompt .columns .column").map(function() { return $(this).data("col") }).get();
+          localStorage["qlab-customCols"] = JSON.stringify(_colOrder);
+          _rowTemplate = _headerRow = undefined;
+        }
+    });
+  }, 0);
+});
+
+
+/**
  * AltServerListView
  *
  * NOTE: duplicated here since it isn't exposed externally in QL JS
@@ -169,10 +213,6 @@ var SHARED_DEFAULT_PROPS = {
 // Constructor
 function AltServerListView(aProps) {
   this.defaultProps = $.extend({}, SHARED_DEFAULT_PROPS, aProps);
-
-  this.template = new EJS({
-    text: TMPL_row
-  });
 
   this.selectedServer = undefined;
 
@@ -254,7 +294,7 @@ AltServerListView.prototype.UpdateServerNode = function(aServer, $aNode) {
   o.upsell = aServer.premium && quakelive.siteConfig.premiumStatus == "standard" && !aServer.invitation;
 
   // Render HTML
-  $aNode.html(this.template.render(o));
+  $aNode.html(this.GetRowTemplate().render(o));
 
   if (this.selectedServer == aServer.public_id) {
     $aNode.addClass("selected");
@@ -285,7 +325,7 @@ AltServerListView.prototype.OnRefreshServersSuccess = function(aManager, aJSON) 
   if ("undefined" !== typeof aJSON && "undefined" !== typeof aJSON.player_tier) {
     $("#debug_tier").text("[DEV] Your tier is " + aJSON.player_tier);
   }
-  this.DisplayServerList(aManager);
+  this.DisplayServerList();
 };
 
 // Show a "sorry" view if quakelive.serverManager either failed to retrieve new server list JSON
@@ -331,7 +371,7 @@ AltServerListView.prototype.OnUpdateServer = function(aManager, aServer) {
 };
 
 // Display the filter bar
-AltServerListView.prototype.DisplayFilterBar = function(aManager, $aContainer) {
+AltServerListView.prototype.DisplayFilterBar = function($aContainer) {
   var self = this
     , $qlabFilterBar = $("#qlab-filterbar")
     ;
@@ -368,7 +408,7 @@ AltServerListView.prototype.DisplayFilterBar = function(aManager, $aContainer) {
       if (13 == aEvent.which) {
         // TODO: decide if we'll do a full list reload or just re-display... currently using re-display since it's much faster
         //fullRefresh();
-        self.DisplayServerList(aManager);
+        self.DisplayServerList();
         this.focus();
       }
     });
@@ -408,23 +448,104 @@ AltServerListView.prototype.UpdateColumnHighlight = function() {
   $thead.find("thead [data-sort="+this.sortBy+"]").addClass(this.sortReverse ? "qlab-sort-desc" : "qlab-sort-asc");
 }
 
+// Constructs (or returns cached) header row based upon user-defined column config
+AltServerListView.prototype.GetHeaderRow = function() {
+  if (_headerRow) return _headerRow;
+
+  _headerRow = "<tr>";
+  for (var i = 0, e = _colOrder.length; i < e; ++i) {
+    switch (_colOrder[i]) {
+      case "location":
+        _headerRow += "<th class='qlab-col-location' data-sort='location'>Location</th>";
+        break;
+      case "ping":
+        _headerRow += "<th class='qlab-col-ping' data-sort='ping'>Ping</th>";
+        break;
+      case "gametype":
+        _headerRow += "<th class='qlab-col-gametype' title='Gametype' data-sort='gametype'>GT</th>";
+        break;
+      case "main":
+        _headerRow += "<th class='qlab-col-main'><span data-sort='map'>Map</span> (<span data-sort='servername'>Hostname</span>)</th>";
+        break;
+      case "icons":
+        // NOTE: keep single space character before icon images to match row spacing... do this in CSS at some point
+        _headerRow += "<th class='qlab-col-icons'>"
+        _headerRow +=  "<img data-sort='skill' src='" + quakelive.resource("/images/sqranks/rank_1.png") + "' title='Skill'/>"
+        _headerRow += " <img data-sort='premium' src='" + quakelive.resource("/images/lgi/premium_icon.png") + "' title='Premium Match'/>"
+        _headerRow += " <img data-sort='unranked' src='" + quakelive.resource("/images/modules/browser/unrank_icon.png") + "' title='Unranked Match'/>"
+        _headerRow += " <img data-sort='modified' src='" + quakelive.resource("/images/modules/browser/modified_icon.png") + "' title='Server Modified'/>"
+        _headerRow += " <img data-sort='passworded' src='" + quakelive.resource("/images/lgi/server_details_ranked.png") + "' title='Password Protected'/>"
+        _headerRow += "</th>"
+        break;
+      case "players":
+        _headerRow += "<th class='qlab-col-players' data-sort='players'>Players</th>";
+        break;
+    }
+  }
+  _headerRow += "</tr>";
+
+  return _headerRow;
+}
+
+// Constructs (or returns cached) server row template based upon user-defined column config
+// TODO: fix icon fixed block size... currently just setting img visibility to 'hidden'... seems hacky
+AltServerListView.prototype.GetRowTemplate = function() {
+  if (_rowTemplate) { return _rowTemplate; }
+
+  var content = "";
+
+  for (var i = 0, e = _colOrder.length; i < e; ++i) {
+    switch (_colOrder[i]) {
+      case "location":
+        content += "<td class='qlab-col-location' title='<%= fullLocation %>\n<%= hostAddress %>'><img src='<%= flagIconURL %>'/> <%= cityName %></td>";
+        break;
+      case "ping":
+        content += "<td class='qlab-col-ping'><img src='<%= pingQualityURL %>'/> <span><%= ping %></span></td>";
+        break;
+      case "gametype":
+        content += "<td class='qlab-col-gametype'><img class='qlab-gametype-icon' src='<%= gtIconURL %>' title='<%= gtIconTitle %>'/></td>";
+        break;
+      case "main":
+        content += "<td class='qlab-col-main'><%= mapinfo.name %> (<span class='qlab-hostname'><%= server.host_name %></span>)</td>";
+        break;
+      case "icons":
+        content += "<td class='qlab-col-icons'>"
+        content +=  "<img src='<%= skill.iconURL %>' title='<%= skill.desc %>'/>"
+        content += " <img src='" + quakelive.resource("/images/lgi/premium_icon.png") + "' title='Premium Match' class='<%= server.premium ? '' : 'hidden' %>'/>"
+        content += " <img src='" + quakelive.resource("/images/modules/browser/unrank_icon.png") + "' title='Unranked Match' class='<%= !server.ranked ? '' : 'hidden' %>'/>"
+        content += " <img src='" + quakelive.resource("/images/modules/browser/modified_icon.png") + "' title='<%= modifiedInfo %>' class='<%= isModified ? '' : 'hidden' %>'/>"
+        content += " <img src='" + quakelive.resource("/images/lgi/server_details_ranked.png") + "' title='Password Protected' class='<%= server.g_needpass ? '' : 'hidden' %>'/>"
+        content += "</td>"
+        break;
+      case "players":
+        content += "<td class='qlab-col-players'><%= num_players %>/<%= max_size %></td>";
+        break;
+    }
+  }
+
+  _rowTemplate = new EJS({text: content});
+
+  return _rowTemplate;
+}
+
 // Rebuilds the entire server list container and contents
-AltServerListView.prototype.DisplayServerList = function(aManager) {
+AltServerListView.prototype.DisplayServerList = function() {
   var self = this
     , $container = this.GetContainer()
     , $listContainer = this.GetListContainer()
-    , servers = this.FilterServerList(aManager.GetServers())
+    , servers = this.FilterServerList(quakelive.serverManager.GetServers())
     ;
 
   // Wipe out the list container (the table) and any "no servers found" or error messages
   $listContainer.parent().remove();
   $container.find(".qlab-servers-issue").remove();
 
-  this.DisplayFilterBar(aManager, $container);
+  this.DisplayFilterBar($container);
 
   // Add the list container
-  // NOTE: keep single space character before icon images to match row spacing
-  $container.append(
+  $container.append("<table><thead>" + this.GetHeaderRow() + "</thead><tbody></tbody></table>");
+
+  /*$container.append(
       "<table>"
     +   "<thead>"
     +     "<tr>"
@@ -444,7 +565,8 @@ AltServerListView.prototype.DisplayServerList = function(aManager) {
     +   "</thead>"
     +   "<tbody></tbody>"
     + "</table>"
-  );
+  );*/
+
   $listContainer = this.GetListContainer();
   this.UpdateColumnHighlight();
 
@@ -462,7 +584,7 @@ AltServerListView.prototype.DisplayServerList = function(aManager) {
 
     self.UpdateColumnHighlight();
 
-    self.SortServerList(aManager);
+    self.SortServerList();
     return false;
   });
 
@@ -776,7 +898,7 @@ function modifiedSort(a, b) {
 
 // Sort (or delegate sorting of) the servers array
 // Called by quakelive.serverManager.SortServerList
-AltServerListView.prototype.SortServerList = function(aManager) {
+AltServerListView.prototype.SortServerList = function() {
   var letMgrHandle = [/*"location",*/ /*"ping",*/ "gametype", "map", "servername", "players"];
 
   // If we delegated sorting the server manager will make a call to our SortServerList.  To avoid
@@ -790,18 +912,18 @@ AltServerListView.prototype.SortServerList = function(aManager) {
   if (-1 !== letMgrHandle.indexOf(this.sortBy)) {
     this.ignoreNextSortServerList = true;
 
-    aManager.sortBy = this.sortBy;
-    aManager.sortReverse = this.sortReverse;
-    aManager.SortServerList();
-    aManager.sortBy = undefined;
-    aManager.sortReverse = undefined;
+    quakelive.serverManager.sortBy = this.sortBy;
+    quakelive.serverManager.sortReverse = this.sortReverse;
+    quakelive.serverManager.SortServerList();
+    quakelive.serverManager.sortBy = undefined;
+    quakelive.serverManager.sortReverse = undefined;
 
-    this.SortServerListNodes(aManager);
+    this.SortServerListNodes();
     return;
   }
 
   // Custom sorting
-  var servers = aManager.GetServers()
+  var servers = quakelive.serverManager.GetServers()
     , sorter
     ;
 
@@ -819,13 +941,13 @@ AltServerListView.prototype.SortServerList = function(aManager) {
   servers.sort(sorter);
   if (this.sortReverse) servers.reverse();
 
-  this.SortServerListNodes(aManager);
+  this.SortServerListNodes();
 }
 
 // Detaches and appends all servers in the order the manager has them
-AltServerListView.prototype.SortServerListNodes = function(aManager) {
+AltServerListView.prototype.SortServerListNodes = function() {
   var $list = this.GetListContainer();
-  var servers = aManager.GetServers();
+  var servers = quakelive.serverManager.GetServers();
   for (var i = 0; i < servers.length; i++) {
     $("#" + this.GetServerNodeId(servers[i])).detach().appendTo($list);
   }
