@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.101
+// @version        1.102
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,12 @@
 // ==/UserScript==
 
 /*
+
+Version 1.102
+- /elo shuffle,+all,-player1 allows to add all players except player1 to the shuffle
+- unified output format for /elo shuffle and /elo score (using team colors where applicable)
+- format=list now also shows average and team Elo
+- fixed "/elo shuffle!" assigning wrong players to teams
 
 Version 1.101
 - /elo shuffle now supports format=table and format=list
