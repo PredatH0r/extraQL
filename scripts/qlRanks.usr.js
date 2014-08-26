@@ -1229,7 +1229,7 @@ var extraQL = window.extraQL;
     if (gap < 80) descr = "^2balanced";
     if (gap < 40) descr = "^2very balanced";
 
-    var teamSummary = redavg && bluavg ? redavg + "(" + counts[1].count + ") " + "^4" + bluavg + "(" + counts[2].count + ") ^3Gap: " + gap + "  " + descr : "";
+    var teamSummary = redavg && bluavg ? " ^1" + redavg + "(" + counts[1].count + ") " + "^4" + bluavg + "(" + counts[2].count + ") ^3Gap: " + gap + "  " + descr : "";
     return {
       allavg: counts[0].count == 0 ? 0 : Math.round(counts[0].sum / counts[0].count),
       allcount : counts[0].count,
@@ -1550,7 +1550,7 @@ var extraQL = window.extraQL;
 
           var stats = calcStats(best_shuff);
           var desc_word = doit ? "Performing" : "Optimum";
-          qz_instance.SendGameCommand(currentOut + " \"^3" + desc_word + " Elo shuffle: ^1" + stats.teamSummary + "\"");
+          qz_instance.SendGameCommand(currentOut + " \"^3" + desc_word + " Elo shuffle:" + stats.teamSummary + "\"");
 
           var prevTeam = best_shuff[0].team;
           var teamMemberCount = 0;
