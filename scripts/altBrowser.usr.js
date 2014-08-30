@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             qlAltBrowser
 // @name           Quake Live Alt Browser
-// @version        0.16
+// @version        0.17
 // @description    A different Quake Live server browser with filtering and other tweaks
 // @namespace      phob.net
 // @author         wn
@@ -56,6 +56,10 @@ function fullRefresh() {
   quakelive.serverManager.FlushCache();
   quakelive.mod_home.ReloadServerList();
   return false;
+}
+
+function isModified(aServer) {
+  return (!!aServer.owner && (3 !== aServer.ruleset || 0 !== aServer.g_customSettings));
 }
 
 
@@ -255,7 +259,7 @@ AltServerListView.prototype.UpdateServerNode = function(aServer, $aNode) {
     server: aServer
   };
 
-  o.isModified = (aServer.owner && (aServer.ruleset != 3 || aServer.g_customSettings != 0));
+  o.isModified = isModified(aServer);
   o.modifiedInfo = "Server Modified:\n" + aServer.GetModifiedSettings().join("\n");
 
   o.mapinfo = mapdb.getBySysName(aServer.map);
@@ -776,8 +780,7 @@ function componentMatchesServer(aComponent, aServer) {
   }
 
   // Match a specific modification or special modification keywords
-  var usesMods = !!aServer.owner && (1 !== aServer.ruleset || 0 !== aServer.g_customSettings);
-  if (usesMods) {
+  if (isModified(aServer)) {
     var modsFilter = aServer.GetModifiedSettings().slice(0);
     modsFilter.push("mods"); // special keyword
     modsFilter.push("modifications"); // special keyword
@@ -869,9 +872,7 @@ function premiumSort(a, b) { return b.premium - a.premium; }
 function rankedSort(a, b) { return b.ranked - a.ranked; }
 function passwordedSort(a, b) { return b.g_needpass - a.g_needpass; }
 function modifiedSort(a, b) {
-  var aIsModified = (!!a.owner && (a.ruleset != 1 || a.g_customSettings != 0));
-  var bIsModified = (!!b.owner && (b.ruleset != 1 || b.g_customSettings != 0));
-  return bIsModified - aIsModified;
+  return isModified(b) - isModified(a);
 }
 
 // Sort (or delegate sorting of) the servers array
