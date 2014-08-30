@@ -545,28 +545,6 @@ AltServerListView.prototype.DisplayServerList = function() {
   // Add the list container
   $container.append("<table><thead>" + this.GetHeaderRow() + "</thead><tbody></tbody></table>");
 
-  /*$container.append(
-      "<table>"
-    +   "<thead>"
-    +     "<tr>"
-    +       "<th class='qlab-col-location' data-sort='location'>Location</th>"
-    +       "<th class='qlab-col-ping' data-sort='ping'>Ping</th>"
-    +       "<th class='qlab-col-gametype' title='Gametype' data-sort='gametype'>GT</th>"
-    +       "<th class='qlab-col-main'><span data-sort='map'>Map</span> (<span data-sort='servername'>Hostname</span>)</th>"
-    +       "<th class='qlab-col-icons'>"
-    +          "<img data-sort='skill' src='" + quakelive.resource("/images/sqranks/rank_1.png") + "' title='Skill'/>"
-    +          " <img data-sort='premium' src='" + quakelive.resource("/images/lgi/premium_icon.png") + "' title='Premium Match'/>"
-    +          " <img data-sort='unranked' src='" + quakelive.resource("/images/modules/browser/unrank_icon.png") + "' title='Unranked Match'/>"
-    +          " <img data-sort='modified' src='" + quakelive.resource("/images/modules/browser/modified_icon.png") + "' title='Server Modified'/>"
-    +          " <img data-sort='passworded' src='" + quakelive.resource("/images/lgi/server_details_ranked.png") + "' title='Password Protected'/>"
-    +       "</th>"
-    +       "<th class='qlab-col-players' data-sort='players'>Players</th>"
-    +     "</tr>"
-    +   "</thead>"
-    +   "<tbody></tbody>"
-    + "</table>"
-  );*/
-
   $listContainer = this.GetListContainer();
   this.UpdateColumnHighlight();
 
