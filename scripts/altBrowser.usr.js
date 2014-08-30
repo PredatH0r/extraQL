@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             qlAltBrowser
 // @name           Quake Live Alt Browser
-// @version        0.15
+// @version        0.16
 // @description    A different Quake Live server browser with filtering and other tweaks
 // @namespace      phob.net
 // @author         wn
@@ -126,7 +126,7 @@ var TMPL_help = [
   ,   "<li><b>Ranking:</b> 'ranked', 'unranked'</li>"
   ,   "<li><b>Skill level:</b> 'Unrestricted', 'Skill Matched', etc. (hover over icons)</li>"
   ,   "<li><b>Passworded:</b> 'password', 'passworded', 'password protected'</li>"
-  ,   "<li><b>Modifications:</b> 'mods', 'modifications', 'air control', 'headshots', etc. (hover over icons)</li>"
+  ,   "<li><b>Modifications:</b> 'ruleset: classic', 'ruleset: turbo', 'mods', 'modifications', 'air control', 'headshots', etc. (hover over icons)</li>"
   ,   "<li><b>Special keywords:</b> 'qlab.open' (playable slots available)</li>"
   , "</ul>"
   , "<p>It is possible to combine keywords to make a filter segment more specific.  For example:</p>"
@@ -255,7 +255,7 @@ AltServerListView.prototype.UpdateServerNode = function(aServer, $aNode) {
     server: aServer
   };
 
-  o.isModified = (aServer.owner && (aServer.ruleset != 1 || aServer.g_customSettings != 0));
+  o.isModified = (aServer.owner && (aServer.ruleset != 3 || aServer.g_customSettings != 0));
   o.modifiedInfo = "Server Modified:\n" + aServer.GetModifiedSettings().join("\n");
 
   o.mapinfo = mapdb.getBySysName(aServer.map);
