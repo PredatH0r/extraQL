@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.103
+// @version        1.104
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,11 @@
 // ==/UserScript==
 
 /*
+
+Version 1.104
+- show Team Elo gap in the color of the team that has the higher Elo
+- no longer showing ??? as QLRanks score in match browser details for unsupported game types
+- improved "/elo help" command
 
 Version 1.103
 - added /elo profile=x,y,... to open QLRanks profile of players x,y,... in your browser
@@ -1031,16 +1036,7 @@ var extraQL = window.extraQL;
     if (val == "" || "\"" + val + "\"" == CMD_DEFAULT)
       return;
     if (val == "help") {
-      qz_instance.SendGameCommand("echo Usage: ^5/" + CMD_NAME + "^7 <^3command^7>");
-      qz_instance.SendGameCommand("echo \"^3method^7    print the current output method\"");
-      qz_instance.SendGameCommand("echo \"^3method=^7x  sets the output method to ^3echo^7,^3print^7,^3say_team^7 or ^3say^7\"");
-      qz_instance.SendGameCommand("echo \"^3format=^7x  sets the output format to ^3table^7 or ^3list^7\"");
-      qz_instance.SendGameCommand("echo \"^3sort=^7x    sets the sort criteria to ^3ql^7, ^3team^7 or ^3elo^7\"");
-      qz_instance.SendGameCommand("echo \"^3score^7     shows the QLRanks score of each player on the server\"");
-      qz_instance.SendGameCommand("echo \"^3games^7     shows the number of completed games for each player\"");
-      qz_instance.SendGameCommand("echo \"^3shuffle^7   suggest the most even teams based on QLRanks score\"");
-      qz_instance.SendGameCommand("echo \"^3shuffle!^7  if OP, setup the teams as suggested\"");
-      qz_instance.SendGameCommand("echo \"^3profile=^7x opens the QLranks profile of player x in your browser\"");
+      showHelp();
     } else if (val == "score")
       announce("1");
     else if (val == "method")
@@ -1066,6 +1062,21 @@ var extraQL = window.extraQL;
     else
       qz_instance.SendGameCommand("echo " + CMD_USAGE);
     qz_instance.SendGameCommand("set " + CMD_NAME + "\"\"");
+  }
+
+  function showHelp() {
+    qz_instance.SendGameCommand("echo Usage: ^5/" + CMD_NAME + "^7 <^3command^7>");
+    qz_instance.SendGameCommand("echo \"^3method^7    print the current output method\"");
+    qz_instance.SendGameCommand("echo \"^3method=^7x  sets the output method to ^3echo^7,^3print^7,^3say_team^7 or ^3say^7\"");
+    qz_instance.SendGameCommand("echo \"^3format=^7x  sets the output format to ^3table^7 or ^3list^7\"");
+    qz_instance.SendGameCommand("echo \"^3sort=^7x    sets the sort criteria to ^3ql^7, ^3team^7 or ^3elo^7\"");
+    qz_instance.SendGameCommand("echo \"^3score^7     shows the QLRanks score of each player on the server\"");
+    qz_instance.SendGameCommand("echo \"^3games^7     shows the number of completed games for each player\"");
+    qz_instance.SendGameCommand("echo \"^3shuffle^7   suggest the most even teams based on QLRanks score\"");
+    qz_instance.SendGameCommand("echo \"          append ^3,+all,+player1,-player2^7 to add/remove players\"");
+    qz_instance.SendGameCommand("echo \"^3shuffle!^7  if OP, setup the teams as suggested\"");
+    qz_instance.SendGameCommand("echo \"^3profile=^7x opens QLranks.com player profile in your browser\"");
+    qz_instance.SendGameCommand("echo \"          ^3x^7 is a comma separated list of game types and players\"");
   }
 
   function setOutputMethod(val) {
@@ -1619,6 +1630,7 @@ var extraQL = window.extraQL;
     var redavg = counts[1].count == 0 ? 0 : Math.round(counts[1].sum / counts[1].count);
     var bluavg = counts[2].count == 0 ? 0 : Math.round(counts[2].sum / counts[2].count);
     var gap = Math.abs(redavg - bluavg);
+    var gapColor = redavg > bluavg ? "^1" : bluavg > redavg ? "^4" : "^2";
 
     var descr = "^1ragequit";
     if (gap < 300) descr = "^1unplayable";
@@ -1628,7 +1640,7 @@ var extraQL = window.extraQL;
     if (gap < 80) descr = "^2balanced";
     if (gap < 40) descr = "^2very balanced";
 
-    var teamSummary = redavg && bluavg ? " ^1" + redavg + "(" + counts[1].count + ") " + "^4" + bluavg + "(" + counts[2].count + ") ^3Gap: " + gap + "  " + descr : "";
+    var teamSummary = redavg && bluavg ? " ^1" + redavg + "(" + counts[1].count + ") " + "^4" + bluavg + "(" + counts[2].count + ") ^3Gap: " + gapColor + gap + "  " + descr : "";
     return {
       allavg: counts[0].count == 0 ? 0 : Math.round(counts[0].sum / counts[0].count),
       allcount: counts[0].count,
@@ -1728,6 +1740,9 @@ var extraQL = window.extraQL;
   quakelive.matchcolumn.RenderMatchDetails = function(node, server) {
     currentServer = server;
     oldRenderMatchDetails.call(quakelive.matchcolumn, node, server);
+
+    if (!(server.gt.name.toLowerCase() in QLRD.GAMETYPES))
+      return;
 
     var playerList = [];
     var nodeByName = {};
