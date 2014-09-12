@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.104
+// @version        1.105
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,10 @@
 // ==/UserScript==
 
 /*
+
+Version 1.105
+- fixed "/elo shuffle!" printing "unknown cmd undefined" instead of putting players into teams
+- "/elo games" now shows players with >= 10k games in a different color
 
 Version 1.104
 - show Team Elo gap in the color of the team that has the higher Elo
@@ -1337,7 +1341,7 @@ var extraQL = window.extraQL;
                 for (var i = 0; i < games_played.length; i++) {
                   (function(player) {
                     window.setTimeout(function() {
-                      var color = player.Games < 400 ? "^3" : "^2";
+                      var color = player.Games < 400 ? "^3" : player.Games >= 10000 ? "^6": "^2";
                       qz_instance.SendGameCommand(currentOut + " \"^7" + pad(player.Name, 15) + " " + color + pad(player.Games, -6) + "^7\"");
                     }, i * step);
                   })(games_played[i]);
@@ -1527,10 +1531,8 @@ var extraQL = window.extraQL;
 
             for (var i = 0; i < best_shuff.length; i++) {
               var put_command = commands[i];
-              (function(put_command, i) {
-                window.setTimeout(function(command) {
-                  qz_instance.SendGameCommand(command);
-                }, i * 1100);
+              (function(command, i) {
+                window.setTimeout(function() { qz_instance.SendGameCommand(command); }, i * 1100);
               })(put_command, i);
             }
           }
