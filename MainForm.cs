@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -12,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.7";
+    public const string Version = "1.8";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -580,8 +581,25 @@ namespace ExtraQL
         this.Log("Unable to detect Quake Live's baseq3 directory");
         return;
       }
-      var targetHook = path + "hook.js";
-      var backupHook = path + "hook_.js";
+
+      if (steam)
+      {
+        // copy hook.js to all <steam-user-id>\baseq3 directories
+        var dirs = Directory.GetDirectories(path);
+        foreach (var dir in dirs)
+        {
+          if (Regex.IsMatch(Path.GetFileName(dir), "\\d{5,}"))
+            InstallHookJs(dir + "\\baseq3\\", force);
+        }
+      }
+      else
+        InstallHookJs(path, force);
+    }
+
+    private void InstallHookJs(string baseq3Path, bool force)
+    {
+      var targetHook = baseq3Path + "hook.js";
+      var backupHook = baseq3Path + "hook_.js";
 
       // create backup of original hook.js
       if (!File.Exists(backupHook))
@@ -637,7 +655,7 @@ namespace ExtraQL
       {
         path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
         if (path != null)
-          path += @"\SteamApps\Common\Quake Live\baseq3\";
+          path += @"\SteamApps\Common\Quake Live\";
       }
       else
       {

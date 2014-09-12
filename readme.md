@@ -18,11 +18,15 @@ B) hook.js only (reduced functionality)
 - save hook.js to your Quake Live config directory:
    * For the standalone launcher on Windows XP this is: %appdata%\\id software\\quakelive\\home\\baseq3
    * For the standalone launcher on Win Vista and later: %appdata%\\..\\LocalLow\\id software\\home\\baseq3
-   * For Steam version of QL this is: <steamdir>\\SteamApps\\Common\\Quake Live\\baseq3
+   * For Steam version of QL this is: <steamdir>\\SteamApps\\common\\Quake Live\\<steam-user-id>\\baseq3
 
 
 Changelog
 =========
+
+Version 1.8
+---
+- support for latest steam build (with configs and hook.js in SteamApps\\common\\Quake Live\\<steam-user-id>\\baseq3
 
 Version 1.7
 ---
