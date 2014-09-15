@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -484,7 +483,9 @@ namespace ExtraQL
     {
       get
       {
-        foreach (Process proc in Process.GetProcessesByName("quakelive"))
+        foreach (Process proc in Process.GetProcessesByName("quakelive")) // standalone
+          return proc.MainWindowHandle;
+        foreach (Process proc in Process.GetProcessesByName("quakelive_steam")) // steam
           return proc.MainWindowHandle;
         return IntPtr.Zero;
       }

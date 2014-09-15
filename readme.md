@@ -24,6 +24,10 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.9
+---
+- fixed detection for running QL Steam build
+
 Version 1.8
 ---
 - support for latest steam build (with configs and hook.js in SteamApps\\common\\Quake Live\\<steam-user-id>\\baseq3
