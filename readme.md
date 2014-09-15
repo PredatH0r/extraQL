@@ -24,9 +24,14 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.10
+---
+- "Focus Member" check box and section are no longer visible by default, if "focus" is empty in .ini file
+- fixed detection for running QL Steam build for "auto quit extraQL when QL quits"
+
 Version 1.9
 ---
-- fixed detection for running QL Steam build
+- fixed detection for running QL Steam build (for docker userscript)
 
 Version 1.8
 ---

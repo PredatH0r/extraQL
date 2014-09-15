@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.9";
+    public const string Version = "1.10";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -405,10 +405,10 @@ namespace ExtraQL
     #region autoQuitTimer_Tick
     private void autoQuitTimer_Tick(object sender, EventArgs e)
     {
-      int count = Process.GetProcessesByName("quakelive").Length;
-      if (this.autoQuitQlIsRunning && count == 0)
+      bool running = Servlets.QLWindowHandle != IntPtr.Zero;
+      if (this.autoQuitQlIsRunning && !running)
         this.Close();
-      else if (count > 0)
+      else if (running)
         this.autoQuitQlIsRunning = true;
     }
     #endregion
@@ -435,7 +435,8 @@ namespace ExtraQL
       this.comboRealm.Text = config.GetString("realm");
 
       this.cbAdvanced.Checked = config.GetBool("advanced");
-      this.cbFocus.Checked = config.GetBool("focus");
+      this.cbFocus.Checked = config.GetString("focus") == "1";
+      this.cbFocus.Visible = config.GetString("focus") != "";
       this.cbBindToAll.Checked = config.GetBool("bindToAll");
       this.cbSystemTray.Checked = config.GetBool("systemTray");
       this.cbStartMinimized.Checked = config.GetBool("startMinimized");
@@ -470,7 +471,7 @@ namespace ExtraQL
           this.config.RealmHistory.Add(realmUrl);
         }
         config.Set("lastEmail", this.comboEmail.Text);
-        config.Set("focus", this.cbFocus.Checked);
+        config.Set("focus", !this.cbFocus.Visible ? "" : this.cbFocus.Checked ? "1" : "0");
         config.Set("advanced", this.cbAdvanced.Checked);
         config.Set("realm", this.comboRealm.Text);
         config.Set("launcherExe", this.txtLauncherExe.Text);

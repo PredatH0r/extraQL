@@ -383,10 +383,10 @@ namespace ExtraQL
       this.cbLog.AutoSize = true;
       this.cbLog.Checked = true;
       this.cbLog.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbLog.Location = new System.Drawing.Point(221, 187);
+      this.cbLog.Location = new System.Drawing.Point(95, 188);
       this.cbLog.Name = "cbLog";
       this.cbLog.Size = new System.Drawing.Size(43, 17);
-      this.cbLog.TabIndex = 29;
+      this.cbLog.TabIndex = 9;
       this.cbLog.Text = "Log";
       this.cbLog.UseVisualStyleBackColor = true;
       this.cbLog.CheckedChanged += new System.EventHandler(this.cbLog_CheckedChanged);
@@ -467,10 +467,10 @@ namespace ExtraQL
       this.cbFocus.AutoSize = true;
       this.cbFocus.Checked = true;
       this.cbFocus.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbFocus.Location = new System.Drawing.Point(12, 187);
+      this.cbFocus.Location = new System.Drawing.Point(153, 189);
       this.cbFocus.Name = "cbFocus";
       this.cbFocus.Size = new System.Drawing.Size(111, 17);
-      this.cbFocus.TabIndex = 8;
+      this.cbFocus.TabIndex = 10;
       this.cbFocus.Text = "QL Focus Member";
       this.cbFocus.UseVisualStyleBackColor = false;
       this.cbFocus.CheckedChanged += new System.EventHandler(this.cbFocus_CheckedChanged);
@@ -484,7 +484,7 @@ namespace ExtraQL
       this.linkAbout.Location = new System.Drawing.Point(289, 188);
       this.linkAbout.Name = "linkAbout";
       this.linkAbout.Size = new System.Drawing.Size(128, 18);
-      this.linkAbout.TabIndex = 10;
+      this.linkAbout.TabIndex = 11;
       this.linkAbout.TabStop = true;
       this.linkAbout.Text = "visit the extraQL website";
       this.linkAbout.TextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -496,10 +496,10 @@ namespace ExtraQL
       this.cbAdvanced.AutoSize = true;
       this.cbAdvanced.Checked = true;
       this.cbAdvanced.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbAdvanced.Location = new System.Drawing.Point(135, 187);
+      this.cbAdvanced.Location = new System.Drawing.Point(12, 187);
       this.cbAdvanced.Name = "cbAdvanced";
       this.cbAdvanced.Size = new System.Drawing.Size(63, 17);
-      this.cbAdvanced.TabIndex = 9;
+      this.cbAdvanced.TabIndex = 8;
       this.cbAdvanced.Text = "Options";
       this.cbAdvanced.UseVisualStyleBackColor = true;
       this.cbAdvanced.CheckedChanged += new System.EventHandler(this.cbAdvanced_CheckedChanged);

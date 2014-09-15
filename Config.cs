@@ -31,7 +31,7 @@ namespace ExtraQL
       this.settings["email"] = "";
       this.settings["password"] = "";
       this.settings["lastEmail"] = "";
-      this.settings["focus"] = "0";
+      this.settings["focus"] = "";
       this.settings["advanced"] = "0";
       this.settings["realm"] = "";
       this.settings["realmHistory"] = "";
