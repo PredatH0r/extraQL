@@ -1,12 +1,15 @@
 ﻿// ==UserScript==
 // @name        Quake Live Twich.tv Streams and VODs
-// @version     1.4
+// @version     1.5
 // @author      PredatH0r
 // @description	Shows a list of twitch.tv QL live streams and videos
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.5
+- added workaround to make external URLs work in Steam build
 
 Version 1.4
 - fixed stuck at "loading..." on live streams
@@ -223,7 +226,7 @@ Version 1.0
             " data-preview='" + item.preview.medium + "'" +
             " data-status=\"" + extraQL.escapeHtml(item.channel.status) + "\"" +
             ">" +
-            "<a href='" + item.channel.url + "' target='_blank'>" +
+            "<a href='javascript:quakelive.OpenURL(\"" + item.channel.url + "\")' target='_blank'>" +
             extraQL.escapeHtml(item.channel.display_name) + " (" + item.viewers + ")</a></div>");
         });
       });
@@ -354,7 +357,7 @@ Version 1.0
             " data-preview='" + item.preview + "'" +
             " data-status=\"[" + vidDate + "] " + vidLength + " &lt;b&gt;" + extraQL.escapeHtml(channel) + "&lt;/b&gt;&lt;br&gt;" + extraQL.escapeHtml(item.title) + "\"" +
             ">" +
-            "<a href='" + item.url + "' target='_blank'>" + extraQL.escapeHtml(item.title) + "</a></div>");
+            "<a href='javascript:quakelive.OpenURL(\"" + item.url + "\")' target='_blank'>" + extraQL.escapeHtml(item.title) + "</a></div>");
         });
       });
       $("#twitchContent div").hover(showStreamDetails);

@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @id          187258
 // @name        Linkify
-// @version     1.4
+// @version     1.5
 // @author      PredatH0r
 // @description	Turn plain text URLs into links
 // @unwrap
@@ -11,6 +11,9 @@
 
 Linkify Plus modified by PredatH0r, based on modified version from kry.
 This version is tailored to work with Quake Live standalone client and QLHM.
+
+Version 1.5
+- added workaround to open external links in QL Steam build
 
 Version 1.4
 - fixed cannot call getElementById of undefined
@@ -212,7 +215,7 @@ Using the Linkify Plus version 2.0.2. as a base.
       } else if (-1 == l.indexOf('://')) {
         l = 'mailto:' + l;
       }
-      a.setAttribute('href', l);
+      a.setAttribute('href', "javascript:quakelive.OpenURL(\"" + l + "\")");
       a.style.color = linkcolor;
       if (l.match(/^http:\/\/www\.quakelive\.com\/forum/i) || !(l.match(/^http:\/\/www\.quakelive\.com/i) || l.match(/^https:\/\/secure\.quakelive\.com/i))) {
         a.setAttribute('target', '_blank');

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.105
+// @version        1.106
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,9 @@
 // ==/UserScript==
 
 /*
+
+Version 1.106
+- added workaround to open external links in QL Steam build
 
 Version 1.105
 - fixed "/elo shuffle!" printing "unknown cmd undefined" instead of putting players into teams
@@ -715,9 +718,9 @@ var extraQL = window.extraQL;
 
       // Add the Elo cell
       $scoreCols.eq(i).before("<div class='lgi_cli_col_elo'>"
-        + "<a id='lgi_cli_elo_" + player + "' href='http://www.qlranks.com/"
+        + "<a id='lgi_cli_elo_" + player + "' href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/"
         + gt + "/player/" + player
-        + "' target='_blank'>&hellip;</a></div>");
+        + "\")' target='_blank'>&hellip;</a></div>");
 
       // Request the Elo rating of the player
       var s = { "name": player, "targets": {} };
@@ -776,12 +779,12 @@ var extraQL = window.extraQL;
 
     // Prepend the Elo rating div so we don't get an annoying FoC.
     var con = "<div id='qlr_elo'>"
-      + "<div><a href='http://www.qlranks.com/duel/player/" + name + "' target='_blank'>QLRanks.com Elo</a></div>"
-      + "<div><a href='http://www.qlranks.com/duel/player/" + name + "' target='_blank'>Duel: <span id='qlr_elo_duel'>loading&hellip;</span></a></div>"
-      + "<div><a href='http://www.qlranks.com/tdm/player/" + name + "' target='_blank'>TDM: <span id='qlr_elo_tdm'>loading&hellip;</span></a></div>"
-      + "<div><a href='http://www.qlranks.com/ctf/player/" + name + "' target='_blank'>CTF: <span id='qlr_elo_ctf'>loading&hellip;</span></a></div>"
-      + "<div><a href='http://www.qlranks.com/ca/player/" + name + "' target='_blank'>CA: <span id='qlr_elo_ca'>loading&hellip;</span></a></div>"
-      + "<div><a href='http://www.qlranks.com/ffa/player/" + name + "' target='_blank'>FFA: <span id='qlr_elo_ffa'>loading&hellip;</span></a></div>"
+      + "<div><a href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/duel/player/" + name + "\")' target='_blank'>QLRanks.com Elo</a></div>"
+      + "<div><a href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/duel/player/" + name + "\")' target='_blank'>Duel: <span id='qlr_elo_duel'>loading&hellip;</span></a></div>"
+      + "<div><a href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/tdm/player/" + name + "\")' target='_blank'>TDM: <span id='qlr_elo_tdm'>loading&hellip;</span></a></div>"
+      + "<div><a href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/ctf/player/" + name + "\")' target='_blank'>CTF: <span id='qlr_elo_ctf'>loading&hellip;</span></a></div>"
+      + "<div><a href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/ca/player/" + name + "\")' target='_blank'>CA: <span id='qlr_elo_ca'>loading&hellip;</span></a></div>"
+      + "<div><a href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/ffa/player/" + name + "\")' target='_blank'>FFA: <span id='qlr_elo_ffa'>loading&hellip;</span></a></div>"
       + "</div>"
       + aCon;
 
@@ -853,8 +856,8 @@ var extraQL = window.extraQL;
     $pcn.before("<span id='qlv_user_data_elo_gametype' title='Click to change QLRanks.com Elo gametype'>" + PREFS.get("user_gt") + "</span>"
       + "<div id='qlv_user_data_elo_gametype_menu'>"
       + "<span>CA</span><span>CTF</span><span>Duel</span><span>FFA</span><span>TDM</span></div>: "
-      + "<a id='qlv_user_data_elo' href='http://www.qlranks.com/" + PREFS.get("user_gt").toLowerCase() + "/player/"
-      + quakelive.username + "' target='_blank'>&hellip;</a>"
+      + "<a id='qlv_user_data_elo' href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/" + PREFS.get("user_gt").toLowerCase() + "/player/"
+      + quakelive.username + "\")' target='_blank'>&hellip;</a>"
       + "<div class='cl' style='margin-bottom: 5px'></div>");
 
     // ... and get the Elo rating
@@ -889,7 +892,7 @@ var extraQL = window.extraQL;
 
         // Update the URL
         $("#qlv_user_data_elo").attr("href",
-          "http://www.qlranks.com/" + new_gt.toLowerCase() + "/player/" + quakelive.username);
+          "javascript:quakelive.OpenURL(\"http://www.qlranks.com/" + new_gt.toLowerCase() + "/player/" + quakelive.username + "\")");
 
         // Show the appropriate Elo #
         var s = { "name": quakelive.username, "targets": {} };
@@ -929,14 +932,14 @@ var extraQL = window.extraQL;
       // Player 1 (left side)
       $mvs.find(".flagNum1")
         .after("<div id='match_vscontainer_elo1'>"
-          + "<a href='http://www.qlranks.com/duel/player/" + player1
-          + "' target='_blank'>&hellip;</a></div>");
+          + "<a href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/duel/player/" + player1
+          + "\")' target='_blank'>&hellip;</a></div>");
 
       // Player 2 (right side)
       $mvs.find(".flagNum2")
         .before("<div id='match_vscontainer_elo2'>"
-          + "<a href='http://www.qlranks.com/duel/player/" + player2
-          + "' target='_blank'>&hellip;</a></div>");
+          + "<a href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/duel/player/" + player2
+          + "\")' target='_blank'>&hellip;</a></div>");
 
       // Wait a bit so the versus frame gets inserted.
       window.setTimeout(function() {
@@ -1785,7 +1788,7 @@ var extraQL = window.extraQL;
         var player = QLRD.PLAYERS[name];
         var elo = player && player[gt] && player[gt].elo ? player[gt].elo : "???";
         player.rating = elo;
-        $node.append("<div class='elo'><a href='http://www.qlranks.com/" + gt + "/player/" + name + "' target='_blank'>" + elo + "</a></div>");
+        $node.append("<div class='elo'><a href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/" + gt + "/player/" + name + "\")' target='_blank'>" + elo + "</a></div>");
         if (sortStyle)
           $node.detach();
 

@@ -1,13 +1,16 @@
 ﻿// ==UserScript==
 // @id          esreality
 // @name        ESReality.com Integration
-// @version     1.2
+// @version     1.3
 // @author      PredatH0r
 // @description	Shows a list of esreality.com Quake Live forum posts
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.3
+- added workaround for external links in QL Steam build
 
 Version 1.2
 - fixed URL parameters to only load QL forum posts
@@ -125,7 +128,7 @@ Version 1.0
         var descr = "Author: <b>" + extraQL.escapeHtml(author) + "</b>, Replies: " + replies + "<br/>" + lastCommentTime;
         $forum.append("<div" +
           " data-status='" + extraQL.escapeHtml(descr) + "'>" +
-          "<a href='http://www.esreality.com" + $link.attr("href") + "' target='_blank'>" +
+          "<a href='javascript:quakelive.OpenURL(\"http://www.esreality.com" + $link.attr("href") + "\")' target='_blank'>" +
           extraQL.escapeHtml($link.text()) +"</a></div>");
       });
       $("#esrealityContent div").hover(showForumDetails);

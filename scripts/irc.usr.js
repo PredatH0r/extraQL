@@ -1,13 +1,16 @@
 ﻿// ==UserScript==
 // @id             186820
 // @name           Quake Live IRC Link
-// @version        1.2
+// @version        1.3
 // @author         PredatH0r
 // @description    Adds a link to the QuakeNet.org IRC Web Chat to your chat window
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.3
+- added workaround for external links in QL Steam build
 
 Version 1.2
 - ensuring consistent order of tabs in the chat bar
@@ -42,7 +45,7 @@ Version 1.1
     if ($("#tab_irc").length)
       return;
     extraQL.addTabPage("irc", "IRC", "", function() {
-      window.open(URL_IRC);
+      quakelive.OpenURL(URL_IRC);
       window.event.stopPropagation();
     }, 400);
   }
