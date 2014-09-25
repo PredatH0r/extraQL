@@ -24,6 +24,10 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.11
+---
+- added links in extraQL.exe UI to open standalone and steam config directories
+
 Version 1.10
 ---
 - "Focus Member" check box and section are no longer visible by default, if "focus" is empty in .ini file

@@ -90,6 +90,8 @@ namespace ExtraQL
       this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.txtLog = new System.Windows.Forms.TextBox();
       this.autoQuitTimer = new System.Windows.Forms.Timer(this.components);
+      this.linkSteamConfig = new System.Windows.Forms.LinkLabel();
+      this.linkStandaloneConfig = new System.Windows.Forms.LinkLabel();
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -174,7 +176,7 @@ namespace ExtraQL
       this.panelAdvanced.BackColor = System.Drawing.Color.Transparent;
       this.panelAdvanced.Controls.Add(this.grpAdvanced);
       this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.panelAdvanced.Location = new System.Drawing.Point(0, 325);
+      this.panelAdvanced.Location = new System.Drawing.Point(0, 342);
       this.panelAdvanced.Name = "panelAdvanced";
       this.panelAdvanced.Size = new System.Drawing.Size(429, 260);
       this.panelAdvanced.TabIndex = 2;
@@ -357,6 +359,8 @@ namespace ExtraQL
       // panelTop
       // 
       this.panelTop.BackColor = System.Drawing.Color.Transparent;
+      this.panelTop.Controls.Add(this.linkSteamConfig);
+      this.panelTop.Controls.Add(this.linkStandaloneConfig);
       this.panelTop.Controls.Add(this.cbLog);
       this.panelTop.Controls.Add(this.picClose);
       this.panelTop.Controls.Add(this.picMinimize);
@@ -375,7 +379,7 @@ namespace ExtraQL
       this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
       this.panelTop.Location = new System.Drawing.Point(0, 0);
       this.panelTop.Name = "panelTop";
-      this.panelTop.Size = new System.Drawing.Size(429, 223);
+      this.panelTop.Size = new System.Drawing.Size(429, 240);
       this.panelTop.TabIndex = 0;
       // 
       // cbLog
@@ -383,7 +387,7 @@ namespace ExtraQL
       this.cbLog.AutoSize = true;
       this.cbLog.Checked = true;
       this.cbLog.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbLog.Location = new System.Drawing.Point(95, 188);
+      this.cbLog.Location = new System.Drawing.Point(95, 209);
       this.cbLog.Name = "cbLog";
       this.cbLog.Size = new System.Drawing.Size(43, 17);
       this.cbLog.TabIndex = 9;
@@ -467,7 +471,7 @@ namespace ExtraQL
       this.cbFocus.AutoSize = true;
       this.cbFocus.Checked = true;
       this.cbFocus.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbFocus.Location = new System.Drawing.Point(153, 189);
+      this.cbFocus.Location = new System.Drawing.Point(153, 210);
       this.cbFocus.Name = "cbFocus";
       this.cbFocus.Size = new System.Drawing.Size(111, 17);
       this.cbFocus.TabIndex = 10;
@@ -481,7 +485,7 @@ namespace ExtraQL
       this.linkAbout.AutoSize = true;
       this.linkAbout.LinkArea = new System.Windows.Forms.LinkArea(10, 22);
       this.linkAbout.LinkColor = System.Drawing.Color.Gold;
-      this.linkAbout.Location = new System.Drawing.Point(289, 188);
+      this.linkAbout.Location = new System.Drawing.Point(289, 209);
       this.linkAbout.Name = "linkAbout";
       this.linkAbout.Size = new System.Drawing.Size(128, 18);
       this.linkAbout.TabIndex = 11;
@@ -496,7 +500,7 @@ namespace ExtraQL
       this.cbAdvanced.AutoSize = true;
       this.cbAdvanced.Checked = true;
       this.cbAdvanced.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbAdvanced.Location = new System.Drawing.Point(12, 187);
+      this.cbAdvanced.Location = new System.Drawing.Point(12, 208);
       this.cbAdvanced.Name = "cbAdvanced";
       this.cbAdvanced.Size = new System.Drawing.Size(63, 17);
       this.cbAdvanced.TabIndex = 8;
@@ -573,7 +577,7 @@ namespace ExtraQL
       this.panelFocus.BackColor = System.Drawing.Color.Transparent;
       this.panelFocus.Controls.Add(this.grpFocus);
       this.panelFocus.Dock = System.Windows.Forms.DockStyle.Top;
-      this.panelFocus.Location = new System.Drawing.Point(0, 223);
+      this.panelFocus.Location = new System.Drawing.Point(0, 240);
       this.panelFocus.Name = "panelFocus";
       this.panelFocus.Size = new System.Drawing.Size(429, 102);
       this.panelFocus.TabIndex = 1;
@@ -657,7 +661,7 @@ namespace ExtraQL
       this.panelLog.Dock = System.Windows.Forms.DockStyle.Right;
       this.panelLog.Location = new System.Drawing.Point(429, 0);
       this.panelLog.Name = "panelLog";
-      this.panelLog.Size = new System.Drawing.Size(495, 585);
+      this.panelLog.Size = new System.Drawing.Size(495, 602);
       this.panelLog.TabIndex = 3;
       // 
       // grpLog
@@ -672,7 +676,7 @@ namespace ExtraQL
       this.grpLog.ForeColor = System.Drawing.Color.White;
       this.grpLog.Location = new System.Drawing.Point(12, 7);
       this.grpLog.Name = "grpLog";
-      this.grpLog.Size = new System.Drawing.Size(471, 567);
+      this.grpLog.Size = new System.Drawing.Size(471, 584);
       this.grpLog.TabIndex = 0;
       this.grpLog.TabStop = false;
       this.grpLog.Text = "Log";
@@ -721,7 +725,7 @@ namespace ExtraQL
       this.txtLog.Name = "txtLog";
       this.txtLog.ReadOnly = true;
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.txtLog.Size = new System.Drawing.Size(453, 503);
+      this.txtLog.Size = new System.Drawing.Size(453, 520);
       this.txtLog.TabIndex = 13;
       // 
       // autoQuitTimer
@@ -729,12 +733,38 @@ namespace ExtraQL
       this.autoQuitTimer.Interval = 2000;
       this.autoQuitTimer.Tick += new System.EventHandler(this.autoQuitTimer_Tick);
       // 
+      // linkSteamConfig
+      // 
+      this.linkSteamConfig.LinkArea = new System.Windows.Forms.LinkArea(0, 37);
+      this.linkSteamConfig.LinkColor = System.Drawing.Color.Gold;
+      this.linkSteamConfig.Location = new System.Drawing.Point(220, 183);
+      this.linkSteamConfig.Name = "linkSteamConfig";
+      this.linkSteamConfig.Size = new System.Drawing.Size(197, 18);
+      this.linkSteamConfig.TabIndex = 30;
+      this.linkSteamConfig.TabStop = true;
+      this.linkSteamConfig.Text = "Open Steam Config Folder";
+      this.linkSteamConfig.UseCompatibleTextRendering = true;
+      this.linkSteamConfig.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkSteamConfig_LinkClicked);
+      // 
+      // linkStandaloneConfig
+      // 
+      this.linkStandaloneConfig.LinkArea = new System.Windows.Forms.LinkArea(0, 40);
+      this.linkStandaloneConfig.LinkColor = System.Drawing.Color.Gold;
+      this.linkStandaloneConfig.Location = new System.Drawing.Point(12, 183);
+      this.linkStandaloneConfig.Name = "linkStandaloneConfig";
+      this.linkStandaloneConfig.Size = new System.Drawing.Size(196, 13);
+      this.linkStandaloneConfig.TabIndex = 29;
+      this.linkStandaloneConfig.TabStop = true;
+      this.linkStandaloneConfig.Text = "Open Standalone Config Folder";
+      this.linkStandaloneConfig.UseCompatibleTextRendering = true;
+      this.linkStandaloneConfig.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkStandaloneConfig_LinkClicked);
+      // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
       this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-      this.ClientSize = new System.Drawing.Size(924, 585);
+      this.ClientSize = new System.Drawing.Size(924, 602);
       this.Controls.Add(this.panelAdvanced);
       this.Controls.Add(this.panelFocus);
       this.Controls.Add(this.panelTop);
@@ -824,6 +854,8 @@ namespace ExtraQL
     private CheckBox cbLogAllRequests;
     private CheckBox cbAutoQuit;
     private Timer autoQuitTimer;
+    private LinkLabel linkSteamConfig;
+    private LinkLabel linkStandaloneConfig;
   }
 }
 

@@ -105,9 +105,7 @@ Version 1.0
       dataType: "text"
     })
     .done(parseForum)
-    .fail(function() {
-      extraQL.rlog("Could not load esreality forum");
-    });
+    .fail(function() { extraQL.log("Could not load esreality forum"); });
 
     updateTimeoutHandle = window.setTimeout(updateForums, UPDATE_INTERVAL);
   }

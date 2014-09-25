@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.10";
+    public const string Version = "1.11";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -174,6 +174,20 @@ namespace ExtraQL
     }
     #endregion
 
+    #region linkStandaloneConfig_LinkClicked
+    private void linkStandaloneConfig_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      this.OpenConfigFolder(false);
+    }
+    #endregion
+
+    #region linkSteamConfig_LinkClicked
+    private void linkSteamConfig_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      this.OpenConfigFolder(true);
+    }
+    #endregion
+
     #region cbFocus_CheckedChanged
     private void cbFocus_CheckedChanged(object sender, EventArgs e)
     {
@@ -227,8 +241,7 @@ namespace ExtraQL
     #region comboRealm_SelectedValueChanged
     private void comboRealm_SelectedValueChanged(object sender, EventArgs e)
     {
-      this.btnStartSteam.Enabled = this.comboRealm.Text == "" && this.GetBaseq3Path(true) != null;
-      this.miStartSteam.Enabled = this.btnStartSteam.Enabled;
+      this.UpdateSteamControls();
     }
     #endregion
 
@@ -522,6 +535,16 @@ namespace ExtraQL
     }
     #endregion
 
+    #region UpdateSteamControls()
+    private void UpdateSteamControls()
+    {
+      bool hasSteam = this.GetBaseq3Path(true) != null;
+      this.btnStartSteam.Enabled = this.comboRealm.Text == "" && hasSteam;
+      this.miStartSteam.Enabled = this.btnStartSteam.Enabled;
+      this.linkSteamConfig.Enabled = hasSteam;      
+    }
+    #endregion
+
     #region CheckForUpdate()
     private void CheckForUpdate()
     {
@@ -556,6 +579,28 @@ namespace ExtraQL
         this.Log("extraQL server listening on " + this.server.EndPointUrl);
       else
         this.Log("extraQL server failed to start on " + this.server.EndPointUrl +". Scripts are disabled!");
+    }
+    #endregion
+
+    #region OpenConfigFolder()
+    private void OpenConfigFolder(bool steam)
+    {
+      var baseq3 = this.GetBaseq3Path(steam);
+      if (baseq3 == null) return;
+      if (steam)
+      {
+        var dirs = Directory.GetDirectories(baseq3);
+        foreach (var dir in dirs)
+        {
+          if (Regex.IsMatch(Path.GetFileName(dir), "\\d{5,}"))
+          {
+            baseq3 = dir + "\\baseq3";
+            break;
+          }
+        }
+      }
+
+      Process.Start("explorer.exe", "/e," + baseq3);
     }
     #endregion
 
@@ -656,7 +701,7 @@ namespace ExtraQL
       {
         path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
         if (path != null)
-          path += @"\SteamApps\Common\Quake Live\";
+          path = path.Replace("/", "\\") +  @"\SteamApps\Common\Quake Live\";
       }
       else
       {
@@ -878,6 +923,5 @@ document.loginform.submit();";
       }
     }
     #endregion
-
   }
 }
