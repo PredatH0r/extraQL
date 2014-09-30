@@ -24,6 +24,10 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.12
+---
+- fixed: no longer trying to log in with empty username/password when starting standalone QL Launcher
+
 Version 1.11
 ---
 - added links in extraQL.exe UI to open standalone and steam config directories

@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.11";
+    public const string Version = "1.12";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -766,7 +766,8 @@ namespace ExtraQL
       this.WindowState = FormWindowState.Minimized;
 
       this.timerCount = 0;
-      this.launcherDetectionTimer.Start();
+      if (this.comboEmail.Text != "" && this.txtPassword.Text != "")
+        this.launcherDetectionTimer.Start();
     }
     #endregion
 
