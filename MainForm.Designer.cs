@@ -119,7 +119,7 @@ namespace ExtraQL
       this.lblLauncherExe.Location = new System.Drawing.Point(10, 68);
       this.lblLauncherExe.Name = "lblLauncherExe";
       this.lblLauncherExe.Size = new System.Drawing.Size(134, 13);
-      this.lblLauncherExe.TabIndex = 0;
+      this.lblLauncherExe.TabIndex = 3;
       this.lblLauncherExe.Text = "File Path to Launcher.exe:";
       // 
       // txtLauncherExe
@@ -130,7 +130,7 @@ namespace ExtraQL
       this.txtLauncherExe.Location = new System.Drawing.Point(10, 86);
       this.txtLauncherExe.Name = "txtLauncherExe";
       this.txtLauncherExe.Size = new System.Drawing.Size(358, 21);
-      this.txtLauncherExe.TabIndex = 2;
+      this.txtLauncherExe.TabIndex = 4;
       // 
       // btnLauncherExe
       // 
@@ -140,7 +140,7 @@ namespace ExtraQL
       this.btnLauncherExe.Location = new System.Drawing.Point(374, 86);
       this.btnLauncherExe.Name = "btnLauncherExe";
       this.btnLauncherExe.Size = new System.Drawing.Size(23, 21);
-      this.btnLauncherExe.TabIndex = 3;
+      this.btnLauncherExe.TabIndex = 6;
       this.btnLauncherExe.Text = "…";
       this.btnLauncherExe.UseVisualStyleBackColor = false;
       this.btnLauncherExe.Click += new System.EventHandler(this.btnLauncherExe_Click);
@@ -163,7 +163,7 @@ namespace ExtraQL
       this.lblRealm.Location = new System.Drawing.Point(7, 27);
       this.lblRealm.Name = "lblRealm";
       this.lblRealm.Size = new System.Drawing.Size(40, 13);
-      this.lblRealm.TabIndex = 2;
+      this.lblRealm.TabIndex = 0;
       this.lblRealm.Text = "Realm:";
       // 
       // btnInstallHook
@@ -174,7 +174,7 @@ namespace ExtraQL
       this.btnInstallHook.Location = new System.Drawing.Point(209, 114);
       this.btnInstallHook.Name = "btnInstallHook";
       this.btnInstallHook.Size = new System.Drawing.Size(188, 29);
-      this.btnInstallHook.TabIndex = 5;
+      this.btnInstallHook.TabIndex = 8;
       this.btnInstallHook.Text = "Re-install hook.js";
       this.btnInstallHook.UseVisualStyleBackColor = false;
       this.btnInstallHook.Click += new System.EventHandler(this.btnInstallHook_Click);
@@ -187,7 +187,7 @@ namespace ExtraQL
       this.panelAdvanced.Location = new System.Drawing.Point(0, 435);
       this.panelAdvanced.Name = "panelAdvanced";
       this.panelAdvanced.Size = new System.Drawing.Size(429, 279);
-      this.panelAdvanced.TabIndex = 2;
+      this.panelAdvanced.TabIndex = 4;
       // 
       // grpAdvanced
       // 
@@ -226,7 +226,7 @@ namespace ExtraQL
       this.txtSteamExe.Location = new System.Drawing.Point(10, 37);
       this.txtSteamExe.Name = "txtSteamExe";
       this.txtSteamExe.Size = new System.Drawing.Size(358, 21);
-      this.txtSteamExe.TabIndex = 15;
+      this.txtSteamExe.TabIndex = 1;
       this.txtSteamExe.TextChanged += new System.EventHandler(this.txtSteamExe_TextChanged);
       // 
       // lblSteamExe
@@ -235,7 +235,7 @@ namespace ExtraQL
       this.lblSteamExe.Location = new System.Drawing.Point(10, 19);
       this.lblSteamExe.Name = "lblSteamExe";
       this.lblSteamExe.Size = new System.Drawing.Size(317, 13);
-      this.lblSteamExe.TabIndex = 14;
+      this.lblSteamExe.TabIndex = 0;
       this.lblSteamExe.Text = "File Path to quakelive_steam.exe (leave empty for auto-detect):";
       // 
       // btnSteamExe
@@ -246,7 +246,7 @@ namespace ExtraQL
       this.btnSteamExe.Location = new System.Drawing.Point(374, 37);
       this.btnSteamExe.Name = "btnSteamExe";
       this.btnSteamExe.Size = new System.Drawing.Size(23, 21);
-      this.btnSteamExe.TabIndex = 16;
+      this.btnSteamExe.TabIndex = 2;
       this.btnSteamExe.Text = "…";
       this.btnSteamExe.UseVisualStyleBackColor = false;
       this.btnSteamExe.Click += new System.EventHandler(this.btnSteamExe_Click);
@@ -257,7 +257,7 @@ namespace ExtraQL
       this.cbAutoQuit.Location = new System.Drawing.Point(209, 186);
       this.cbAutoQuit.Name = "cbAutoQuit";
       this.cbAutoQuit.Size = new System.Drawing.Size(138, 17);
-      this.cbAutoQuit.TabIndex = 11;
+      this.cbAutoQuit.TabIndex = 13;
       this.cbAutoQuit.Text = "Autoquit when QL quits";
       this.cbAutoQuit.UseVisualStyleBackColor = true;
       this.cbAutoQuit.CheckedChanged += new System.EventHandler(this.cbAutoQuit_CheckedChanged);
@@ -268,7 +268,7 @@ namespace ExtraQL
       this.cbHttps.Location = new System.Drawing.Point(10, 232);
       this.cbHttps.Name = "cbHttps";
       this.cbHttps.Size = new System.Drawing.Size(365, 17);
-      this.cbHttps.TabIndex = 13;
+      this.cbHttps.TabIndex = 15;
       this.cbHttps.Text = "Use HTTPS  (requires setup through https\\install.cmd as Administrator)";
       this.cbHttps.UseVisualStyleBackColor = true;
       this.cbHttps.CheckedChanged += new System.EventHandler(this.cbHttps_CheckedChanged);
@@ -279,7 +279,7 @@ namespace ExtraQL
       this.cbRunAsCommandLine.Location = new System.Drawing.Point(209, 67);
       this.cbRunAsCommandLine.Name = "cbRunAsCommandLine";
       this.cbRunAsCommandLine.Size = new System.Drawing.Size(131, 17);
-      this.cbRunAsCommandLine.TabIndex = 1;
+      this.cbRunAsCommandLine.TabIndex = 5;
       this.cbRunAsCommandLine.Text = "Run as Command Line";
       this.cbRunAsCommandLine.UseVisualStyleBackColor = true;
       // 
@@ -289,7 +289,7 @@ namespace ExtraQL
       this.cbAutostart.Location = new System.Drawing.Point(10, 186);
       this.cbAutostart.Name = "cbAutostart";
       this.cbAutostart.Size = new System.Drawing.Size(128, 17);
-      this.cbAutostart.TabIndex = 9;
+      this.cbAutostart.TabIndex = 12;
       this.cbAutostart.Text = "Autostart Quake Live";
       this.cbAutostart.UseVisualStyleBackColor = true;
       // 
@@ -301,7 +301,7 @@ namespace ExtraQL
       this.cbDownloadUpdates.Location = new System.Drawing.Point(10, 140);
       this.cbDownloadUpdates.Name = "cbDownloadUpdates";
       this.cbDownloadUpdates.Size = new System.Drawing.Size(116, 17);
-      this.cbDownloadUpdates.TabIndex = 6;
+      this.cbDownloadUpdates.TabIndex = 9;
       this.cbDownloadUpdates.Text = "Download Updates";
       this.cbDownloadUpdates.UseVisualStyleBackColor = true;
       this.cbDownloadUpdates.CheckedChanged += new System.EventHandler(this.cbDownloadUpdates_CheckedChanged);
@@ -312,7 +312,7 @@ namespace ExtraQL
       this.cbStartMinimized.Location = new System.Drawing.Point(209, 163);
       this.cbStartMinimized.Name = "cbStartMinimized";
       this.cbStartMinimized.Size = new System.Drawing.Size(98, 17);
-      this.cbStartMinimized.TabIndex = 8;
+      this.cbStartMinimized.TabIndex = 11;
       this.cbStartMinimized.Text = "Start Minimized";
       this.cbStartMinimized.UseVisualStyleBackColor = true;
       // 
@@ -322,7 +322,7 @@ namespace ExtraQL
       this.cbSystemTray.Location = new System.Drawing.Point(10, 163);
       this.cbSystemTray.Name = "cbSystemTray";
       this.cbSystemTray.Size = new System.Drawing.Size(126, 17);
-      this.cbSystemTray.TabIndex = 7;
+      this.cbSystemTray.TabIndex = 10;
       this.cbSystemTray.Text = "Show in System Tray";
       this.cbSystemTray.UseVisualStyleBackColor = true;
       this.cbSystemTray.CheckedChanged += new System.EventHandler(this.cbSystemTray_CheckedChanged);
@@ -333,7 +333,7 @@ namespace ExtraQL
       this.cbBindToAll.Location = new System.Drawing.Point(10, 209);
       this.cbBindToAll.Name = "cbBindToAll";
       this.cbBindToAll.Size = new System.Drawing.Size(310, 17);
-      this.cbBindToAll.TabIndex = 12;
+      this.cbBindToAll.TabIndex = 14;
       this.cbBindToAll.Text = "Allow other computers to access your extraQL HTTP server";
       this.cbBindToAll.UseVisualStyleBackColor = true;
       this.cbBindToAll.CheckedChanged += new System.EventHandler(this.cbBindAll_CheckedChanged);
@@ -344,7 +344,7 @@ namespace ExtraQL
       this.cbDisableScripts.Location = new System.Drawing.Point(10, 117);
       this.cbDisableScripts.Name = "cbDisableScripts";
       this.cbDisableScripts.Size = new System.Drawing.Size(116, 17);
-      this.cbDisableScripts.TabIndex = 4;
+      this.cbDisableScripts.TabIndex = 7;
       this.cbDisableScripts.Text = "Disable Userscripts";
       this.cbDisableScripts.UseVisualStyleBackColor = true;
       this.cbDisableScripts.CheckedChanged += new System.EventHandler(this.cbDisableScripts_CheckedChanged);
@@ -356,7 +356,7 @@ namespace ExtraQL
       this.linkFocusForum.Location = new System.Drawing.Point(209, 57);
       this.linkFocusForum.Name = "linkFocusForum";
       this.linkFocusForum.Size = new System.Drawing.Size(111, 18);
-      this.linkFocusForum.TabIndex = 5;
+      this.linkFocusForum.TabIndex = 3;
       this.linkFocusForum.TabStop = true;
       this.linkFocusForum.Text = "Open Focus Forum ";
       this.linkFocusForum.UseCompatibleTextRendering = true;
@@ -369,7 +369,7 @@ namespace ExtraQL
       this.linkFocusLogin.Location = new System.Drawing.Point(10, 57);
       this.linkFocusLogin.Name = "linkFocusLogin";
       this.linkFocusLogin.Size = new System.Drawing.Size(136, 13);
-      this.linkFocusLogin.TabIndex = 4;
+      this.linkFocusLogin.TabIndex = 2;
       this.linkFocusLogin.TabStop = true;
       this.linkFocusLogin.Text = "Login to Focus Website";
       this.linkFocusLogin.UseCompatibleTextRendering = true;
@@ -384,7 +384,7 @@ namespace ExtraQL
       this.comboRealm.Location = new System.Drawing.Point(53, 24);
       this.comboRealm.Name = "comboRealm";
       this.comboRealm.Size = new System.Drawing.Size(344, 21);
-      this.comboRealm.TabIndex = 3;
+      this.comboRealm.TabIndex = 1;
       // 
       // panelTop
       // 
@@ -410,7 +410,7 @@ namespace ExtraQL
       this.rbUseLauncher.Location = new System.Drawing.Point(82, 115);
       this.rbUseLauncher.Name = "rbUseLauncher";
       this.rbUseLauncher.Size = new System.Drawing.Size(126, 17);
-      this.rbUseLauncher.TabIndex = 33;
+      this.rbUseLauncher.TabIndex = 4;
       this.rbUseLauncher.TabStop = true;
       this.rbUseLauncher.Text = "Standalone Launcher";
       this.rbUseLauncher.UseVisualStyleBackColor = true;
@@ -422,7 +422,7 @@ namespace ExtraQL
       this.rbUseSteam.Location = new System.Drawing.Point(12, 115);
       this.rbUseSteam.Name = "rbUseSteam";
       this.rbUseSteam.Size = new System.Drawing.Size(55, 17);
-      this.rbUseSteam.TabIndex = 32;
+      this.rbUseSteam.TabIndex = 3;
       this.rbUseSteam.TabStop = true;
       this.rbUseSteam.Text = "Steam";
       this.rbUseSteam.UseVisualStyleBackColor = true;
@@ -435,7 +435,7 @@ namespace ExtraQL
       this.lblUseSteam.Location = new System.Drawing.Point(9, 90);
       this.lblUseSteam.Name = "lblUseSteam";
       this.lblUseSteam.Size = new System.Drawing.Size(280, 19);
-      this.lblUseSteam.TabIndex = 31;
+      this.lblUseSteam.TabIndex = 2;
       this.lblUseSteam.Text = "How do you want to start Quake Live?";
       // 
       // picClose
@@ -503,7 +503,7 @@ namespace ExtraQL
       this.linkConfig.Location = new System.Drawing.Point(222, 15);
       this.linkConfig.Name = "linkConfig";
       this.linkConfig.Size = new System.Drawing.Size(196, 13);
-      this.linkConfig.TabIndex = 29;
+      this.linkConfig.TabIndex = 1;
       this.linkConfig.TabStop = true;
       this.linkConfig.Text = "Open QL Config Folder";
       this.linkConfig.UseCompatibleTextRendering = true;
@@ -517,7 +517,7 @@ namespace ExtraQL
       this.cbLog.Location = new System.Drawing.Point(96, 72);
       this.cbLog.Name = "cbLog";
       this.cbLog.Size = new System.Drawing.Size(43, 17);
-      this.cbLog.TabIndex = 9;
+      this.cbLog.TabIndex = 4;
       this.cbLog.Text = "Log";
       this.cbLog.UseVisualStyleBackColor = true;
       this.cbLog.CheckedChanged += new System.EventHandler(this.cbLog_CheckedChanged);
@@ -531,7 +531,7 @@ namespace ExtraQL
       this.comboEmail.Location = new System.Drawing.Point(9, 42);
       this.comboEmail.Name = "comboEmail";
       this.comboEmail.Size = new System.Drawing.Size(196, 21);
-      this.comboEmail.TabIndex = 3;
+      this.comboEmail.TabIndex = 1;
       this.comboEmail.SelectedIndexChanged += new System.EventHandler(this.comboEmail_SelectedIndexChanged);
       this.comboEmail.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboEmail_KeyDown);
       // 
@@ -543,7 +543,7 @@ namespace ExtraQL
       this.cbFocus.Location = new System.Drawing.Point(154, 73);
       this.cbFocus.Name = "cbFocus";
       this.cbFocus.Size = new System.Drawing.Size(111, 17);
-      this.cbFocus.TabIndex = 10;
+      this.cbFocus.TabIndex = 5;
       this.cbFocus.Text = "QL Focus Member";
       this.cbFocus.UseVisualStyleBackColor = false;
       this.cbFocus.CheckedChanged += new System.EventHandler(this.cbFocus_CheckedChanged);
@@ -557,7 +557,7 @@ namespace ExtraQL
       this.linkAbout.Location = new System.Drawing.Point(222, 34);
       this.linkAbout.Name = "linkAbout";
       this.linkAbout.Size = new System.Drawing.Size(115, 18);
-      this.linkAbout.TabIndex = 11;
+      this.linkAbout.TabIndex = 2;
       this.linkAbout.TabStop = true;
       this.linkAbout.Text = "Open extraQL website";
       this.linkAbout.UseCompatibleTextRendering = true;
@@ -571,7 +571,7 @@ namespace ExtraQL
       this.cbAdvanced.Location = new System.Drawing.Point(13, 71);
       this.cbAdvanced.Name = "cbAdvanced";
       this.cbAdvanced.Size = new System.Drawing.Size(63, 17);
-      this.cbAdvanced.TabIndex = 8;
+      this.cbAdvanced.TabIndex = 3;
       this.cbAdvanced.Text = "Options";
       this.cbAdvanced.UseVisualStyleBackColor = true;
       this.cbAdvanced.CheckedChanged += new System.EventHandler(this.cbAdvanced_CheckedChanged);
@@ -584,7 +584,7 @@ namespace ExtraQL
       this.txtPassword.Name = "txtPassword";
       this.txtPassword.PasswordChar = '☺';
       this.txtPassword.Size = new System.Drawing.Size(179, 21);
-      this.txtPassword.TabIndex = 5;
+      this.txtPassword.TabIndex = 3;
       this.txtPassword.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPassword_KeyDown);
       this.txtPassword.Validating += new System.ComponentModel.CancelEventHandler(this.txtPassword_Validating);
       // 
@@ -595,7 +595,7 @@ namespace ExtraQL
       this.lblPassword.Location = new System.Drawing.Point(214, 24);
       this.lblPassword.Name = "lblPassword";
       this.lblPassword.Size = new System.Drawing.Size(106, 13);
-      this.lblPassword.TabIndex = 4;
+      this.lblPassword.TabIndex = 2;
       this.lblPassword.Text = "Password (optional):";
       // 
       // lblEmail
@@ -604,7 +604,7 @@ namespace ExtraQL
       this.lblEmail.Location = new System.Drawing.Point(6, 24);
       this.lblEmail.Name = "lblEmail";
       this.lblEmail.Size = new System.Drawing.Size(88, 13);
-      this.lblEmail.TabIndex = 2;
+      this.lblEmail.TabIndex = 0;
       this.lblEmail.Text = "E-Mail (optional):";
       // 
       // btnStartQL
@@ -619,7 +619,7 @@ namespace ExtraQL
       this.btnStartQL.Location = new System.Drawing.Point(13, 15);
       this.btnStartQL.Name = "btnStartQL";
       this.btnStartQL.Size = new System.Drawing.Size(196, 37);
-      this.btnStartQL.TabIndex = 6;
+      this.btnStartQL.TabIndex = 0;
       this.btnStartQL.Text = "Start Quake Live";
       this.btnStartQL.UseVisualStyleBackColor = false;
       this.btnStartQL.Click += new System.EventHandler(this.btnStartQL_Click);
@@ -632,7 +632,7 @@ namespace ExtraQL
       this.panelFocus.Location = new System.Drawing.Point(0, 333);
       this.panelFocus.Name = "panelFocus";
       this.panelFocus.Size = new System.Drawing.Size(429, 102);
-      this.panelFocus.TabIndex = 1;
+      this.panelFocus.TabIndex = 3;
       // 
       // grpFocus
       // 
@@ -706,7 +706,7 @@ namespace ExtraQL
       this.panelLog.Location = new System.Drawing.Point(429, 0);
       this.panelLog.Name = "panelLog";
       this.panelLog.Size = new System.Drawing.Size(495, 714);
-      this.panelLog.TabIndex = 3;
+      this.panelLog.TabIndex = 5;
       // 
       // grpLog
       // 
@@ -731,7 +731,7 @@ namespace ExtraQL
       this.cbLogAllRequests.Location = new System.Drawing.Point(154, 24);
       this.cbLogAllRequests.Name = "cbLogAllRequests";
       this.cbLogAllRequests.Size = new System.Drawing.Size(104, 17);
-      this.cbLogAllRequests.TabIndex = 16;
+      this.cbLogAllRequests.TabIndex = 1;
       this.cbLogAllRequests.Text = "Log all Requests";
       this.cbLogAllRequests.UseVisualStyleBackColor = true;
       this.cbLogAllRequests.CheckedChanged += new System.EventHandler(this.cbLogAllRequests_CheckedChanged);
@@ -743,7 +743,7 @@ namespace ExtraQL
       this.btnClearLog.Location = new System.Drawing.Point(367, 20);
       this.btnClearLog.Name = "btnClearLog";
       this.btnClearLog.Size = new System.Drawing.Size(96, 23);
-      this.btnClearLog.TabIndex = 15;
+      this.btnClearLog.TabIndex = 2;
       this.btnClearLog.Text = "Clear";
       this.btnClearLog.UseVisualStyleBackColor = false;
       this.btnClearLog.Click += new System.EventHandler(this.btnClearLog_Click);
@@ -754,7 +754,7 @@ namespace ExtraQL
       this.cbFollowLog.Location = new System.Drawing.Point(10, 24);
       this.cbFollowLog.Name = "cbFollowLog";
       this.cbFollowLog.Size = new System.Drawing.Size(122, 17);
-      this.cbFollowLog.TabIndex = 14;
+      this.cbFollowLog.TabIndex = 0;
       this.cbFollowLog.Text = "Always Scroll to End";
       this.cbFollowLog.UseVisualStyleBackColor = true;
       // 
@@ -770,7 +770,7 @@ namespace ExtraQL
       this.txtLog.ReadOnly = true;
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.txtLog.Size = new System.Drawing.Size(453, 632);
-      this.txtLog.TabIndex = 13;
+      this.txtLog.TabIndex = 3;
       // 
       // autoQuitTimer
       // 
@@ -785,7 +785,7 @@ namespace ExtraQL
       this.panelAccount.Location = new System.Drawing.Point(0, 239);
       this.panelAccount.Name = "panelAccount";
       this.panelAccount.Size = new System.Drawing.Size(429, 94);
-      this.panelAccount.TabIndex = 4;
+      this.panelAccount.TabIndex = 2;
       // 
       // grpAccount
       // 
@@ -797,7 +797,7 @@ namespace ExtraQL
       this.grpAccount.Location = new System.Drawing.Point(12, 7);
       this.grpAccount.Name = "grpAccount";
       this.grpAccount.Size = new System.Drawing.Size(404, 75);
-      this.grpAccount.TabIndex = 6;
+      this.grpAccount.TabIndex = 0;
       this.grpAccount.TabStop = false;
       this.grpAccount.Text = "Quake Live Account (for Standalone Launcher)";
       // 
@@ -814,7 +814,7 @@ namespace ExtraQL
       this.panelStart.Location = new System.Drawing.Point(0, 137);
       this.panelStart.Name = "panelStart";
       this.panelStart.Size = new System.Drawing.Size(429, 102);
-      this.panelStart.TabIndex = 5;
+      this.panelStart.TabIndex = 1;
       // 
       // MainForm
       // 
