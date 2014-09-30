@@ -24,6 +24,13 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.14
+---
+- when using "Show in System Tray" the minimize button will be hidden and X acts as minimize instead.
+- the "Quake Live Account" section is now also visible when the "QL Focus Member" is visible (even if Steam is selected)
+- fixed tab order of controls
+- default to "Steam" after upgrade when the previous config had the setting "Autostart Steam QL" set
+
 Version 1.13
 ---
 - improved handling of Steam vs. Standalone Launcher in UI

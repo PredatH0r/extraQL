@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.13";
+    public const string Version = "1.14";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -115,7 +115,10 @@ namespace ExtraQL
     #region picClose_Click
     private void picClose_Click(object sender, EventArgs e)
     {
-      this.Close();
+      if (this.cbSystemTray.Checked)
+        this.SetFormVisibility(false);
+      else
+        this.Close();
     }
     #endregion
 
@@ -125,11 +128,8 @@ namespace ExtraQL
       if (!((RadioButton)sender).Checked)
         return;
 
-      this.panelAccount.Visible = this.rbUseLauncher.Checked;
-      if (this.rbUseLauncher.Checked)
-        this.Height += this.panelAccount.Height;
-      else
-        this.Height -= this.panelAccount.Height;
+      this.UpdateLaunchControls();
+      this.UpdateAccountPanelVisiblity();     
     }
     #endregion
 
@@ -194,6 +194,8 @@ namespace ExtraQL
         this.Height += this.panelFocus.Height;
       else
         this.Height -= this.panelFocus.Height;        
+      
+      this.UpdateAccountPanelVisiblity();
     }
     #endregion
 
@@ -330,6 +332,9 @@ namespace ExtraQL
     {
       this.ShowInTaskbar = !this.cbSystemTray.Checked;
       this.trayIcon.Visible = cbSystemTray.Checked;
+      this.picMinimize.Visible = !this.cbSystemTray.Checked;
+      if (this.picMinimize.Visible)
+        this.picMinimize.BringToFront();
     }
     #endregion
 
@@ -427,7 +432,7 @@ namespace ExtraQL
     #region LoadSettings()
     private void LoadSettings()
     {
-      this.rbUseSteam.Checked = this.rbUseSteam.Enabled && this.config.GetBool("steam");
+      this.rbUseSteam.Checked = this.rbUseSteam.Enabled && (this.config.GetBool("steam") || config.GetString("autostart") == "2");
 
       foreach (var account in this.config.Accounts)
         this.comboEmail.Items.Add(account.Key);
@@ -448,7 +453,7 @@ namespace ExtraQL
 
       this.cbAdvanced.Checked = config.GetBool("advanced");
       this.cbFocus.Checked = config.GetString("focus") == "1";
-      this.cbFocus.Visible = config.GetString("focus") != "";
+      this.cbFocus.Visible = this.cbFocus.Enabled = config.GetString("focus") != "";
       this.cbBindToAll.Checked = config.GetBool("bindToAll");
       this.cbSystemTray.Checked = config.GetBool("systemTray");
       this.cbStartMinimized.Checked = config.GetBool("startMinimized");
@@ -484,7 +489,7 @@ namespace ExtraQL
         config.Set("steam", this.rbUseSteam.Checked);
         config.Set("quakelive_steam.exe", this.txtSteamExe.Text);
         config.Set("lastEmail", this.comboEmail.Text);
-        config.Set("focus", !this.cbFocus.Visible ? "" : this.cbFocus.Checked ? "1" : "0");
+        config.Set("focus", !this.cbFocus.Enabled ? "" : this.cbFocus.Checked ? "1" : "0");
         config.Set("advanced", this.cbAdvanced.Checked);
         config.Set("realm", this.comboRealm.Text);
         config.Set("launcherExe", this.txtLauncherExe.Text);
@@ -541,6 +546,23 @@ namespace ExtraQL
       this.rbUseSteam.Enabled = this.GetBaseq3Path(true) != null;
       this.rbUseLauncher.Enabled = this.GetBaseq3Path(false) != null;
       this.miStartQL.Enabled = this.rbUseSteam.Enabled || this.rbUseLauncher.Enabled;
+      this.comboRealm.Enabled = this.rbUseLauncher.Checked;
+    }
+    #endregion
+
+    #region UpdateAccountPanelVisiblity()
+    private void UpdateAccountPanelVisiblity()
+    {
+      var visible = this.rbUseLauncher.Checked || this.cbFocus.Enabled && this.cbFocus.Checked;
+      if (visible == this.panelAccount.Enabled)
+        return;
+
+      this.panelAccount.Visible = visible;
+      this.panelAccount.Enabled = visible;
+      if (visible)
+        this.Height += this.panelAccount.Height;
+      else
+        this.Height -= this.panelAccount.Height;      
     }
     #endregion
 

@@ -184,9 +184,9 @@ namespace ExtraQL
       this.panelAdvanced.BackColor = System.Drawing.Color.Transparent;
       this.panelAdvanced.Controls.Add(this.grpAdvanced);
       this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.panelAdvanced.Location = new System.Drawing.Point(0, 435);
+      this.panelAdvanced.Location = new System.Drawing.Point(0, 395);
       this.panelAdvanced.Name = "panelAdvanced";
-      this.panelAdvanced.Size = new System.Drawing.Size(429, 279);
+      this.panelAdvanced.Size = new System.Drawing.Size(429, 275);
       this.panelAdvanced.TabIndex = 4;
       // 
       // grpAdvanced
@@ -213,7 +213,7 @@ namespace ExtraQL
       this.grpAdvanced.ForeColor = System.Drawing.Color.White;
       this.grpAdvanced.Location = new System.Drawing.Point(12, 7);
       this.grpAdvanced.Name = "grpAdvanced";
-      this.grpAdvanced.Size = new System.Drawing.Size(405, 260);
+      this.grpAdvanced.Size = new System.Drawing.Size(405, 256);
       this.grpAdvanced.TabIndex = 0;
       this.grpAdvanced.TabStop = false;
       this.grpAdvanced.Text = "Options";
@@ -371,7 +371,7 @@ namespace ExtraQL
       this.linkFocusLogin.Size = new System.Drawing.Size(136, 13);
       this.linkFocusLogin.TabIndex = 2;
       this.linkFocusLogin.TabStop = true;
-      this.linkFocusLogin.Text = "Login to Focus Website";
+      this.linkFocusLogin.Text = "Login to Focus Gate";
       this.linkFocusLogin.UseCompatibleTextRendering = true;
       this.linkFocusLogin.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkFocusLogin_LinkClicked);
       // 
@@ -390,6 +390,7 @@ namespace ExtraQL
       // 
       this.panelTop.BackColor = System.Drawing.Color.Transparent;
       this.panelTop.Controls.Add(this.rbUseLauncher);
+      this.panelTop.Controls.Add(this.btnStartQL);
       this.panelTop.Controls.Add(this.rbUseSteam);
       this.panelTop.Controls.Add(this.lblUseSteam);
       this.panelTop.Controls.Add(this.picClose);
@@ -400,16 +401,17 @@ namespace ExtraQL
       this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
       this.panelTop.Location = new System.Drawing.Point(0, 0);
       this.panelTop.Name = "panelTop";
-      this.panelTop.Size = new System.Drawing.Size(429, 137);
+      this.panelTop.Size = new System.Drawing.Size(429, 143);
       this.panelTop.TabIndex = 0;
       // 
       // rbUseLauncher
       // 
       this.rbUseLauncher.AutoSize = true;
       this.rbUseLauncher.Checked = true;
-      this.rbUseLauncher.Location = new System.Drawing.Point(82, 115);
+      this.rbUseLauncher.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.rbUseLauncher.Location = new System.Drawing.Point(96, 108);
       this.rbUseLauncher.Name = "rbUseLauncher";
-      this.rbUseLauncher.Size = new System.Drawing.Size(126, 17);
+      this.rbUseLauncher.Size = new System.Drawing.Size(146, 20);
       this.rbUseLauncher.TabIndex = 4;
       this.rbUseLauncher.TabStop = true;
       this.rbUseLauncher.Text = "Standalone Launcher";
@@ -419,9 +421,10 @@ namespace ExtraQL
       // rbUseSteam
       // 
       this.rbUseSteam.AutoSize = true;
-      this.rbUseSteam.Location = new System.Drawing.Point(12, 115);
+      this.rbUseSteam.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.rbUseSteam.Location = new System.Drawing.Point(12, 108);
       this.rbUseSteam.Name = "rbUseSteam";
-      this.rbUseSteam.Size = new System.Drawing.Size(55, 17);
+      this.rbUseSteam.Size = new System.Drawing.Size(63, 20);
       this.rbUseSteam.TabIndex = 3;
       this.rbUseSteam.TabStop = true;
       this.rbUseSteam.Text = "Steam";
@@ -431,10 +434,9 @@ namespace ExtraQL
       // lblUseSteam
       // 
       this.lblUseSteam.AutoSize = true;
-      this.lblUseSteam.Font = new System.Drawing.Font("Tahoma", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblUseSteam.Location = new System.Drawing.Point(9, 90);
       this.lblUseSteam.Name = "lblUseSteam";
-      this.lblUseSteam.Size = new System.Drawing.Size(280, 19);
+      this.lblUseSteam.Size = new System.Drawing.Size(191, 13);
       this.lblUseSteam.TabIndex = 2;
       this.lblUseSteam.Text = "How do you want to start Quake Live?";
       // 
@@ -500,9 +502,9 @@ namespace ExtraQL
       // 
       this.linkConfig.LinkArea = new System.Windows.Forms.LinkArea(0, 40);
       this.linkConfig.LinkColor = System.Drawing.Color.Gold;
-      this.linkConfig.Location = new System.Drawing.Point(222, 15);
+      this.linkConfig.Location = new System.Drawing.Point(274, 3);
       this.linkConfig.Name = "linkConfig";
-      this.linkConfig.Size = new System.Drawing.Size(196, 13);
+      this.linkConfig.Size = new System.Drawing.Size(136, 20);
       this.linkConfig.TabIndex = 1;
       this.linkConfig.TabStop = true;
       this.linkConfig.Text = "Open QL Config Folder";
@@ -514,7 +516,7 @@ namespace ExtraQL
       this.cbLog.AutoSize = true;
       this.cbLog.Checked = true;
       this.cbLog.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbLog.Location = new System.Drawing.Point(96, 72);
+      this.cbLog.Location = new System.Drawing.Point(95, 24);
       this.cbLog.Name = "cbLog";
       this.cbLog.Size = new System.Drawing.Size(43, 17);
       this.cbLog.TabIndex = 4;
@@ -540,11 +542,11 @@ namespace ExtraQL
       this.cbFocus.AutoSize = true;
       this.cbFocus.Checked = true;
       this.cbFocus.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbFocus.Location = new System.Drawing.Point(154, 73);
+      this.cbFocus.Location = new System.Drawing.Point(12, 3);
       this.cbFocus.Name = "cbFocus";
-      this.cbFocus.Size = new System.Drawing.Size(111, 17);
+      this.cbFocus.Size = new System.Drawing.Size(70, 17);
       this.cbFocus.TabIndex = 5;
-      this.cbFocus.Text = "QL Focus Member";
+      this.cbFocus.Text = "QL Focus";
       this.cbFocus.UseVisualStyleBackColor = false;
       this.cbFocus.CheckedChanged += new System.EventHandler(this.cbFocus_CheckedChanged);
       // 
@@ -554,7 +556,7 @@ namespace ExtraQL
       this.linkAbout.AutoSize = true;
       this.linkAbout.LinkArea = new System.Windows.Forms.LinkArea(0, 22);
       this.linkAbout.LinkColor = System.Drawing.Color.Gold;
-      this.linkAbout.Location = new System.Drawing.Point(222, 34);
+      this.linkAbout.Location = new System.Drawing.Point(274, 23);
       this.linkAbout.Name = "linkAbout";
       this.linkAbout.Size = new System.Drawing.Size(115, 18);
       this.linkAbout.TabIndex = 2;
@@ -568,7 +570,7 @@ namespace ExtraQL
       this.cbAdvanced.AutoSize = true;
       this.cbAdvanced.Checked = true;
       this.cbAdvanced.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.cbAdvanced.Location = new System.Drawing.Point(13, 71);
+      this.cbAdvanced.Location = new System.Drawing.Point(12, 24);
       this.cbAdvanced.Name = "cbAdvanced";
       this.cbAdvanced.Size = new System.Drawing.Size(63, 17);
       this.cbAdvanced.TabIndex = 3;
@@ -616,9 +618,9 @@ namespace ExtraQL
       this.btnStartQL.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
       this.btnStartQL.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
       this.btnStartQL.ForeColor = System.Drawing.Color.Gold;
-      this.btnStartQL.Location = new System.Drawing.Point(13, 15);
+      this.btnStartQL.Location = new System.Drawing.Point(274, 91);
       this.btnStartQL.Name = "btnStartQL";
-      this.btnStartQL.Size = new System.Drawing.Size(196, 37);
+      this.btnStartQL.Size = new System.Drawing.Size(135, 37);
       this.btnStartQL.TabIndex = 0;
       this.btnStartQL.Text = "Start Quake Live";
       this.btnStartQL.UseVisualStyleBackColor = false;
@@ -629,7 +631,7 @@ namespace ExtraQL
       this.panelFocus.BackColor = System.Drawing.Color.Transparent;
       this.panelFocus.Controls.Add(this.grpFocus);
       this.panelFocus.Dock = System.Windows.Forms.DockStyle.Top;
-      this.panelFocus.Location = new System.Drawing.Point(0, 333);
+      this.panelFocus.Location = new System.Drawing.Point(0, 293);
       this.panelFocus.Name = "panelFocus";
       this.panelFocus.Size = new System.Drawing.Size(429, 102);
       this.panelFocus.TabIndex = 3;
@@ -649,7 +651,7 @@ namespace ExtraQL
       this.grpFocus.Size = new System.Drawing.Size(405, 84);
       this.grpFocus.TabIndex = 0;
       this.grpFocus.TabStop = false;
-      this.grpFocus.Text = "QL Focus Members (Beta Testers)";
+      this.grpFocus.Text = "QL Focus";
       // 
       // trayIcon
       // 
@@ -705,7 +707,7 @@ namespace ExtraQL
       this.panelLog.Dock = System.Windows.Forms.DockStyle.Right;
       this.panelLog.Location = new System.Drawing.Point(429, 0);
       this.panelLog.Name = "panelLog";
-      this.panelLog.Size = new System.Drawing.Size(495, 714);
+      this.panelLog.Size = new System.Drawing.Size(495, 670);
       this.panelLog.TabIndex = 5;
       // 
       // grpLog
@@ -720,7 +722,7 @@ namespace ExtraQL
       this.grpLog.ForeColor = System.Drawing.Color.White;
       this.grpLog.Location = new System.Drawing.Point(12, 7);
       this.grpLog.Name = "grpLog";
-      this.grpLog.Size = new System.Drawing.Size(471, 696);
+      this.grpLog.Size = new System.Drawing.Size(471, 652);
       this.grpLog.TabIndex = 0;
       this.grpLog.TabStop = false;
       this.grpLog.Text = "Log";
@@ -769,7 +771,7 @@ namespace ExtraQL
       this.txtLog.Name = "txtLog";
       this.txtLog.ReadOnly = true;
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.txtLog.Size = new System.Drawing.Size(453, 632);
+      this.txtLog.Size = new System.Drawing.Size(453, 588);
       this.txtLog.TabIndex = 3;
       // 
       // autoQuitTimer
@@ -782,7 +784,7 @@ namespace ExtraQL
       this.panelAccount.BackColor = System.Drawing.Color.Transparent;
       this.panelAccount.Controls.Add(this.grpAccount);
       this.panelAccount.Dock = System.Windows.Forms.DockStyle.Top;
-      this.panelAccount.Location = new System.Drawing.Point(0, 239);
+      this.panelAccount.Location = new System.Drawing.Point(0, 199);
       this.panelAccount.Name = "panelAccount";
       this.panelAccount.Size = new System.Drawing.Size(429, 94);
       this.panelAccount.TabIndex = 2;
@@ -799,21 +801,20 @@ namespace ExtraQL
       this.grpAccount.Size = new System.Drawing.Size(404, 75);
       this.grpAccount.TabIndex = 0;
       this.grpAccount.TabStop = false;
-      this.grpAccount.Text = "Quake Live Account (for Standalone Launcher)";
+      this.grpAccount.Text = "Quake Live Account";
       // 
       // panelStart
       // 
       this.panelStart.BackColor = System.Drawing.Color.Transparent;
       this.panelStart.Controls.Add(this.linkAbout);
-      this.panelStart.Controls.Add(this.btnStartQL);
       this.panelStart.Controls.Add(this.cbAdvanced);
       this.panelStart.Controls.Add(this.cbFocus);
       this.panelStart.Controls.Add(this.cbLog);
       this.panelStart.Controls.Add(this.linkConfig);
       this.panelStart.Dock = System.Windows.Forms.DockStyle.Top;
-      this.panelStart.Location = new System.Drawing.Point(0, 137);
+      this.panelStart.Location = new System.Drawing.Point(0, 143);
       this.panelStart.Name = "panelStart";
-      this.panelStart.Size = new System.Drawing.Size(429, 102);
+      this.panelStart.Size = new System.Drawing.Size(429, 56);
       this.panelStart.TabIndex = 1;
       // 
       // MainForm
@@ -821,7 +822,7 @@ namespace ExtraQL
       this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
       this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-      this.ClientSize = new System.Drawing.Size(924, 714);
+      this.ClientSize = new System.Drawing.Size(924, 670);
       this.ControlBox = false;
       this.Controls.Add(this.panelAdvanced);
       this.Controls.Add(this.panelFocus);
