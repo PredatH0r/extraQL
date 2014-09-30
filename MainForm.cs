@@ -700,7 +700,16 @@ namespace ExtraQL
       if (steam)
       {
         if (this.txtSteamExe.Text != "")
-          path = Path.GetDirectoryName(this.txtSteamExe.Text) ?? "";
+        {
+          try
+          {
+            path = Path.GetDirectoryName(this.txtSteamExe.Text) ?? "";
+          }
+          catch
+          {
+            return null;
+          }
+        }
         else
         {
           path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
