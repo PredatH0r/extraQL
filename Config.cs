@@ -48,6 +48,8 @@ namespace ExtraQL
       this.settings["https"] = "0";
       this.settings["logAllRequests"] = "0";
       this.settings["autoquit"] = "0";
+      this.settings["quakelive_steam.exe"] = "";
+      this.settings["steam"] = "0";
 
       var configFile = this.ConfigFile;
       if (File.Exists(configFile))

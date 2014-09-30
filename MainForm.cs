@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.12";
+    public const string Version = "1.13";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -60,11 +60,9 @@ namespace ExtraQL
       this.scriptRepository.RegisterScripts();
       this.RestartHttpServer();
       this.CheckForUpdate();
-
-      if (this.cbAutostartLauncher.Checked)
-        this.Launch(false);
-      else if (this.cbAutostartSteam.Checked)
-        this.Launch(true);
+      this.UpdateLaunchControls();
+      if (this.cbAutostart.Checked)
+        this.Launch();
     }
     #endregion
 
@@ -110,7 +108,7 @@ namespace ExtraQL
     #region picMinimize_Click
     private void picMinimize_Click(object sender, EventArgs e)
     {
-      this.WindowState = FormWindowState.Minimized;
+      this.SetFormVisibility(false);
     }
     #endregion
 
@@ -118,6 +116,20 @@ namespace ExtraQL
     private void picClose_Click(object sender, EventArgs e)
     {
       this.Close();
+    }
+    #endregion
+
+    #region rbUseSteam_CheckedChanged
+    private void rbUseSteam_CheckedChanged(object sender, EventArgs e)
+    {
+      if (!((RadioButton)sender).Checked)
+        return;
+
+      this.panelAccount.Visible = this.rbUseLauncher.Checked;
+      if (this.rbUseLauncher.Checked)
+        this.Height += this.panelAccount.Height;
+      else
+        this.Height -= this.panelAccount.Height;
     }
     #endregion
 
@@ -146,7 +158,7 @@ namespace ExtraQL
     {
       if (e.KeyData == Keys.Enter)
       {
-        this.btnStartLauncher.Select();
+        this.btnStartQL.Select();
         e.Handled = true;
       }
     }
@@ -160,31 +172,17 @@ namespace ExtraQL
     }
     #endregion
 
-    #region btnStartLauncher_Click
-    private void btnStartLauncher_Click(object sender, EventArgs e)
+    #region btnStartQL_Click
+    private void btnStartQL_Click(object sender, EventArgs e)
     {
-      this.Launch(false);
+      this.Launch();
     }
     #endregion
 
-    #region btnStartSteam_Click
-    private void btnStartSteam_Click(object sender, EventArgs e)
+    #region linkConfig_LinkClicked
+    private void linkConfig_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-      this.Launch(true);
-    }
-    #endregion
-
-    #region linkStandaloneConfig_LinkClicked
-    private void linkStandaloneConfig_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-    {
-      this.OpenConfigFolder(false);
-    }
-    #endregion
-
-    #region linkSteamConfig_LinkClicked
-    private void linkSteamConfig_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-    {
-      this.OpenConfigFolder(true);
+      this.OpenConfigFolder(this.rbUseSteam.Checked);
     }
     #endregion
 
@@ -232,18 +230,11 @@ namespace ExtraQL
     #region linkAbout_LinkClicked
     private void linkAbout_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-      Process.Start("https://sourceforge.net/projects/extraql");
+      Process.Start("https://sourceforge.net/p/extraql/wiki/Home/");
     }
     #endregion
 
     // controls in Focus view
-
-    #region comboRealm_SelectedValueChanged
-    private void comboRealm_SelectedValueChanged(object sender, EventArgs e)
-    {
-      this.UpdateSteamControls();
-    }
-    #endregion
 
     #region linkFocusLogin_LinkClicked
     private void linkFocusLogin_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -260,6 +251,29 @@ namespace ExtraQL
     #endregion
 
     // controls in Options view
+
+    #region txtSteamExe_TextChanged
+    private void txtSteamExe_TextChanged(object sender, EventArgs e)
+    {
+      this.UpdateLaunchControls();
+    }
+    #endregion
+
+    #region btnSteamExe_Click
+    private void btnSteamExe_Click(object sender, EventArgs e)
+    {
+      string path = "";
+      string file = "quakelive_steam.exe";
+      try { path = Path.GetDirectoryName(this.txtSteamExe.Text); }
+      catch { }
+      try { file = Path.GetFileName(this.txtSteamExe.Text); }
+      catch { }
+      this.openFileDialog1.FileName = file;
+      this.openFileDialog1.InitialDirectory = path;
+      if (this.openFileDialog1.ShowDialog(this) == DialogResult.OK)
+        this.txtSteamExe.Text = this.openFileDialog1.FileName;
+    }
+    #endregion
 
     #region btnLauncherExe_Click
     private void btnLauncherExe_Click(object sender, EventArgs e)
@@ -282,13 +296,14 @@ namespace ExtraQL
     {
       this.servlets.EnableScripts = !this.cbDisableScripts.Checked;
       this.btnInstallHook.Text = this.cbDisableScripts.Checked ? "Delete hook.js" : "Re-install hook.js";
+      this.InstallHookJs(this.rbUseSteam.Checked, true);
     }
     #endregion
 
     #region btnInstallHook_Click
     private void btnInstallHook_Click(object sender, EventArgs e)
     {
-      this.InstallHookJs(false, force: true);
+      this.InstallHookJs(this.rbUseSteam.Checked, true);
     }
     #endregion
 
@@ -315,18 +330,6 @@ namespace ExtraQL
     {
       this.ShowInTaskbar = !this.cbSystemTray.Checked;
       this.trayIcon.Visible = cbSystemTray.Checked;
-    }
-    #endregion
-
-    #region cbAutostart_CheckedChanged
-    private void cbAutostart_CheckedChanged(object sender, EventArgs e)
-    {
-      if (!((CheckBox)sender).Checked)
-        return;
-      if (sender == this.cbAutostartLauncher)
-        this.cbAutostartSteam.Checked = false;
-      else
-        this.cbAutostartLauncher.Checked = false;
     }
     #endregion
 
@@ -378,24 +381,17 @@ namespace ExtraQL
     {
       if (e.Button == MouseButtons.Left)
       {
-        this.WindowState = FormWindowState.Normal;
+        this.SetFormVisibility(true);
         this.BringToFront();
         this.Activate();
       }
     }
     #endregion
 
-    #region miStartLauncher_Click
-    private void miStartLauncher_Click(object sender, EventArgs e)
+    #region miStartQL_Click
+    private void miStartQL_Click(object sender, EventArgs e)
     {
-      this.Launch(false);
-    }
-    #endregion
-
-    #region miStartSteam_Click
-    private void miStartSteam_Click(object sender, EventArgs e)
-    {
-      this.Launch(true);
+      this.Launch();
     }
     #endregion
 
@@ -431,6 +427,8 @@ namespace ExtraQL
     #region LoadSettings()
     private void LoadSettings()
     {
+      this.rbUseSteam.Checked = this.rbUseSteam.Enabled && this.config.GetBool("steam");
+
       foreach (var account in this.config.Accounts)
         this.comboEmail.Items.Add(account.Key);
 
@@ -440,6 +438,7 @@ namespace ExtraQL
       else if (this.comboEmail.Items.Count > 0)
         this.comboEmail.SelectedIndex = 0;
 
+      this.txtSteamExe.Text = config.GetString("quakelive_steam.exe");
       this.txtLauncherExe.Text = config.GetString("launcherExe");
 
       this.comboRealm.Items.Add("");
@@ -454,10 +453,9 @@ namespace ExtraQL
       this.cbSystemTray.Checked = config.GetBool("systemTray");
       this.cbStartMinimized.Checked = config.GetBool("startMinimized");
       if (this.cbStartMinimized.Checked)
-        this.WindowState = FormWindowState.Minimized;
+        this.SetFormVisibility(false);
       this.cbDownloadUpdates.Checked = config.GetBool("checkUpdates");
-      this.cbAutostartLauncher.Checked = config.GetString("autostart") == "1";
-      this.cbAutostartSteam.Checked = config.GetString("autostart") == "2";
+      this.cbAutostart.Checked = config.GetString("autostart") != "0";
       this.cbRunAsCommandLine.Checked = config.GetBool("runAsCommandLine");
       this.cbLog.Checked = config.GetBool("log");
       this.cbFollowLog.Checked = config.GetBool("followLog");
@@ -483,6 +481,8 @@ namespace ExtraQL
           this.comboRealm.Items.Add(realmUrl);
           this.config.RealmHistory.Add(realmUrl);
         }
+        config.Set("steam", this.rbUseSteam.Checked);
+        config.Set("quakelive_steam.exe", this.txtSteamExe.Text);
         config.Set("lastEmail", this.comboEmail.Text);
         config.Set("focus", !this.cbFocus.Visible ? "" : this.cbFocus.Checked ? "1" : "0");
         config.Set("advanced", this.cbAdvanced.Checked);
@@ -492,7 +492,7 @@ namespace ExtraQL
         config.Set("systemTray", this.cbSystemTray.Checked);
         config.Set("startMinimized", this.cbStartMinimized.Checked);
         config.Set("checkUpdates", this.cbDownloadUpdates.Checked);
-        config.Set("autostart", this.cbAutostartLauncher.Checked ? "1" : this.cbAutostartSteam.Checked ? "2" : "0");
+        config.Set("autostart", this.cbAutostart.Checked ? "1" : "0");
         config.Set("runAsCommandLine", this.cbRunAsCommandLine.Checked);        
         config.Set("log", this.cbLog.Checked);
         config.Set("followLog", this.cbFollowLog.Checked);
@@ -535,13 +535,12 @@ namespace ExtraQL
     }
     #endregion
 
-    #region UpdateSteamControls()
-    private void UpdateSteamControls()
+    #region UpdateLaunchControls()
+    private void UpdateLaunchControls()
     {
-      bool hasSteam = this.GetBaseq3Path(true) != null;
-      this.btnStartSteam.Enabled = this.comboRealm.Text == "" && hasSteam;
-      this.miStartSteam.Enabled = this.btnStartSteam.Enabled;
-      this.linkSteamConfig.Enabled = hasSteam;      
+      this.rbUseSteam.Enabled = this.GetBaseq3Path(true) != null;
+      this.rbUseLauncher.Enabled = this.GetBaseq3Path(false) != null;
+      this.miStartQL.Enabled = this.rbUseSteam.Enabled || this.rbUseLauncher.Enabled;
     }
     #endregion
 
@@ -606,9 +605,10 @@ namespace ExtraQL
 
     #region Launch()
 
-    private void Launch(bool steam)
+    private void Launch()
     {
       SaveSettings();
+      bool steam = this.rbUseSteam.Checked;
       InstallHookJs(steam);
       if (steam)
         StartSteam();
@@ -699,9 +699,14 @@ namespace ExtraQL
       string path;
       if (steam)
       {
-        path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
-        if (path != null)
-          path = path.Replace("/", "\\") +  @"\SteamApps\Common\Quake Live\";
+        if (this.txtSteamExe.Text != "")
+          path = Path.GetDirectoryName(this.txtSteamExe.Text) ?? "";
+        else
+        {
+          path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
+          if (path != null)
+            path = path.Replace("/", "\\") + @"\SteamApps\Common\Quake Live\";
+        }
       }
       else
       {
@@ -723,7 +728,7 @@ namespace ExtraQL
     {
       this.Log("Starting Quake Live Steam App...");
       Process.Start("steam://rungameid/282440");
-      this.WindowState = FormWindowState.Minimized;
+      this.SetFormVisibility(false);
     }
     #endregion
 
@@ -763,7 +768,7 @@ namespace ExtraQL
         MessageBox.Show(this, "Could not start \"" + si.FileName + "\":\n" + ex.Message, "extraQL", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         return;
       }
-      this.WindowState = FormWindowState.Minimized;
+      this.SetFormVisibility(false);
 
       this.timerCount = 0;
       if (this.comboEmail.Text != "" && this.txtPassword.Text != "")
@@ -801,6 +806,24 @@ namespace ExtraQL
       return true;
     }
 
+    #endregion
+
+    #region SetFormVisiblity()
+    private void SetFormVisibility(bool visible)
+    {
+      if (visible)
+      {
+        this.WindowState = FormWindowState.Normal;
+        this.Show();
+      }
+      else
+      {
+        if (this.cbSystemTray.Checked)
+          this.Hide();
+        else
+          this.WindowState = FormWindowState.Minimized;
+      }
+    }
     #endregion
 
     #region laucherDetectionTimer_Tick
@@ -924,5 +947,6 @@ document.loginform.submit();";
       }
     }
     #endregion
+    
   }
 }

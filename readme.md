@@ -24,6 +24,12 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.13
+---
+- improved handling of Steam vs. Standalone Launcher in UI
+- added option to manually configure QL's steam base directory
+- no longer showing floating title bar on desktop when using "Show in System Tray"
+
 Version 1.12
 ---
 - fixed: no longer trying to log in with empty username/password when starting standalone QL Launcher
