@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             qlAltBrowser
 // @name           Quake Live Alt Browser
-// @version        0.17
+// @version        0.18
 // @description    A different Quake Live server browser with filtering and other tweaks
 // @namespace      phob.net
 // @author         wn
@@ -112,7 +112,7 @@ addStyle(
   , "th.qlab-col-icons img[data-sort=passworded] { -webkit-filter: invert(100%); }"
   , ".qlab-col-icons > img { display: inline-block; height: 14px; width; 14px; padding: 0 1px; }"
   , ".qlab-col-players { text-align: center; }"
-  , ".hidden { visibility: hidden; }"
+  , ".qlab-col-icons > .hidden { visibility: hidden; }"
 );
 
 
