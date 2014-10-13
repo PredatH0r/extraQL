@@ -6,6 +6,7 @@ namespace ExtraQL
   static class Program
   {
     public const string PostUpdateSwitch = "-postupdate";
+    public const string WinServiceSwitch = "-service";
 
     #region Main()
     [STAThread]
@@ -29,7 +30,11 @@ namespace ExtraQL
         if (!isPostUpdate)
           updater.Run();
 
-        Application.Run(new MainForm(config, updater));
+        var mainForm = new MainForm(config, updater);
+        if (Environment.CommandLine.Contains(WinServiceSwitch))
+          WinService.Start(mainForm);
+        else
+          Application.Run(mainForm);
       }
       catch (Exception ex)
       {

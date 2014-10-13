@@ -51,6 +51,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Security" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -74,6 +75,9 @@
       <DependentUpon>UpdateForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Updater.cs" />
+    <Compile Include="WinService.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="XWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -103,6 +107,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="create-extraQL-zip.cmd" />
+    <None Include="WinService.cmd" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

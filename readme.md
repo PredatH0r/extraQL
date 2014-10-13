@@ -24,6 +24,10 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.15 (work in progress)
+---
+- extraQL.exe can run as a windows service (UI is not supported). See WinService.cmd to install/uninstall/start/stop the service
+
 Version 1.14
 ---
 - when using "Show in System Tray" the minimize button will be hidden and X acts as minimize instead.
