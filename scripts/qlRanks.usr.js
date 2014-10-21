@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.106
+// @version        1.107
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,9 @@
 // ==/UserScript==
 
 /*
+
+Version 1.107
+- fixed error handling when ECS web service is unavailable
 
 Version 1.106
 - added workaround to open external links in QL Steam build
@@ -1163,8 +1166,7 @@ var extraQL = window.extraQL;
           data: { profile: just_names.join(",") },
           dataType: "json",
           success: announceEcsDataArrived,
-          fail: announceAllDataAvailable,
-          timeout: 5000
+          timeout: 4500
         });
       },
       onError: function() {
@@ -1172,6 +1174,8 @@ var extraQL = window.extraQL;
         QLRD.activeServerReq = false;
       }
     });
+
+    var announceTimeout = null;
 
     function announceQlrDataArrived(error, players) {
       // Always clear the active request flag.
@@ -1186,6 +1190,8 @@ var extraQL = window.extraQL;
       announceQlrPlayers = players;
       if (announceEcsGamesPlayed)
         announceAllDataAvailable();
+      else
+        window.setTimeout(announceAllDataAvailable, 5000);
     }
 
     function announceEcsDataArrived(data) {
@@ -1205,6 +1211,11 @@ var extraQL = window.extraQL;
       var mul = 1,
         currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value,
         step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
+
+      if (announceTimeout) {
+        window.clearTimeout(announceTimeout);
+        announceTimeout = null;
+      }
 
       // Show the chat pane for 10 seconds if output method is 'print',
       // otherwise it will be difficult to notice.
@@ -1232,7 +1243,7 @@ var extraQL = window.extraQL;
           "team": p.team,
           "elo": getQlmEloByName(announceQlrPlayers, p.name),
           "index": index++,
-          "badge": isNaN(games) ? "?" : games >= 16000 ? "Z" : games < 1000 ? String.fromCharCode(65 + Math.floor(games / 100)) : String.fromCharCode(74 + Math.floor(games / 1000))
+          "badge": isNaN(games) ? "" : games >= 16000 ? "Z" : games < 1000 ? String.fromCharCode(65 + Math.floor(games / 100)) : String.fromCharCode(74 + Math.floor(games / 1000))
         }
       });
 
