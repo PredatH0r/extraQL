@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.107
+// @version        1.108
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,9 @@
 // ==/UserScript==
 
 /*
+
+Version 1.108
+- added workaround to open external links in QL Steam build when using /elo profile=x
 
 Version 1.107
 - fixed error handling when ECS web service is unavailable
@@ -1010,12 +1013,10 @@ var extraQL = window.extraQL;
  */
   var CMD_NAME = "elo";
   var CMD_USAGE = "Use ^1/" + CMD_NAME + " help^7 for help";
-  var CMD_DEFAULT = "\" a user command. " + CMD_USAGE + "\"";
-  qz_instance.SendGameCommand("seta " + CMD_NAME + " \"\""); // set default value to blank
-  qz_instance.SendGameCommand("set " + CMD_NAME + " " + CMD_DEFAULT);
+  qz_instance.SendGameCommand("set " + CMD_NAME + " \"" + CMD_USAGE + "\"");
 
   var oldOnCvarChanged = window.OnCvarChanged;
-  window.OnCvarChanged = function(name, val, replicate) {
+  window.OnCvarChanged = function (name, val, replicate) {
     switch (name) {
     case CMD_NAME:
       handleQlrdCommand(val);
@@ -1043,11 +1044,13 @@ var extraQL = window.extraQL;
   }
 
   function handleQlrdCommand(val) {
-    if (val == "" || "\"" + val + "\"" == CMD_DEFAULT)
+    if (val == "" || val == CMD_USAGE)
       return;
-    if (val == "help") {
+    qz_instance.SendGameCommand("set " + CMD_NAME + " \"" + CMD_USAGE + "\"");
+
+    if (val == "help")
       showHelp();
-    } else if (val == "score")
+    else if (val == "score")
       announce("1");
     else if (val == "method")
       qz_instance.SendGameCommand("echo Output method is: " + quakelive.cvars.Get("_qlrd_outputMethod").value);
@@ -1071,7 +1074,6 @@ var extraQL = window.extraQL;
       shuffle("1", false, val.substr(7));
     else
       qz_instance.SendGameCommand("echo " + CMD_USAGE);
-    qz_instance.SendGameCommand("set " + CMD_NAME + "\"\"");
   }
 
   function showHelp() {
@@ -1625,7 +1627,7 @@ var extraQL = window.extraQL;
       if (",duel,ca,tdm,ffa,".indexOf("," + player + ",") >= 0)
         gt = player;
       else
-        window.open("http://www.qlranks.com/" + gt + "/player/" + player, "_blank");
+        quakelive.OpenURL("http://www.qlranks.com/" + gt + "/player/" + player);
     });
   }
 
