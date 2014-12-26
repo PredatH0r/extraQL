@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        1.108
+// @version        1.109
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,10 @@
 // ==/UserScript==
 
 /*
+
+Version 1.109
+- fixed displaying in-game score twice
+- using the /elo sort=... setting now also for the output of the in-game command
 
 Version 1.108
 - added workaround to open external links in QL Steam build when using /elo profile=x
@@ -976,7 +980,7 @@ var extraQL = window.extraQL;
     // These track the current output method and position in "cycling" through the methods, respectively
     "_qlrd_outputMethod": "echo",
     "_qlrd_output": "vstr _qlrd_output1",
-    "_qlrd_browserSort": "ql"
+    "_qlrd_browserSort": "team"
     // These are the possible output method states
     ,
     "_qlrd_output0": "seta _qlrd_outputMethod echo; set _qlrd_output vstr _qlrd_output1; echo ^2QLRD: ^7output method is now ^5echo; print ^2[QLRD] ^7output method is now ^5echo ^7(check the console!)",
@@ -1111,6 +1115,7 @@ var extraQL = window.extraQL;
     var announceGametype = null;
     var announceQlrPlayers = null;
     var announceEcsGamesPlayed = null;
+    var announceComplete = false;
 
     if (1 !== parseInt(val) || !quakelive.IsGameRunning()) {
       return;
@@ -1208,16 +1213,20 @@ var extraQL = window.extraQL;
     }
 
     function announceAllDataAvailable() {
+      if (announceTimeout) {
+        window.clearTimeout(announceTimeout);
+        announceTimeout = null;
+      }
+
+      if (announceComplete)
+        return;
+      announceComplete = true;
+
       // Display the results.
       // NOTE: mul is "1" to separate the header from the results
       var mul = 1,
         currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value,
         step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
-
-      if (announceTimeout) {
-        window.clearTimeout(announceTimeout);
-        announceTimeout = null;
-      }
 
       // Show the chat pane for 10 seconds if output method is 'print',
       // otherwise it will be difficult to notice.
@@ -1250,7 +1259,8 @@ var extraQL = window.extraQL;
       });
 
       // Sort players by Elo (descending).
-      players_copy.sort(function(a, b) { return b.elo - a.elo; });
+      var sortStyle = getSortStyle();
+      players_copy.sort(sortPlayerFunc(sortStyle));
 
       // display team stats
       var stats = calcStats(players_copy);
@@ -1789,11 +1799,7 @@ var extraQL = window.extraQL;
       if (requestedServer != currentServer) // data arrived after user already selected another server
         return;
 
-      var sortStyle = quakelive.cvars.Get("_qlrd_browserSort");
-      if (sortStyle)
-        sortStyle = sortStyle.value;
-      if (sortStyle != "elo" && sortStyle != "team")
-        sortStyle = "";
+      var sortStyle = getSortStyle();
 
       var playerSortInfos = [];
       $.each(nodeByName, function(name, elem) {
@@ -1813,17 +1819,13 @@ var extraQL = window.extraQL;
           team = 2;
         else if ($img.hasClass("lgi_bordercolor_3"))
           team = 3;
-        playerSortInfos.push({ "name": name, "rating": elo, "team": team });
+        playerSortInfos.push({ "name": name, "elo": elo, "team": team });
       });
 
       if (sortStyle) {
         // reorder players
         $("#browser_details ul.players").empty(); // prevent double-fill
-        playerSortInfos.sort(function(player1, player2) {
-          var key1 = sortCriteria(player1, sortStyle);
-          var key2 = sortCriteria(player2, sortStyle);
-          return key1 < key2 ? -1 : key1 == key2 ? 0 : +1;
-        });
+        playerSortInfos.sort(sortPlayerFunc(sortStyle));
       }
       var $list = $("#browser_details ul.players");
       var avgScoreSum = 0, avgRedSum = 0, avgBlueSum = 0;
@@ -1831,7 +1833,7 @@ var extraQL = window.extraQL;
       $.each(playerSortInfos, function(idx, player) {
         if (sortStyle)
           $list.append(nodeByName[player.name]);
-        var rating = player.rating;
+        var rating = player.elo;
         if (rating > 0) {
           if (player.team == 1) {
             ++avgRedCount;
@@ -1859,11 +1861,29 @@ var extraQL = window.extraQL;
     });
   }
 
+  function sortPlayerFunc(sortStyle) {
+    return function(player1, player2) {
+      var key1 = sortCriteria(player1, sortStyle);
+      var key2 = sortCriteria(player2, sortStyle);
+      return key1 < key2 ? -1 : key1 == key2 ? 0 : +1;
+    };
+  }
+
   function sortCriteria(player, sortPref) {
-    var score = player.rating;
+    var score = player.elo;
     score = isNaN(parseInt(score)) ? "9999" : ("0000" + (10000 - score)).substr(-4);
     var isSpec = player.team == 3 ? "1" : "0";
     var crit = sortPref == "team" ? player.team + score + player.name : isSpec + score + player.name;
     return crit;
   }
+
+  function getSortStyle() {
+    var sortStyle = quakelive.cvars.Get("_qlrd_browserSort");
+    if (sortStyle)
+      sortStyle = sortStyle.value;
+    if (sortStyle != "elo" && sortStyle != "team")
+      sortStyle = "";
+    return sortStyle;
+  }
+
 })();
