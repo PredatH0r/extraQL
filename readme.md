@@ -24,9 +24,11 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
-Version 1.15 (work in progress)
+Version 1.15
 ---
 - extraQL.exe can run as a windows service (UI is not supported). See WinService.cmd to install/uninstall/start/stop the service
+- added /condump and /serverinfo servlets which load/parse a condump.txt file
+- QLranks userscript in-game commands like "/elo shuffle" now use up-to-date player and team information (requires extraQL.exe 1.15)
 
 Version 1.14
 ---
