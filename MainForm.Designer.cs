@@ -61,6 +61,7 @@ namespace ExtraQL
       this.comboRealm = new System.Windows.Forms.ComboBox();
       this.panelTop = new System.Windows.Forms.Panel();
       this.rbUseLauncher = new System.Windows.Forms.RadioButton();
+      this.btnStartQL = new System.Windows.Forms.Button();
       this.rbUseSteam = new System.Windows.Forms.RadioButton();
       this.lblUseSteam = new System.Windows.Forms.Label();
       this.picClose = new System.Windows.Forms.PictureBox();
@@ -77,7 +78,6 @@ namespace ExtraQL
       this.txtPassword = new System.Windows.Forms.TextBox();
       this.lblPassword = new System.Windows.Forms.Label();
       this.lblEmail = new System.Windows.Forms.Label();
-      this.btnStartQL = new System.Windows.Forms.Button();
       this.panelFocus = new System.Windows.Forms.Panel();
       this.grpFocus = new System.Windows.Forms.GroupBox();
       this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
@@ -418,6 +418,23 @@ namespace ExtraQL
       this.rbUseLauncher.UseVisualStyleBackColor = true;
       this.rbUseLauncher.CheckedChanged += new System.EventHandler(this.rbUseSteam_CheckedChanged);
       // 
+      // btnStartQL
+      // 
+      this.btnStartQL.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnStartQL.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+      this.btnStartQL.FlatAppearance.BorderSize = 2;
+      this.btnStartQL.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+      this.btnStartQL.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
+      this.btnStartQL.ForeColor = System.Drawing.Color.Gold;
+      this.btnStartQL.Location = new System.Drawing.Point(274, 91);
+      this.btnStartQL.Name = "btnStartQL";
+      this.btnStartQL.Size = new System.Drawing.Size(135, 37);
+      this.btnStartQL.TabIndex = 0;
+      this.btnStartQL.Text = "Start Quake Live";
+      this.btnStartQL.UseVisualStyleBackColor = false;
+      this.btnStartQL.Click += new System.EventHandler(this.btnStartQL_Click);
+      // 
       // rbUseSteam
       // 
       this.rbUseSteam.AutoSize = true;
@@ -464,13 +481,13 @@ namespace ExtraQL
       // 
       // lblVersion
       // 
-      this.lblVersion.AutoSize = true;
       this.lblVersion.Font = new System.Drawing.Font("Tahoma", 10F);
-      this.lblVersion.Location = new System.Drawing.Point(381, 41);
+      this.lblVersion.Location = new System.Drawing.Point(353, 41);
       this.lblVersion.Name = "lblVersion";
-      this.lblVersion.Size = new System.Drawing.Size(36, 17);
+      this.lblVersion.Size = new System.Drawing.Size(64, 17);
       this.lblVersion.TabIndex = 1;
       this.lblVersion.Text = "0.00";
+      this.lblVersion.TextAlign = System.Drawing.ContentAlignment.TopRight;
       this.lblVersion.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picLogo_MouseMove);
       // 
       // lblExtra
@@ -500,6 +517,7 @@ namespace ExtraQL
       // 
       // linkConfig
       // 
+      this.linkConfig.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.linkConfig.LinkArea = new System.Windows.Forms.LinkArea(0, 40);
       this.linkConfig.LinkColor = System.Drawing.Color.Gold;
       this.linkConfig.Location = new System.Drawing.Point(274, 3);
@@ -608,23 +626,6 @@ namespace ExtraQL
       this.lblEmail.Size = new System.Drawing.Size(88, 13);
       this.lblEmail.TabIndex = 0;
       this.lblEmail.Text = "E-Mail (optional):";
-      // 
-      // btnStartQL
-      // 
-      this.btnStartQL.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnStartQL.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-      this.btnStartQL.FlatAppearance.BorderSize = 2;
-      this.btnStartQL.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-      this.btnStartQL.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold);
-      this.btnStartQL.ForeColor = System.Drawing.Color.Gold;
-      this.btnStartQL.Location = new System.Drawing.Point(274, 91);
-      this.btnStartQL.Name = "btnStartQL";
-      this.btnStartQL.Size = new System.Drawing.Size(135, 37);
-      this.btnStartQL.TabIndex = 0;
-      this.btnStartQL.Text = "Start Quake Live";
-      this.btnStartQL.UseVisualStyleBackColor = false;
-      this.btnStartQL.Click += new System.EventHandler(this.btnStartQL_Click);
       // 
       // panelFocus
       // 

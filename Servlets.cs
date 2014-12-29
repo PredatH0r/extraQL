@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
@@ -42,6 +43,8 @@ namespace ExtraQL
 
     public bool EnablePrivateServlets { get; set; }
 
+    public string QuakeConfigFolder { get; set; }
+
     #region RegisterServlets()
 
     /// <summary>
@@ -62,6 +65,8 @@ namespace ExtraQL
       RegisterServlet("/bringToFront", BringToFront);
       RegisterServlet("/repository.json", RepositoryJson);
       RegisterServlet("/extraQL.exe", ExtraQlExe);
+      RegisterServlet("/condump", GetCondump);
+      RegisterServlet("/serverinfo", GetServerInfo);
     }
 
     #endregion
@@ -465,6 +470,100 @@ namespace ExtraQL
       writer.WriteLine();
       writer.Flush();
       stream.Write(data, 0, data.Length);
+    }
+    #endregion
+
+    #region GetCondump()
+    private void GetCondump(Stream stream, Uri uri, string request)
+    {
+      var file = this.QuakeConfigFolder + "\\condump.txt";
+      string content = File.Exists(file) ? File.ReadAllText(file) : "";
+      HttpOk(stream, content);
+    }
+    #endregion
+
+    #region GetServerInfo()
+    private void GetServerInfo(Stream stream, Uri uri, string request)
+    {
+      int i = -1;
+      string[] lines = null;
+      var file = this.QuakeConfigFolder + "\\condump.txt";
+      if (File.Exists(file))
+      {
+        lines = File.ReadAllLines(file);
+
+        // find line with last /configstrings command
+        for (i = lines.Length - 1; i >= 0; i--)
+          if (lines[i].EndsWith("]\\configstrings"))
+            break;
+      }
+
+      if (i < 0)
+      {
+        HttpOk(stream, "{\"error\":true}");
+        return;
+      }
+
+      // search for lines with index 529 - 553
+      var info = ExtractConfigstrings(i, lines);
+      var json = GenerateClientinfoJson(info);
+      HttpOk(stream, json);
+    }
+
+    private static Dictionary<int, string> ExtractConfigstrings(int i, string[] lines)
+    {
+      int index = -1;
+      string value = "";
+      var info = new Dictionary<int, string>();
+      for (; i < lines.Length; i++)
+      {
+        string line = lines[i];
+        if (line.Length >= 4 && line[0] == ' ' && line[4] == ':')
+        {
+          if (index == 0 || index >= 529 && index < 529+16)
+            info.Add(index, value);
+          index = int.Parse(line.Substring(1, 3));
+          value = line.Substring(5).Trim();
+        }
+        else if (index >= 0)
+          value += line.TrimEnd();
+      }
+      return info;
+    }
+
+    private string GenerateClientinfoJson(Dictionary<int, string> info)
+    {
+      StringBuilder sb = new StringBuilder();
+      sb.Append("{\"error\":false");
+      sb.Append(",\"gameinfo\":{").Append(FieldListToJson(info[0].Substring(1))).Append('}');
+      sb.Append(",\"players\":[");
+      var sep = "";
+      foreach (var entry in info)
+      {
+        if (entry.Key >= 529 && entry.Key < 529 + 16)
+        {
+          sb.Append(sep);
+          sb.Append("{\"clientid\":\"").Append(entry.Key - 529).Append("\",");
+          sb.Append(FieldListToJson(entry.Value));
+          sb.Append("}");
+          sep = ",";
+        }
+      }
+      sb.Append("]}");
+      return sb.ToString();
+    }
+
+    private string FieldListToJson(string fieldList)
+    {
+      StringBuilder sb = new StringBuilder();
+      var fields = fieldList.Split('\\');
+      for (int i = 0; i+1 < fields.Length; i += 2)
+      {
+        if (i > 0)
+          sb.Append(',');
+        sb.Append('"').Append(fields[i]).Append("\":\"").Append(fields[i + 1]).Append('"');
+      }
+      return sb.ToString();
     }
     #endregion
 

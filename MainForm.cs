@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.15-pre";
+    public const string Version = "1.15";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -46,6 +46,7 @@ namespace ExtraQL
       this.scriptRepository.Log = this.Log;
 
       this.servlets = new Servlets(this.server, this.scriptRepository, this.Log, this, config.AppBaseDir);
+      this.UpdateServletSettings();
 
       this.ActiveControl = this.comboEmail;
     }
@@ -61,6 +62,7 @@ namespace ExtraQL
       this.RestartHttpServer();
       this.CheckForUpdate();
       this.UpdateLaunchControls();
+      this.UpdateServletSettings();
       if (this.cbAutostart.Checked)
         this.Launch();
     }
@@ -129,7 +131,8 @@ namespace ExtraQL
         return;
 
       this.UpdateLaunchControls();
-      this.UpdateAccountPanelVisiblity();     
+      this.UpdateAccountPanelVisiblity();
+      this.UpdateServletSettings();
     }
     #endregion
 
@@ -566,6 +569,14 @@ namespace ExtraQL
     }
     #endregion
 
+    #region UpdateServletSettings()
+    private void UpdateServletSettings()
+    {
+      if (this.servlets != null)
+        this.servlets.QuakeConfigFolder = this.GetConfigFolder(this.rbUseSteam.Checked);      
+    }
+    #endregion
+
     #region CheckForUpdate()
     private void CheckForUpdate()
     {
@@ -606,22 +617,26 @@ namespace ExtraQL
     #region OpenConfigFolder()
     private void OpenConfigFolder(bool steam)
     {
-      var baseq3 = this.GetBaseq3Path(steam);
-      if (baseq3 == null) return;
-      if (steam)
-      {
-        var dirs = Directory.GetDirectories(baseq3);
-        foreach (var dir in dirs)
-        {
-          if (Regex.IsMatch(Path.GetFileName(dir), "\\d{5,}"))
-          {
-            baseq3 = dir + "\\baseq3";
-            break;
-          }
-        }
-      }
+      var dir = this.GetConfigFolder(steam);
+      if (dir != null)
+        Process.Start("explorer.exe", "/e," + dir);
+    }
+    #endregion
 
-      Process.Start("explorer.exe", "/e," + baseq3);
+    #region GetConfigFolder()
+    private string GetConfigFolder(bool steam)
+    {
+      var baseq3 = this.GetBaseq3Path(steam);
+      if (baseq3 == null || !steam) 
+        return baseq3;
+
+      var dirs = Directory.GetDirectories(baseq3);
+      foreach (var dir in dirs)
+      {
+        if (Regex.IsMatch(Path.GetFileName(dir), "\\d{5,}"))
+          return dir + "\\baseq3";
+      }
+      return null;
     }
     #endregion
 
@@ -630,7 +645,7 @@ namespace ExtraQL
     private void Launch()
     {
       SaveSettings();
-      bool steam = this.rbUseSteam.Checked;
+      bool steam = this.rbUseSteam.Checked;      
       InstallHookJs(steam);
       if (steam)
         StartSteam();
