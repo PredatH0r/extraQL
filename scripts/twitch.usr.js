@@ -1,12 +1,15 @@
 ﻿// ==UserScript==
 // @name        Quake Live Twich.tv Streams and VODs
-// @version     1.5
+// @version     1.6
 // @author      PredatH0r
 // @description	Shows a list of twitch.tv QL live streams and videos
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.6
+- fixed archive and VODs not showing videos for certain channels
 
 Version 1.5
 - added workaround to make external URLs work in Steam build
@@ -313,7 +316,7 @@ Version 1.0
   function parseVideosFromChannel(channel, data) {
     var groupName = groupVideosByChannel ? channel : FLAT_VIDEO_LIST;
     $.each(data.videos, function (i, video) {
-      if (games.indexOf(video.game) < 0) return; // ignore videos of unsubscribed games
+      if (video.game && games.indexOf(video.game) < 0) return; // ignore videos of unsubscribed games
       if (loadCasts && videoChannels.indexOf(video.channel.name) < 0) return;  // ignore recorded casts from non-featured channels
       if (!videos[groupName])
         videos[groupName] = Array();
@@ -333,15 +336,15 @@ Version 1.0
       groups.sort(function (a, b) { return -(latestVideoByChannel[a] < latestVideoByChannel[b] ? -1 : latestVideoByChannel[a] > latestVideoByChannel[b] ? +1 : 0); });
 
       $.each(groups, function (groupIndex, groupName) {
-        var videosInGroup = videos[groupName];
-        videosInGroup.sort(function(a, b) { return -(a.recorded_at < b.recorded_at ? -1 : a.recorded_at > b.recorded_at ? +1 : 0); });
-
         $streams.append("<h1>" + groupName + "</h1>");
 
-        if (videosInGroup.length == 0) {
+        var videosInGroup = videos[groupName];
+        if (!videosInGroup || videosInGroup.length == 0) {
           $streams.append("<div>No videos found</div>");
           return;
         }
+
+        videosInGroup.sort(function (a, b) { return -(a.recorded_at < b.recorded_at ? -1 : a.recorded_at > b.recorded_at ? +1 : 0); });
 
         // update video list
         $.each(videosInGroup, function(i, item) {
