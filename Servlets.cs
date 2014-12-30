@@ -16,6 +16,7 @@ namespace ExtraQL
   {
     private static readonly string[] DomainsAllowedForProxy = { "esreality.com", "quakelive.com", "sourceforge.net", "github.com" };
     private const string AddScriptRoute = "/addScript";
+    private const string CondumpFile = "extraql_condump.txt";
     private readonly HttpServer server;
     private readonly StringBuilder indexBuilder = new StringBuilder();
     private readonly string baseDir;
@@ -476,7 +477,7 @@ namespace ExtraQL
     #region GetCondump()
     private void GetCondump(Stream stream, Uri uri, string request)
     {
-      var file = this.QuakeConfigFolder + "\\condump.txt";
+      var file = this.QuakeConfigFolder + "\\" + CondumpFile;
       string content = File.Exists(file) ? File.ReadAllText(file) : "";
       HttpOk(stream, content);
     }
@@ -487,7 +488,7 @@ namespace ExtraQL
     {
       int i = -1;
       string[] lines = null;
-      var file = this.QuakeConfigFolder + "\\condump.txt";
+      var file = this.QuakeConfigFolder + "\\" + CondumpFile;
       if (File.Exists(file))
       {
         lines = File.ReadAllLines(file);
@@ -520,7 +521,7 @@ namespace ExtraQL
         string line = lines[i];
         if (line.Length >= 4 && line[0] == ' ' && line[4] == ':')
         {
-          if (index == 0 || index >= 529 && index < 529+16)
+          if (index == 0 || index >= 529 && index < 529 + 32)
             info.Add(index, value);
           index = int.Parse(line.Substring(1, 3));
           value = line.Substring(5).Trim();
@@ -540,7 +541,7 @@ namespace ExtraQL
       var sep = "";
       foreach (var entry in info)
       {
-        if (entry.Key >= 529 && entry.Key < 529 + 16)
+        if (entry.Key >= 529 && entry.Key < 529 + 32)
         {
           sb.Append(sep);
           sb.Append("{\"clientid\":\"").Append(entry.Key - 529).Append("\",");

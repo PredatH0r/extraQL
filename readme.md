@@ -24,6 +24,11 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.16
+---
+- /serverinfo servlet (used by QLranks /elo shuffle) now works with >16 players on the server (Silent Night allows 28)
+- QLranks script updated to allow customizing colors with /elo colors
+
 Version 1.15
 ---
 - extraQL.exe can run as a windows service (UI is not supported). See WinService.cmd to install/uninstall/start/stop the service

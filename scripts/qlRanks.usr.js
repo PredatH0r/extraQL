@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        2.0
+// @version        2.1
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,11 @@
 // ==/UserScript==
 
 /*
+
+Version 2.1
+- unified output format for /elo score and /elo shuffle
+- added "/elo colors=nrb" to set colors for name, rating and badge letter. color 0 is used for team specific colors
+- added info messages when in-game commands fail to get accurate team information from extraQL.exe
 
 Version 2.0
 - in-game commands now uses extraQL.exe to get accurate player/team info using /configstrings and /condump
@@ -264,6 +269,8 @@ var extraQL = window.extraQL;
       "team death match": "tdm" // used by the mapdb
     },
     OUTPUT: ["print", "echo", "say", "say_team"] // keep in sync with 'cvarDefaults' for in-game
+    , FORMAT: ["list", "table"]
+    , SORT: ["ql", "elo", "team"]
     ,
     activeServerReq: false
 
@@ -982,9 +989,11 @@ var extraQL = window.extraQL;
  */
   var cvarDefaults = {
     // These track the current output method and position in "cycling" through the methods, respectively
-    "_qlrd_outputMethod": "echo",
+    "_qlrd_outputMethod": QLRD.OUTPUT[0],
+    "_qlrd_outputFormat": QLRD.FORMAT[0],
+    "_qlrd_outputColors": "307",
     "_qlrd_output": "vstr _qlrd_output1",
-    "_qlrd_browserSort": "team"
+    "_qlrd_browserSort": QLRD.SORT[0]
     // These are the possible output method states
     ,
     "_qlrd_output0": "seta _qlrd_outputMethod echo; set _qlrd_output vstr _qlrd_output1; echo ^2QLRD: ^7output method is now ^5echo; print ^2[QLRD] ^7output method is now ^5echo ^7(check the console!)",
@@ -1001,13 +1010,14 @@ var extraQL = window.extraQL;
     "qlrdChangeOutput": "vstr _qlrd_output"
   }
 
-// create cvars with default values if missing
-  $.each(cvarDefaults, function(cvar, def) {
-    if (!quakelive.cvars.Get(cvar).value) {
+  // create cvars with default values if missing
+  $.each(cvarDefaults, function(name, def) {
+    var cvar = quakelive.cvars.Get(name);
+    if (!cvar || !cvar.value) {
       logMsg("setting " + cvar + " to default: " + def);
       // NOTE: quakelive.cvars.Set doesn't quote the value, so we update and second the command ourselves
-      quakelive.cvars.Update(cvar, def, true, false);
-      qz_instance.SendGameCommand('seta ' + cvar + ' "' + def + '"');
+      quakelive.cvars.Update(name, def, true, false);
+      qz_instance.SendGameCommand('seta ' + name + ' "' + def + '"');
     }
   });
 
@@ -1060,18 +1070,14 @@ var extraQL = window.extraQL;
       showHelp();
     else if (val == "score")
       announce("1");
-    else if (val == "method")
-      qz_instance.SendGameCommand("echo Output method is: " + quakelive.cvars.Get("_qlrd_outputMethod").value);
-    else if (val.indexOf("method=") == 0)
-      quakelive.cvars.Set("_qlrd_outputMethod", val.substr(7, val.length - 7));
-    else if (val == "format")
-      qz_instance.SendGameCommand("echo Output format is: " + quakelive.cvars.Get("_qlrd_outputFormat").value);
-    else if (val.indexOf("format=") == 0)
-      quakelive.cvars.Set("_qlrd_outputFormat", val.substr(7, val.length - 7) == "list" ? "list" : "table");
-    else if (val == "sort")
-      qz_instance.SendGameCommand("echo Sort method is: " + quakelive.cvars.Get("_qlrd_browserSort").value);
-    else if (val.indexOf("sort=") == 0)
-      quakelive.cvars.Set("_qlrd_browserSort", val.substr(5, val.length - 5));
+    else if (RegExp("^method(=.*)?$").test(val))
+      printOrSetCvar("_qlrd_outputMethod", val.substr(7), QLRD.OUTPUT);
+    else if (RegExp("^format(=.*)?$").test(val))
+      printOrSetCvar("_qlrd_outputFormat", val.substr(7), QLRD.FORMAT);
+    else if (RegExp("^sort(=.*)?$").test(val))
+      printOrSetCvar("_qlrd_browserSort", val.substr(5), QLRD.SORT);
+    else if (RegExp("^colors(=.*)?$").test(val))
+      printOrSetColors(val.substr(7));
     else if (val.indexOf("profile=") == 0)
       showQlranksProfile(val.substr(8, val.length - 8));
     else if (val == "games")
@@ -1086,10 +1092,10 @@ var extraQL = window.extraQL;
 
   function showHelp() {
     qz_instance.SendGameCommand("echo Usage: ^5/" + CMD_NAME + "^7 <^3command^7>");
-    qz_instance.SendGameCommand("echo \"^3method^7    print the current output method\"");
-    qz_instance.SendGameCommand("echo \"^3method=^7x  sets the output method to ^3echo^7,^3print^7,^3say_team^7 or ^3say^7\"");
-    qz_instance.SendGameCommand("echo \"^3format=^7x  sets the output format to ^3table^7 or ^3list^7\"");
-    qz_instance.SendGameCommand("echo \"^3sort=^7x    sets the sort criteria to ^3ql^7, ^3team^7 or ^3elo^7\"");
+    qz_instance.SendGameCommand("echo \"^3method^7=x  show/set output method\"");
+    qz_instance.SendGameCommand("echo \"^3format^7=x  show/set output format\"");
+    qz_instance.SendGameCommand("echo \"^3sort^7=x    show/set sorting\"");
+    qz_instance.SendGameCommand("echo \"^3colors^7=x  show/set color digits for player,rating,badge\"");
     qz_instance.SendGameCommand("echo \"^3score^7     shows the QLRanks score of each player on the server\"");
     qz_instance.SendGameCommand("echo \"^3games^7     shows the number of completed games for each player\"");
     qz_instance.SendGameCommand("echo \"^3shuffle^7   suggest the most even teams based on QLRanks score\"");
@@ -1097,6 +1103,29 @@ var extraQL = window.extraQL;
     qz_instance.SendGameCommand("echo \"^3shuffle!^7  if OP, setup the teams as suggested\"");
     qz_instance.SendGameCommand("echo \"^3profile=^7x opens QLranks.com player profile in your browser\"");
     qz_instance.SendGameCommand("echo \"          ^3x^7 is a comma separated list of game types and players\"");
+  }
+  
+  function printOrSetCvar(variable, newValue, allowedValues) {
+    if (newValue == undefined || newValue == "")
+      qz_instance.SendGameCommand("echo Current value is: ^5" + quakelive.cvars.Get(variable).value + "^7. Allowed: ^5" + allowedValues.join("^7,^5"));
+    else if (allowedValues.indexOf(newValue) >= 0)
+      quakelive.cvars.Set(variable, newValue);
+    else
+      qz_instance.SendGameCommand("echo ^1Invalid value.^7 Allowed: ^5" + allowedValues.join("^7,^5"));
+  }
+
+  function printOrSetColors(newValue) {
+    function colorInfo(digit) { return (digit == "0" ? "^5" : "^" + digit) + digit; }
+    var variable = "_qlrd_outputColors";
+    var colors = quakelive.cvars.Get(variable).value;
+    if (newValue == undefined || newValue == "") {
+      qz_instance.SendGameCommand("echo Current value is: " + colorInfo(colors[0]) + colorInfo(colors[1]) + colorInfo(colors[2]) + "^7. Allowed: 3 digits for ^5player name^7, ^5score^7, ^5badge letter^7");
+      qz_instance.SendGameCommand("echo Valid digits are ^5^70=team color (^5player^7, ^1red^7, ^4blue^7, spec), ^11 ^22 ^33 ^44 ^55 ^66 ^77");
+    }
+    else if (RegExp("^[0-7]{3}$").test(newValue))
+      quakelive.cvars.Set(variable, newValue);
+    else
+      qz_instance.SendGameCommand("echo ^1Invalid value.^7 Use ^5/elo colors^7 for help");
   }
 
   function setOutputMethod(val) {
@@ -1218,21 +1247,6 @@ var extraQL = window.extraQL;
         return;
       announceComplete = true;
 
-      // Display the results.
-      // NOTE: mul is "1" to separate the header from the results
-      var mul = 1,
-        currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value,
-        step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
-
-      // Show the chat pane for 10 seconds if output method is 'print',
-      // otherwise it will be difficult to notice.
-      if ("print" == currentOut) {
-        qz_instance.SendGameCommand("+chat;");
-        window.setTimeout(function() {
-          qz_instance.SendGameCommand("-chat;");
-        }, 10E3);
-      }
-
       function getQlmEloByName(players, name) {
         for (var p = 0; p < players.length; p++) {
           if (players[p].name == name)
@@ -1258,43 +1272,77 @@ var extraQL = window.extraQL;
       var sortStyle = getSortStyle();
       players_copy.sort(sortPlayerFunc(sortStyle));
 
-      // display team stats
-      var stats = calcStats(players_copy);
-      var hasTeams = stats.redcount > 0 || stats.blucount > 0;
-      var avgInfo = "^3Avg rating: " + stats.allavg + "(" + stats.allcount + ")" + stats.teamSummary;
-      qz_instance.SendGameCommand(currentOut + "\"" + avgInfo + "\"");
+      displayPlayers(players_copy, "Current");
+    }
+  }
 
-      var tableFormat = quakelive.cvars.Get("_qlrd_outputFormat");
-      tableFormat = currentOut == "echo" && (!tableFormat || tableFormat.value == "table");
-      var scoreColor = hasTeams ? "" : "^3";
-      for (var i = 0, out = [], len = players_copy.length; i <= len; ++i) {
-        // Group by 4, delaying commands as needed
-        if (i && i % 4 == 0 || i == len) {
-          window.setTimeout(function (txt) {
-            qz_instance.SendGameCommand(currentOut + " \"" + txt + "\";");
-          }.bind(null, out.join(tableFormat ? "^3|" : "^7, ")), mul++ * step);
-          out = [];
-        }
-        if (i == len)
-          break;
+  function displayPlayers(players, verb) {
+    // Display the results.
+    // NOTE: mul is "1" to separate the header from the results
+    var mul = 1,
+      currentOut = quakelive.cvars.Get("_qlrd_outputMethod").value,
+      step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
 
-        var color = getTeamColor(players_copy[i].team);
-        if (tableFormat)
-          out.push(color + pad(players_copy[i].name, 10).substr(0, 10) + " " + pad(players_copy[i].elo, -4) + players_copy[i].badge);
-        else
-          out.push(color + players_copy[i].name + " " + scoreColor + players_copy[i].elo + players_copy[i].badge);
-      }    
+    // Show the chat pane for 10 seconds if output method is 'print',
+    // otherwise it will be difficult to notice.
+    if ("print" == currentOut) {
+      qz_instance.SendGameCommand("+chat;");
+      window.setTimeout(function () {
+        qz_instance.SendGameCommand("-chat;");
+      }, 10E3);
+    }
+
+    // display team stats
+    var stats = calcStats(players);
+    var hasTeams = stats.redcount > 0 || stats.blucount > 0;
+    var avgInfo = hasTeams ? 
+      verb + " teams: " + stats.teamSummary + " ^7Avg: " + stats.allavg + "(" + stats.allcount + ")" :
+      "^3Avg rating: " + stats.allavg + "(" + stats.allcount + ")";
+    qz_instance.SendGameCommand(currentOut + "\"" + avgInfo + "\"");
+
+    var format = quakelive.cvars.Get("_qlrd_outputFormat", QLRD.FORMAT[0]).value;
+    if (format == "table" && currentOut != "echo")
+      format = QLRD.FORMAT[0];
+    var colors = quakelive.cvars.Get("_qlrd_outputColors").value;
+    var prefixLine = colors[0] != "0" && colors[1] != "0";
+    var prevTeam = players[0].team;
+    var teamMemberCount = 0;
+    var columnSep = format == "table" ? "^3|" : "^7, ";
+    for (var i = 0, out = [], len = players.length; i <= len; ++i) {
+      var curTeam = i == len ? prevTeam : players[i].team;
+      if (curTeam != prevTeam || i == len || (teamMemberCount && teamMemberCount % 4 == 0)) {
+        var linePrefix = prefixLine ? getTeamColor(prevTeam) + "PRBS"[prevTeam] + ": ^7" : "";
+        var line = linePrefix + out.join(columnSep);
+        window.setTimeout(function (txt) {
+          qz_instance.SendGameCommand(currentOut + " \"" + txt + "\";");
+        }.bind(null, line), mul++ * step);
+        out = [];
+      }
+      if (i == len)
+        break;
+      teamMemberCount = curTeam == prevTeam ? teamMemberCount + 1 : 1;
+      prevTeam = curTeam;
+
+      var nameColor = colors[0] == "0" ? getTeamColor(curTeam) : "^" + colors[0];
+      var scoreColor = colors[1] == "0" ? getTeamColor(curTeam) : "^" + colors[1];
+      var badgeColor = "^" + colors[2];
+      var badge = players[i].badge || "";
+      if (format == "table")
+        out.push(nameColor + pad(players[i].name, 10).substr(0, 10) + " " + scoreColor + pad(players[i].elo, -4) + badgeColor + badge);
+      else
+        out.push(nameColor + players[i].name + " " + scoreColor + players[i].elo + badgeColor + badge);
     }
   }
 
   function refreshServerDetails(callback) {
     if (extraQL.isLocalServerRunning()) {
       qz_instance.SendGameCommand("echo ]\\configstrings"); // text marker required by extraQL servlet
-      qz_instance.SendGameCommand("configstrings;condump condump.txt");
+      qz_instance.SendGameCommand("configstrings;condump extraql_condump.txt");
       window.setTimeout(function() {
         $.getJSON(extraQL.BASE_URL + "serverinfo")
           .done(function(json) {
             if (json.error) {
+              extraQL.echo("^1[QLRD] failed to parse condump.^7 Using stale player information from quakelive.com instead");
               refreshServerDetailsFromQlApi(callback);
               return;
             }
@@ -1304,10 +1352,15 @@ var extraQL = window.extraQL;
             });
             callback(server);
           })
-          .fail(function() { refreshServerDetailsFromQlApi(callback); });
+          .fail(function() {
+            extraQL.echo("^1[QLRD] failed to call extraQL.exe.^7 Using stale player information from quakelive.com instead");
+            refreshServerDetailsFromQlApi(callback);
+          });
       }, 1000);
-    } else
+    } else {
+      extraQL.echo("^1[QLRD] extraQL.exe not running.^7 Using stale player information from quakelive.com instead");
       refreshServerDetailsFromQlApi(callback);
+    }
   }
 
   function refreshServerDetailsFromQlApi(callback) {
@@ -1333,7 +1386,6 @@ var extraQL = window.extraQL;
     var currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value;
 
     QLRD.activeServerReq = true;
-    //extraQL.log("Updating current server info...", false);
 
     // Refresh the current server's details
     refreshServerDetails(function(server) {
@@ -1583,62 +1635,10 @@ var extraQL = window.extraQL;
           }
         }
 
-        //extraQL.log("best diff " + bestdiff / best_shuff.length );
-        //extraQL.log("best_shuff length " + best_shuff.length );
-
-        //extraQL.log("sort");
-
         // Sort players by Elo (descending).
         best_shuff.sort(function(a, b) { return b.team - a.team; });
 
-        //extraQL.log("sort done");
-
-
-        // Display the results.
-        // NOTE: mul is "1" to separate the header from the results
-        var mul = 1,
-          currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value,
-          step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
-
-        // Show the chat pane for 10 seconds if output method is 'print',
-        // otherwise it will be difficult to notice.
-        if ("print" == currentOut) {
-          qz_instance.SendGameCommand("+chat;");
-          window.setTimeout(function () {
-            qz_instance.SendGameCommand("-chat;");
-          }, 10E3);
-        }
-
-
-        var stats = calcStats(best_shuff);
-        var desc_word = doit ? "Performing" : "Optimum";
-        qz_instance.SendGameCommand(currentOut + " \"^3" + desc_word + " Elo shuffle:" + stats.teamSummary + "\"");
-
-        var prevTeam = best_shuff[0].team;
-        var teamMemberCount = 0;
-        var tableFormat = currentOut == "echo" && quakelive.cvars.Get("_qlrd_outputFormat").value == "table";
-        for (var i = 0, out = [], len = best_shuff.length; i <= len; ++i) {
-          // Group by 5, delaying commands as needed
-          var curTeam = i == len ? prevTeam : best_shuff[i].team;
-          if (curTeam != prevTeam || i == len || (tableFormat && ++teamMemberCount % 5 == 0)) {
-            window.setTimeout(function (txt) {
-              qz_instance.SendGameCommand(currentOut + " \"" + txt + "\"");
-            }.bind(null, out.join(tableFormat ? "^7|" : "^7, ")), mul++ * step);
-            out = [];
-          }
-          if (i == len)
-            break;
-
-          if (curTeam != prevTeam)
-            teamMemberCount = 0;
-          prevTeam = curTeam;
-
-          var color = getTeamColor(best_shuff[i].team);
-          if (tableFormat)
-            out.push(color + pad(best_shuff[i].name.substr(0, 12), 12, " "));
-          else
-            out.push(color + best_shuff[i].name);
-        }
+        displayPlayers(best_shuff, doit ? "Arranging" : "Suggested");
       });
     });
   }
@@ -1683,7 +1683,7 @@ var extraQL = window.extraQL;
     if (gap < 80) descr = "^2balanced";
     if (gap < 40) descr = "^2very balanced";
 
-    var teamSummary = redavg && bluavg ? " ^1" + redavg + "(" + counts[1].count + ") " + "^4" + bluavg + "(" + counts[2].count + ") ^3Gap: " + gapColor + gap + "  " + descr : "";
+    var teamSummary = redavg && bluavg ? " ^1" + redavg + "(" + counts[1].count + ") " + "^4" + bluavg + "(" + counts[2].count + ") ^7Gap: " + gapColor + gap + "  " + descr : "";
     return {
       allavg: counts[0].count == 0 ? 0 : Math.round(counts[0].sum / counts[0].count),
       allcount: counts[0].count,
@@ -1901,4 +1901,7 @@ var extraQL = window.extraQL;
     return sortStyle;
   }
 
+  function configScreen() {
+    
+  }
 })();
