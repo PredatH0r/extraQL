@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        2.1
+// @version        2.2
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,9 @@
 // ==/UserScript==
 
 /*
+
+Version 2.2
+- output of "/elo shuffle" is now sorted by Elo
 
 Version 2.1
 - unified output format for /elo score and /elo shuffle
@@ -1636,7 +1639,7 @@ var extraQL = window.extraQL;
         }
 
         // Sort players by Elo (descending).
-        best_shuff.sort(function(a, b) { return b.team - a.team; });
+        best_shuff.sort(sortPlayerFunc("team"));
 
         displayPlayers(best_shuff, doit ? "Arranging" : "Suggested");
       });
