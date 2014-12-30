@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        2.2
+// @version        2.3
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,8 @@
 // ==/UserScript==
 
 /*
+Version 2.3
+- allow an "x" as 3rd digit for /elo colors to disable the badge letter
 
 Version 2.2
 - output of "/elo shuffle" is now sorted by Elo
@@ -1118,14 +1120,15 @@ var extraQL = window.extraQL;
   }
 
   function printOrSetColors(newValue) {
-    function colorInfo(digit) { return (digit == "0" ? "^5" : "^" + digit) + digit; }
+    function colorInfo(digit) { return (digit >= "1" && digit <= "7" ? "^" + digit : "^5") + digit; }
     var variable = "_qlrd_outputColors";
     var colors = quakelive.cvars.Get(variable).value;
     if (newValue == undefined || newValue == "") {
       qz_instance.SendGameCommand("echo Current value is: " + colorInfo(colors[0]) + colorInfo(colors[1]) + colorInfo(colors[2]) + "^7. Allowed: 3 digits for ^5player name^7, ^5score^7, ^5badge letter^7");
-      qz_instance.SendGameCommand("echo Valid digits are ^5^70=team color (^5player^7, ^1red^7, ^4blue^7, spec), ^11 ^22 ^33 ^44 ^55 ^66 ^77");
+      qz_instance.SendGameCommand("echo Valid digits are ^50^7=team color (^5player^7, ^1red^7, ^4blue^7, spec), ^11 ^22 ^33 ^44 ^55 ^66 ^77");
+      qz_instance.SendGameCommand("echo Use ^5x^7 as 3rd digit to disable badge letters");
     }
-    else if (RegExp("^[0-7]{3}$").test(newValue))
+    else if (RegExp("^[0-7][0-7][0-7Xx]$").test(newValue))
       quakelive.cvars.Set(variable, newValue);
     else
       qz_instance.SendGameCommand("echo ^1Invalid value.^7 Use ^5/elo colors^7 for help");
@@ -1196,17 +1199,23 @@ var extraQL = window.extraQL;
         // Wait for all server players to be available in the QLRD cache.
         announceServer = server;
         announceGametype = gt;
-        var names = $.map(server.players, function(p) { return { "name": p.name } });
-        QLRD.waitFor(names, gt, announceQlrDataArrived);
+        var names = $.map(server.players, function (p) { return { "name": p.name } });
 
-        var just_names = $.map(server.players, function (p) { return p.name; });
-        $.ajax({
-          url:"http://qlranks20917.azurewebsites.net/api/Stats/GetProfileGametypesFinished", 
-          data: { profile: just_names.join(",") },
-          dataType: "json",
-          success: announceEcsDataArrived,
-          timeout: 4500
-        });
+        var showBadge = quakelive.cvars.Get("_qlr_outputColors").value.substr(2, 1).toUpperCase != "X";
+        if (showBadge) {
+          QLRD.waitFor(names, gt, announceQlrDataArrived);
+
+          var just_names = $.map(server.players, function(p) { return p.name; });
+          $.ajax({
+            url: "http://qlranks20917.azurewebsites.net/api/Stats/GetProfileGametypesFinished",
+            data: { profile: just_names.join(",") },
+            dataType: "json",
+            success: announceEcsDataArrived,
+            timeout: 4500
+          });
+        }
+        else
+          QLRD.waitFor(names, gt, announceAllDataAvailable);
       }
     );
 
