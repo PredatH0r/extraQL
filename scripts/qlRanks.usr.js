@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        2.3
+// @version        2.4
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,10 @@
 // ==/UserScript==
 
 /*
+
+Version 2.4
+- fixed disabling badge letter (was printed black before)
+
 Version 2.3
 - allow an "x" as 3rd digit for /elo colors to disable the badge letter
 
@@ -1201,7 +1205,7 @@ var extraQL = window.extraQL;
         announceGametype = gt;
         var names = $.map(server.players, function (p) { return { "name": p.name } });
 
-        var showBadge = quakelive.cvars.Get("_qlr_outputColors").value.substr(2, 1).toUpperCase != "X";
+        var showBadge = quakelive.cvars.Get("_qlr_outputColors").value.substr(2, 1).toUpperCase() != "X";
         if (showBadge) {
           QLRD.waitFor(names, gt, announceQlrDataArrived);
 
@@ -1337,12 +1341,11 @@ var extraQL = window.extraQL;
 
       var nameColor = colors[0] == "0" ? getTeamColor(curTeam) : "^" + colors[0];
       var scoreColor = colors[1] == "0" ? getTeamColor(curTeam) : "^" + colors[1];
-      var badgeColor = "^" + colors[2];
-      var badge = players[i].badge || "";
+      var badge = colors[2].toUpperCase() != "X" && players[i].badge ? "^" + colors[2] + players[i].badge : "";
       if (format == "table")
-        out.push(nameColor + pad(players[i].name, 10).substr(0, 10) + " " + scoreColor + pad(players[i].elo, -4) + badgeColor + badge);
+        out.push(nameColor + pad(players[i].name, 10).substr(0, 10) + " " + scoreColor + pad(players[i].elo, -4) + badge);
       else
-        out.push(nameColor + players[i].name + " " + scoreColor + players[i].elo + badgeColor + badge);
+        out.push(nameColor + players[i].name + " " + scoreColor + players[i].elo + badge);
     }
   }
 
