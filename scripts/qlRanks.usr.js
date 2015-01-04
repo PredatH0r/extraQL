@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        2.4
+// @version        2.5
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,10 @@
 // ==/UserScript==
 
 /*
+
+Version 2.5
+- fixed "/elo shuffle!", where players are put into wrong teams. 
+  This was caused by a race condition where extraQL read the condump file before it was updated with a delay by QL
 
 Version 2.4
 - fixed disabling badge letter (was printed black before)
@@ -1221,6 +1225,7 @@ var extraQL = window.extraQL;
         else
           QLRD.waitFor(names, gt, announceAllDataAvailable);
       }
+      ,true
     );
 
     var announceTimeout = null;
@@ -1271,21 +1276,18 @@ var extraQL = window.extraQL;
         return -1;
       }
 
-      var index = 0;
-
       var players_copy = $.map(announceServer.players, function(p) {
         var games = announceEcsGamesPlayed ? parseInt(announceEcsGamesPlayed[p.name]) : NaN;
         return {
           "name": p.name,
           "team": p.team,
           "elo": getQlmEloByName(announceQlrPlayers, p.name),
-          "index": index++,
           "badge": isNaN(games) ? "" : games >= 16000 ? "Z" : games < 1000 ? String.fromCharCode(65 + Math.floor(games / 100)) : String.fromCharCode(74 + Math.floor(games / 1000))
         }
       });
 
-      // Sort players by Elo (descending).
-      var sortStyle = getSortStyle();
+      // Sort players by either Elo or team
+      var sortStyle = getSortStyle() || "team";
       players_copy.sort(sortPlayerFunc(sortStyle));
 
       displayPlayers(players_copy, "Current");
@@ -1349,32 +1351,38 @@ var extraQL = window.extraQL;
     }
   }
 
-  function refreshServerDetails(callback) {
+  function refreshServerDetails(callback, allowFallback) {
+    function fallback(msg, callback) {
+      if (allowFallback) {
+        QLRD.igAnnounce(msg + " Using stale player information from quakelive.com instead");
+        refreshServerDetailsFromQlApi(callback);
+      } else {
+        QLRD.igAnnounce(msg + " Action aborted.", true);
+      }
+    }
+
     if (extraQL.isLocalServerRunning()) {
       qz_instance.SendGameCommand("echo ]\\configstrings"); // text marker required by extraQL servlet
-      qz_instance.SendGameCommand("configstrings;condump extraql_condump.txt");
-      window.setTimeout(function() {
-        $.getJSON(extraQL.BASE_URL + "serverinfo")
-          .done(function(json) {
-            if (json.error) {
-              extraQL.echo("^1[QLRD] failed to parse condump.^7 Using stale player information from quakelive.com instead");
-              refreshServerDetailsFromQlApi(callback);
-              return;
-            }
-            var server = { game_type: json.gameinfo.g_gametype, players: [] };
-            $.each(json.players, function(i, obj) {
-              server.players.push({ "name": obj.n.toLowerCase(), "team": obj.t, "index": obj.clientid });
-            });
-            callback(server);
-          })
-          .fail(function() {
-            extraQL.echo("^1[QLRD] failed to call extraQL.exe.^7 Using stale player information from quakelive.com instead");
-            refreshServerDetailsFromQlApi(callback);
+      qz_instance.SendGameCommand("configstrings");
+      qz_instance.SendGameCommand("condump extraql_condump.txt");
+      // QL writes the condump delayed, so the servlet must handle this race condition 
+      $.getJSON(extraQL.BASE_URL + "serverinfo")
+        .done(function(json) {
+          if (json.error) {
+            fallback(json.error, callback);
+            return;
+          }
+          var server = { condump: true, game_type: json.gameinfo.g_gametype, players: [] };
+          $.each(json.players, function(i, obj) {
+            server.players.push({ "name": obj.n.toLowerCase(), "team": obj.t, "clientid": obj.clientid });
           });
-      }, 1000);
+          callback(server);
+        })
+        .fail(function() {
+          fallback("Failed to call extraQL.exe", callback);
+        });      
     } else {
-      extraQL.echo("^1[QLRD] extraQL.exe not running.^7 Using stale player information from quakelive.com instead");
-      refreshServerDetailsFromQlApi(callback);
+      fallback("extraQL.exe not running.", callback);
     }
   }
 
@@ -1470,7 +1478,8 @@ var extraQL = window.extraQL;
             });
         }
       );
-    });
+    }
+      , true);
   }
 
   function shuffle(val, doit, args) {
@@ -1485,7 +1494,7 @@ var extraQL = window.extraQL;
     }
 
     // Refresh the current server's details
-    refreshServerDetails(function(server) {
+    refreshServerDetails(function (server) {
       // Stop if no players were returned
       if (0 == server.players.length) {
         QLRD.igAnnounce("No players were returned by Quake Live.  "
@@ -1543,7 +1552,7 @@ var extraQL = window.extraQL;
               "name": p.name,
               "elo": parseInt(getQlmPlayerByName(players, p.name).elo),
               "team": p.team,
-              "index": p.clientid || index,
+              "clientid": p.clientid,
               "candidateTeam": -1
             });
           }
@@ -1637,7 +1646,7 @@ var extraQL = window.extraQL;
         if (doit) {
           var commands = [];
           for (var i = 0; i < best_shuff.length; i++) {
-            var command = ("put " + (players_copy[i].index) + " " + (best_shuff[i].team == 1 ? "r" : "b") + ";");
+            var command = ("put " + (players_copy[i].clientid) + " " + (best_shuff[i].team == 1 ? "r" : "b") + ";");
             commands.push(command);
             QLRD.igAnnounce(command);
           }
@@ -1650,12 +1659,13 @@ var extraQL = window.extraQL;
           }
         }
 
-        // Sort players by Elo (descending).
+        // Sort players by team
         best_shuff.sort(sortPlayerFunc("team"));
 
         displayPlayers(best_shuff, doit ? "Arranging" : "Suggested");
       });
-    });
+    }
+      , false);
   }
 
   function showQlranksProfile(playerString) {
@@ -1895,7 +1905,7 @@ var extraQL = window.extraQL;
     return function(player1, player2) {
       var key1 = sortCriteria(player1, sortStyle);
       var key2 = sortCriteria(player2, sortStyle);
-      return key1 < key2 ? -1 : key1 == key2 ? 0 : +1;
+      return key1 < key2 ? -1 : key1 > key2 ? +1 : 0;
     };
   }
 

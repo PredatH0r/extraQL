@@ -486,22 +486,23 @@ namespace ExtraQL
     #region GetServerInfo()
     private void GetServerInfo(Stream stream, Uri uri, string request)
     {
-      int i = -1;
-      string[] lines = null;
       var file = this.QuakeConfigFolder + "\\" + CondumpFile;
-      if (File.Exists(file))
+      var lines = ReadUpdatedFile(file);
+      if (lines == null)
       {
-        lines = File.ReadAllLines(file);
-
-        // find line with last /configstrings command
-        for (i = lines.Length - 1; i >= 0; i--)
-          if (lines[i].EndsWith("]\\configstrings"))
-            break;
+        HttpOk(stream, "{\"error\":\"" + CondumpFile + " is old or doesn't exist.\"}");
+        return;       
       }
+
+      // find line with last /configstrings command
+      int i;
+      for (i = lines.Length - 1; i >= 0; i--)
+        if (lines[i].EndsWith("]\\configstrings"))
+          break;
 
       if (i < 0)
       {
-        HttpOk(stream, "{\"error\":true}");
+        HttpOk(stream, "{\"error\":\"Can't find configstrings in condump.\"}");
         return;
       }
 
@@ -509,6 +510,27 @@ namespace ExtraQL
       var info = ExtractConfigstrings(i, lines);
       var json = GenerateClientinfoJson(info);
       HttpOk(stream, json);
+    }
+
+    private string[] ReadUpdatedFile(string file)
+    {
+      for (int attempt = 0; attempt < 30; attempt++)
+      {
+        if (File.Exists(file) && (DateTime.Now - File.GetLastWriteTime(file)).TotalSeconds < 5)
+        {
+          try
+          {
+            var lines = File.ReadAllLines(file);
+            return lines;
+          }
+          catch
+          {
+            // file may still be locked by QL for writing
+          }
+        }
+        Thread.Sleep(100);
+      }
+      return null;
     }
 
     private static Dictionary<int, string> ExtractConfigstrings(int i, string[] lines)
@@ -524,6 +546,8 @@ namespace ExtraQL
           if (index == 0 || index >= 529 && index < 529 + 32)
             info.Add(index, value);
           index = int.Parse(line.Substring(1, 3));
+          if (index >= 529 + 32)
+            break;
           value = line.Substring(5).Trim();
         }
         else if (index >= 0)

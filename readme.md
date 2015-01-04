@@ -24,6 +24,11 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.17
+---
+- fixed "/elo score" and "/elo shuffle" commands (condump file was read before QL finished writing it)
+
+
 Version 1.16
 ---
 - /serverinfo servlet (used by QLranks /elo shuffle) now works with >16 players on the server (Silent Night allows 28)
