@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        2.5
+// @version        2.6
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,9 @@
 // ==/UserScript==
 
 /*
+
+Version 2.6
+- another attempt at "/elo shuffle!" (put everyone into spec first to prevent exceeding teamsize while rearranging)
 
 Version 2.5
 - fixed "/elo shuffle!", where players are put into wrong teams. 
@@ -1504,8 +1507,9 @@ var extraQL = window.extraQL;
       }
 
       // Make sure we're using a gametype tracked by QLRanks
+      var gt;
       try {
-        var gt = mapdb.getGameTypeByID(server.game_type).title.toLowerCase();
+        gt = mapdb.getGameTypeByID(server.game_type).title.toLowerCase();
       } catch (e) {
         QLRD.igAnnounce("Unable to determine server gametype. " + e, true);
         QLRD.activeServerReq = false;
@@ -1521,7 +1525,7 @@ var extraQL = window.extraQL;
 
       // Wait for all server players to be available in the QLRD cache.
       var names = $.map(server.players, function(p) { return { "name": p.name } });
-      QLRD.waitFor(names, gt, function(error, players) {
+      QLRD.waitFor(names, gt, function(error, qlrPlayerInfo) {
         // Always clear the active request flag.
         QLRD.activeServerReq = false;
 
@@ -1531,41 +1535,34 @@ var extraQL = window.extraQL;
           return;
         }
 
-        function getQlmPlayerByName(players, name) {
+        function getPlayerByName(players, name) {
           for (var p = 0; p < players.length; p++)
             if (players[p].name == name) return players[p];
           return {};
         }
 
         args = "," + args + ",";
-        var index = -1;
-        var players_copy = [];
+        var players = [];
         var addAll = args.indexOf(",+all,") >= 0;
         $.each(server.players, function (i, p) {
-          ++index;
           var name = p.name.toLowerCase();
           if (args.indexOf(",-" + name + ",") >= 0)
             return;
           // skip specs by default, but allow overrides via comma separated +playername or +all
           if (addAll || args.indexOf(",+" + name + ",") >= 0 || p.team >= 1 && p.team <= 2) {
-            players_copy.push({
-              "name": p.name,
-              "elo": parseInt(getQlmPlayerByName(players, p.name).elo),
-              "team": p.team,
-              "clientid": p.clientid,
-              "candidateTeam": -1
-            });
+            p.oldTeam = p.team;
+            p.elo = parseInt(getPlayerByName(qlrPlayerInfo, p.name).elo);
+            players.push(p);
           }
         });
 
-        if (players_copy.length % 2 != 0 || players_copy.length < 2) {
-          QLRD.igAnnounce(("Shuffle needs an even number of players, currently " + players_copy.length), true);
+        if (players.length % 2 != 0 || players.length < 2) {
+          QLRD.igAnnounce(("Shuffle needs an even number of players, currently " + players.length), true);
           QLRD.igAnnounce(("Use ^3/elo shuffle,+all,+player1,-player2^7 to add/remove players"), true);
           return;
         }
 
         var bestdiff = 1e8;
-        var best_shuff = null;
 
         function k_combinations(set, k) {
           var i, j, combs, head, tailcombs;
@@ -1605,22 +1602,22 @@ var extraQL = window.extraQL;
           return array;
         }
 
-        var team_size = players_copy.length / 2;
+        var team_size = players.length / 2;
 
         ///ecs@060714 number of team permutations is n choose k where n is server size k teamsize
-        var shuffle_perms = k_combinations(range(0, players_copy.length), team_size);
+        var shuffle_perms = k_combinations(range(0, players.length), team_size);
 
         for (var i = 0; i < shuffle_perms.length; i++) {
           var reds = 0;
           var blues = 0;
 
-          for (var p = 0; p < players_copy.length; p++) {
+          for (var p = 0; p < players.length; p++) {
             if (shuffle_perms[i].indexOf(p) != -1) {
-              reds = reds + players_copy[p].elo;
-              players_copy[p].candidateTeam = 0;
+              reds = reds + players[p].elo;
+              players[p].candidateTeam = 1;
             } else {
-              blues = blues + players_copy[p].elo;
-              players_copy[p].candidateTeam = 1;
+              blues = blues + players[p].elo;
+              players[p].candidateTeam = 2;
             }
           }
 
@@ -1632,37 +1629,41 @@ var extraQL = window.extraQL;
 
           if (diff < bestdiff) {
             bestdiff = diff;
-            best_shuff = $.map(players_copy,
-              function(p) {
-                return {
-                  "name": p.name,
-                  "elo": p.elo,
-                  "team": p.candidateTeam == 0 ? 1 : 2
-                }
-              });
+            p.newTeam = p.candidateTeam;
           }
         }
 
         if (doit) {
           var commands = [];
-          for (var i = 0; i < best_shuff.length; i++) {
-            var command = ("put " + (players_copy[i].clientid) + " " + (best_shuff[i].team == 1 ? "r" : "b") + ";");
+          for (var i = 0; i < players.length; i++) {
+            if (players[i].team == players[i].oldTeam)
+              continue;
+            var command = ("put " + players[i].clientid + " s;");
+            commands.push(command);
+          }
+
+          for (var i = 0; i < players.length; i++) {
+            if (players[i].team == players[i].oldTeam)
+              continue;
+            var command = ("put " + (players[i].clientid) + " " + (players[i].team == 1 ? "r" : "b") + ";");
             commands.push(command);
             QLRD.igAnnounce(command);
           }
 
-          for (var i = 0; i < best_shuff.length; i++) {
+          var delay = 0;
+          for (var i = 0; i < players.length; i++) {
             var put_command = commands[i];
-            (function(command, i) {
-              window.setTimeout(function() { qz_instance.SendGameCommand(command); }, i * 1100);
-            })(put_command, i);
+            (function(command, delay) {
+              window.setTimeout(function() { qz_instance.SendGameCommand(command); }, delay);
+            })(put_command, delay);
+            delay += 1100;
           }
         }
 
         // Sort players by team
-        best_shuff.sort(sortPlayerFunc("team"));
+        players.sort(sortPlayerFunc("team"));
 
-        displayPlayers(best_shuff, doit ? "Arranging" : "Suggested");
+        displayPlayers(players, doit ? "Arranging" : "Suggested");
       });
     }
       , false);
