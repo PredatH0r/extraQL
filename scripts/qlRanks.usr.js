@@ -19,6 +19,7 @@
 
 Version 2.6
 - another attempt at "/elo shuffle!" (put everyone into spec first to prevent exceeding teamsize while rearranging)
+- added "/elo update" to clear qlranks player cache
 
 Version 2.5
 - fixed "/elo shuffle!", where players are put into wrong teams. 
@@ -245,10 +246,7 @@ var extraQL = window.extraQL;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // If we have GM_registerMenuCommand, create our commands
-  GM_registerMenuCommand("QLRanks.com Display: Clear the player data cache", function() {
-    QLRD.PLAYERS = {};
-    logMsg("Player data cache cleared");
-  });
+  GM_registerMenuCommand("QLRanks.com Display: Clear the player data cache", clearEloCache);
 
   GM_registerMenuCommand("QLRanks.com Display: Toggle Elo rating on unsupported scoreboards", function() {
     PREFS.toggle("showRatingForAllGametypes");
@@ -1084,6 +1082,8 @@ var extraQL = window.extraQL;
 
     if (val == "help")
       showHelp();
+    else if (val == "update")
+      clearEloCache();
     else if (val == "score")
       announce("1");
     else if (RegExp("^method(=.*)?$").test(val))
@@ -1119,8 +1119,14 @@ var extraQL = window.extraQL;
     qz_instance.SendGameCommand("echo \"^3shuffle!^7  if OP, setup the teams as suggested\"");
     qz_instance.SendGameCommand("echo \"^3profile=^7x opens QLranks.com player profile in your browser\"");
     qz_instance.SendGameCommand("echo \"          ^3x^7 is a comma separated list of game types and players\"");
+    qz_instance.SendGameCommand("echo \"^3update^7    clears cached Elo ratings\"");
   }
   
+  function clearEloCache() {
+    QLRD.PLAYERS = {};
+    logMsg("Player data cache cleared");
+  }
+
   function printOrSetCvar(variable, newValue, allowedValues) {
     if (newValue == undefined || newValue == "")
       qz_instance.SendGameCommand("echo Current value is: ^5" + quakelive.cvars.Get(variable).value + "^7. Allowed: ^5" + allowedValues.join("^7,^5"));
