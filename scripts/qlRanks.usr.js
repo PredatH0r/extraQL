@@ -20,7 +20,12 @@
 Version 2.6
 - another attempt at "/elo shuffle!" (put everyone into spec first to prevent exceeding teamsize while rearranging)
 - added "/elo update" to clear qlranks player cache
+- added "/elo say" as a shortcut for simple "say" output
+- added "/elo table|list|simple" as a shortcut for formatted console output
 - added info about badge letters to "/elo help"
+- changed format=table to group teams in columns instead of lines
+- added format=list
+- lots of internal code cleanup (using localStorage instead of CVARs for storing user settings)
 
 Version 2.5
 - fixed "/elo shuffle!", where players are put into wrong teams. 
@@ -172,66 +177,48 @@ var extraQL = window.extraQL;
     DOLITTLE = function() {},
     logMsg = DEBUG ? function(aMsg) { console.log(aMsg); } : DOLITTLE,
     logError = function(aMsg) { console.log("ERROR: " + aMsg); },
-    ELO_DIFF_FOR_GREEN_JOIN_BUTTON = 150;
+    ELO_DIFF_FOR_GREEN_JOIN_BUTTON = 150,
+    RE_profile = /profile\/summary\/(\w+)/i;
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // PREFERENCES HELPER
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  var PREFS = initPrefs();
-  
-  function initPrefs() {
-    var _defaults = [
-      { "name": "debug", "def": false },
-      { "name": "showRatingForAllGametypes", "def": false },
-      { "name": "user_gt", "def": "Duel" }];
+  var PREFS = new Prefs();
 
-    var prefs = {
-      _prefs: {}
-      
-      /**
-	     * Get a preference value
-	     * @param {String} the preference name
-	     * @param {Boolean|Number|String} a default value
-	     * @return {Boolean|Number|String} either the stored or default value
-	     */,
-      get: function(aName, aDefault) {
-        return (aName in this._prefs ? this._prefs[aName] : aDefault);
-      }
-
-      /**
-	   * Sets the local and stored value of a preference
-	   * @param {String} the preference name
-	   * @param {Boolean|Number|String} a value
-	   * @return {Boolean|Number|String} the value passed as aVal
-	   */,
-      set: function(aName, aVal) {
-        this._prefs[aName] = aVal;
-        localStorage["qlrd_" + aName] = aVal;
-        return aVal;
-      }
-
-      /**
-	   * Toggle a preference value
-	   * @param {String} the preference name
-	   * @return {Boolean} the "toggled" value of aName
-	   */,
-      toggle: function(aName) {
-        return this.set(aName, !this.get(aName));
-      }
-    }
+  function Prefs() {
+    this.debug = false;
+    this.showRatingForAllGametypes = false;
+    this.user_gt = "Duel";
+    this.method = "echo";
+    this.format = "table";
+    this.sort = "team";
+    this.colors = "007";
 
     /**
- 	    * Initialize preferences
-	    */
-    _defaults.forEach(function(aPref) {
-      prefs.set(aPref.name, localStorage["qlrd_" + aPref.name] || aPref.def);
-      logMsg("loaded pref '" + aPref.name + "' => '" + prefs.get(aPref.name) + "'");
-    });
+	  * Sets the local and stored value of a preference
+	  * @param {String} the preference name
+	  * @param {Boolean|Number|String} a value
+	  * @return {Boolean|Number|String} the value passed as aVal
+	  */
+    this.set = function(aName, aVal) {
+      this[aName] = aVal;
+      localStorage["qlrd_" + aName] = aVal;
+      return aVal;
+    }
 
-    return prefs;
-  };
+    // load saved preferences from local storage
+    var self = this;
+    $.each(this, function(name) {
+      var val = localStorage["qlrd_" + name];
+      if (val !== undefined) {
+        self.set(name, val);
+        logMsg("loaded pref '" + name + "' => '" + self[name] + "'");
+      }
+    });
+  }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +252,7 @@ var extraQL = window.extraQL;
         "team death match": "tdm" // used by the mapdb
       },
       OUTPUT: ["print", "echo", "say", "say_team"] // keep in sync with 'cvarDefaults' for in-game
-      , FORMAT: ["list", "table"]
+      , FORMAT: ["table", "simple", "list" ]
       , SORT: ["ql", "elo", "team"]
       ,
       activeServerReq: false
@@ -722,7 +709,7 @@ var extraQL = window.extraQL;
       var $this = $(this),
         gt = $("#lgi_match_gametype span").text().trim().toLowerCase(),
         isSupported = gt in QLRD.GAMETYPES,
-        showForAll = PREFS.get("showRatingForAllGametypes"),
+        showForAll = PREFS.showRatingForAllGametypes,
         $scoreCols = $this.find(".lgi_cli_col_2");
 
       // Currently only showing Elo for supported gametypes
@@ -894,16 +881,16 @@ var extraQL = window.extraQL;
         return;
 
       // Inject...
-      $pcn.before("<span id='qlv_user_data_elo_gametype' title='Click to change QLRanks.com Elo gametype'>" + PREFS.get("user_gt") + "</span>"
+      $pcn.before("<span id='qlv_user_data_elo_gametype' title='Click to change QLRanks.com Elo gametype'>" + PREFS.user_gt + "</span>"
         + "<div id='qlv_user_data_elo_gametype_menu'>"
         + "<span>CA</span><span>CTF</span><span>Duel</span><span>FFA</span><span>TDM</span></div>: "
-        + "<a id='qlv_user_data_elo' href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/" + PREFS.get("user_gt").toLowerCase() + "/player/"
+        + "<a id='qlv_user_data_elo' href='javascript:quakelive.OpenURL(\"http://www.qlranks.com/" + PREFS.user_gt.toLowerCase() + "/player/"
         + quakelive.username + "\")' target='_blank'>&hellip;</a>"
         + "<div class='cl' style='margin-bottom: 5px'></div>");
 
       // ... and get the Elo rating
       var s = { "name": quakelive.username, "targets": {} };
-      s["targets"][PREFS.get("user_gt")] = "#qlv_user_data_elo";
+      s["targets"][PREFS.user_gt] = "#qlv_user_data_elo";
       QLRD.set(s);
 
       // Set up the toggle
@@ -926,7 +913,7 @@ var extraQL = window.extraQL;
           $("#qlv_user_data_elo_gametype").text(new_gt).show();
 
           // Do nothing more if the gametype didn't change
-          if (new_gt == PREFS.get("user_gt")) {
+          if (new_gt == PREFS.user_gt) {
             logMsg("ignoring identical 'user_gt': " + new_gt);
             return;
           }
@@ -941,10 +928,10 @@ var extraQL = window.extraQL;
           QLRD.set(s);
 
           // Update the script's user_gt preference
-          logMsg("change pref 'user_gt' from '" + PREFS.get("user_gt") + "' to '" + new_gt + "'");
+          logMsg("change pref 'user_gt' from '" + PREFS.user_gt + "' to '" + new_gt + "'");
           PREFS.set("user_gt", new_gt);
         })
-        .find("span:contains('" + PREFS.get("user_gt") + "')").addClass("selected");
+        .find("span:contains('" + PREFS.user_gt + "')").addClass("selected");
     }
   })();
 
@@ -1016,12 +1003,8 @@ var extraQL = window.extraQL;
     var cvarDefaults = {
       // These track the current output method and position in "cycling" through the methods, respectively
       "_qlrd_outputMethod": QLRD.OUTPUT[0],
-      "_qlrd_outputFormat": QLRD.FORMAT[0],
-      "_qlrd_outputColors": "307",
       "_qlrd_output": "vstr _qlrd_output1",
-      "_qlrd_browserSort": QLRD.SORT[0]
       // These are the possible output method states
-      ,
       "_qlrd_output0": "seta _qlrd_outputMethod echo; set _qlrd_output vstr _qlrd_output1; echo ^2QLRD: ^7output method is now ^5echo; print ^2[QLRD] ^7output method is now ^5echo ^7(check the console!)",
       "_qlrd_output1": "seta _qlrd_outputMethod print; set _qlrd_output vstr _qlrd_output2; print ^2QLRD: ^7output method is now ^5print",
       "_qlrd_output2": "seta _qlrd_outputMethod say_team; set _qlrd_output vstr _qlrd_output3; print ^2QLRD: ^7output method is now ^5say_team",
@@ -1072,7 +1055,7 @@ var extraQL = window.extraQL;
         break;
 
       case "_qlrd_announce":
-        announce();
+        announce(PREFS.method, PREFS.format);
         break;
 
       case "_gamescomp":
@@ -1097,13 +1080,17 @@ var extraQL = window.extraQL;
       else if (val == "update")
         clearEloCache();
       else if (val == "score")
-        announce();
+        announce(PREFS.method, PREFS.format);
+      else if (val == "say")
+        announce("say", PREFS.format);
+      else if (val == "table" || val == "list" || val == "simple")
+        announce("echo", val);
       else if (RegExp("^method(=.*)?$").test(val))
-        printOrSetCvar("_qlrd_outputMethod", val.substr(7), QLRD.OUTPUT);
+        printOrSetPref("method", val.substr(7), QLRD.OUTPUT);
       else if (RegExp("^format(=.*)?$").test(val))
-        printOrSetCvar("_qlrd_outputFormat", val.substr(7), QLRD.FORMAT);
+        printOrSetPref("format", val.substr(7), QLRD.FORMAT, "^5Note:^7 Formatting is only customizable for ^3method=echo^7. All other methods use ^3format=simple^7.");
       else if (RegExp("^sort(=.*)?$").test(val))
-        printOrSetCvar("_qlrd_browserSort", val.substr(5), QLRD.SORT);
+        printOrSetPref("sort", val.substr(5), QLRD.SORT);
       else if (RegExp("^colors(=.*)?$").test(val))
         printOrSetColors(val.substr(7));
       else if (val.indexOf("profile=") == 0)
@@ -1120,18 +1107,19 @@ var extraQL = window.extraQL;
 
     function showHelp() {
       qz_instance.SendGameCommand("echo Usage: ^5/" + CMD_NAME + "^7 <^3command^7>");
+      qz_instance.SendGameCommand("echo \"^3say^7       shows the QLRanks score to all players\"");
+      qz_instance.SendGameCommand("echo \"^3table^7|^3list^7|^3simple^7           ^^^7... formatted in your console\"");
       qz_instance.SendGameCommand("echo \"^3method^7=x  show/set output method\"");
-      qz_instance.SendGameCommand("echo \"^3format^7=x  show/set output format\"");
+      qz_instance.SendGameCommand("echo \"^3format^7=x  show/set output format used by method=echo\"");
       qz_instance.SendGameCommand("echo \"^3sort^7=x    show/set sorting\"");
-      qz_instance.SendGameCommand("echo \"^3colors^7=x  show/set color digits for player,rating,badge\"");
-      qz_instance.SendGameCommand("echo \"^3score^7     shows the QLRanks score of each player on the server\"");
+      qz_instance.SendGameCommand("echo \"^3colors^7=x  show/set color digits for player,score,badge\"");
+      qz_instance.SendGameCommand("echo \"^3score^7     shows the QLRanks score using above settings\"");
       qz_instance.SendGameCommand("echo \"^3games^7     shows the number of completed games for each player\"");
-      qz_instance.SendGameCommand("echo \"^3shuffle^7   suggest the most even teams based on QLRanks score\"");
+      qz_instance.SendGameCommand("echo \"^3shuffle^7!  suggest/arrange teams based on QLRanks score\"");
       qz_instance.SendGameCommand("echo \"          append ^3,+all,+player1,-player2^7 to add/remove players\"");
-      qz_instance.SendGameCommand("echo \"^3shuffle!^7  if OP, setup the teams as suggested\"");
       qz_instance.SendGameCommand("echo \"^3profile=^7x opens QLranks.com player profile in your browser\"");
       qz_instance.SendGameCommand("echo \"          ^3x^7 is a comma separated list of game types and players\"");
-      qz_instance.SendGameCommand("echo \"^3update^7    clears cached Elo ratings\"");
+      qz_instance.SendGameCommand("echo \"^3update^7    clears cached QLRanks Elo scores\"");
       qz_instance.SendGameCommand("echo \"\"");
       qz_instance.SendGameCommand("echo \"Badge letters after Elo score indicate number of games completed\"");
       qz_instance.SendGameCommand("echo ^3A-J^7:  <100...<1000, ^3K-Y^7: <2000...<16000, ^3Z^7: >=16000");
@@ -1142,33 +1130,32 @@ var extraQL = window.extraQL;
       logMsg("Player data cache cleared");
     }
 
-    function printOrSetCvar(variable, newValue, allowedValues) {
-      if (newValue == undefined || newValue == "")
-        qz_instance.SendGameCommand("echo Current value is: ^5" + quakelive.cvars.Get(variable).value + "^7. Allowed: ^5" + allowedValues.join("^7,^5"));
-      else if (allowedValues.indexOf(newValue) >= 0)
-        quakelive.cvars.Set(variable, newValue);
-      else
-        qz_instance.SendGameCommand("echo ^1Invalid value.^7 Allowed: ^5" + allowedValues.join("^7,^5"));
+    function printOrSetPref(prefName, newValue, allowedValues, extraHelp) {
+      if (newValue == undefined || newValue == "") {
+        extraQL.echo("Current ^3" + prefName + "^7 is: ^5" + PREFS[prefName] + "^7. Allowed: ^5" + allowedValues.join("^7,^5"));
+        if (extraHelp)
+          extraQL.echo(extraHelp);
+      } else if (allowedValues.indexOf(newValue) >= 0) {
+        PREFS.set(prefName, newValue);
+      } else
+        extraQL.echo("^1Invalid " + prefName + ".^7 Allowed: ^5" + allowedValues.join("^7,^5"));
     }
 
     function printOrSetColors(newValue) {
       function colorInfo(digit) { return (digit >= "1" && digit <= "7" ? "^" + digit : "^5") + digit; }
 
-      var variable = "_qlrd_outputColors";
-      var colors = quakelive.cvars.Get(variable).value;
       if (newValue == undefined || newValue == "") {
+        var colors = PREFS.colors;
         qz_instance.SendGameCommand("echo Current value is: " + colorInfo(colors[0]) + colorInfo(colors[1]) + colorInfo(colors[2]) + "^7. Allowed: 3 digits for ^5player name^7, ^5score^7, ^5badge^7");
         qz_instance.SendGameCommand("echo Valid digits are ^50^7=team color (^5player^7, ^1red^7, ^4blue^7, spec), ^11 ^22 ^33 ^44 ^55 ^66 ^77");
         qz_instance.SendGameCommand("echo Use ^5x^7 as 3rd digit to disable badge letters");
       } else if (RegExp("^[0-7][0-7][0-7Xx]$").test(newValue))
-        quakelive.cvars.Set(variable, newValue);
+        PREFS.set("colors", newValue);
       else
         qz_instance.SendGameCommand("echo ^1Invalid value.^7 Use ^5/elo colors^7 for help");
     }
 
     function setOutputMethod(val) {
-      logMsg("cvar '" + name + "' changed to '" + val + "'");
-
       // See if the value is valid.  If not, set it to a good one.
       var oi = 0;
       val = $.trim((val + "")).toLowerCase();
@@ -1178,10 +1165,10 @@ var extraQL = window.extraQL;
           break;
         }
       }
-      return QLRD.OUTPUT[oi];
+      return PREFS.output = QLRD.OUTPUT[oi];
     }
 
-    function announce() {
+    function announce(method, format) {
       var announceServer = null;
       var announceGametype = null;
       var announceQlrPlayers = null;
@@ -1234,7 +1221,7 @@ var extraQL = window.extraQL;
           announceGametype = gt;
           var names = $.map(server.players, function(p) { return { "name": p.name } });
 
-          var showBadge = quakelive.cvars.Get("_qlr_outputColors").value.substr(2, 1).toUpperCase() != "X";
+          var showBadge = PREFS.colors[2].toUpperCase() != "X";
           if (showBadge) {
             QLRD.waitFor(names, gt, announceQlrDataArrived);
 
@@ -1313,16 +1300,17 @@ var extraQL = window.extraQL;
         var sortStyle = getSortStyle() || "team";
         players_copy.sort(sortPlayerFunc(sortStyle));
 
-        displayPlayers(players_copy, "Current");
+        displayPlayers(players_copy, "Current", method, format);
       }
     }
 
-    function displayPlayers(players, verb) {
+    function displayPlayers(players, verb, currentOut, format) {
       // Display the results.
       // NOTE: mul is "1" to separate the header from the results
-      var mul = 1,
-        currentOut = quakelive.cvars.Get("_qlrd_outputMethod").value,
-        step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
+      if (!currentOut)
+        currentOut = PREFS.method;
+      if (!format)
+        format = PREFS.format;
 
       // Show the chat pane for 10 seconds if output method is 'print',
       // otherwise it will be difficult to notice.
@@ -1341,36 +1329,94 @@ var extraQL = window.extraQL;
         "^3Avg rating: " + stats.allavg + "(" + stats.allcount + ")";
       qz_instance.SendGameCommand(currentOut + "\"" + avgInfo + "\"");
 
-      var format = quakelive.cvars.Get("_qlrd_outputFormat", QLRD.FORMAT[0]).value;
-      if (format == "table" && currentOut != "echo")
-        format = QLRD.FORMAT[0];
-      var colors = quakelive.cvars.Get("_qlrd_outputColors").value;
-      var prefixLine = colors[0] != "0" && colors[1] != "0";
-      var prevTeam = players[0].team;
-      var teamMemberCount = 0;
-      var columnSep = format == "table" ? "^3|" : "^7, ";
-      for (var i = 0, out = [], len = players.length; i <= len; ++i) {
-        var curTeam = i == len ? prevTeam : players[i].team;
-        if (curTeam != prevTeam || i == len || (teamMemberCount && teamMemberCount % 4 == 0)) {
-          var linePrefix = prefixLine ? getTeamColor(prevTeam) + "PRBS"[prevTeam] + ": ^7" : "";
-          var line = linePrefix + out.join(columnSep);
-          window.setTimeout(function(txt) {
-            qz_instance.SendGameCommand(currentOut + " \"" + txt + "\";");
-          }.bind(null, line), mul++ * step);
-          out = [];
-        }
-        if (i == len)
-          break;
-        teamMemberCount = curTeam == prevTeam ? teamMemberCount + 1 : 1;
-        prevTeam = curTeam;
+      // generate output lines
+      if (currentOut != "echo")
+        format = "simple";
+      var lines = format == "table" ? getTableLines(players, hasTeams) : getSequentialLines(players, format);
 
-        var nameColor = colors[0] == "0" ? getTeamColor(curTeam) : "^" + colors[0];
-        var scoreColor = colors[1] == "0" ? getTeamColor(curTeam) : "^" + colors[1];
-        var badge = colors[2].toUpperCase() != "X" && players[i].badge ? "^" + colors[2] + players[i].badge : "";
-        if (format == "table")
-          out.push(nameColor + pad(players[i].name, 10).substr(0, 10) + " " + scoreColor + pad(players[i].elo, -4) + badge);
-        else
-          out.push(nameColor + players[i].name + " " + scoreColor + players[i].elo + badge);
+      // print output lines
+      var mul = 1, step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
+      $.each(lines, function(i, line) {
+        window.setTimeout(function(txt) {
+          qz_instance.SendGameCommand(currentOut + " \"" + txt + "\";");
+        }.bind(null, line), mul++ * step);
+      });
+
+      function getSequentialLines(players, format) {
+        var colors = PREFS.colors;
+        var prefixLine = colors[0] != "0" && colors[1] != "0";
+        var prevTeam = players[0].team;
+        var teamMemberCount = 0;
+        var playersPerLine = format == "list" ? 1 : 4;
+        var columnSep = format == "list" ? "" : "^7, ";
+        var lines = [];
+        for (var i = 0, out = [], len = players.length; i <= len; ++i) {
+          var curTeam = i == len ? prevTeam : players[i].team;
+          if (curTeam != prevTeam || i == len || (teamMemberCount && teamMemberCount % playersPerLine == 0)) {
+            var linePrefix = prefixLine ? getTeamColor(prevTeam) + "PRBS"[prevTeam] + ": ^7" : "";
+            var line = linePrefix + out.join(columnSep);
+            lines.push(line);
+            out = [];
+          }
+          if (i == len)
+            break;
+          teamMemberCount = curTeam == prevTeam ? teamMemberCount + 1 : 1;
+          prevTeam = curTeam;
+
+          var nameColor = colors[0] == "0" ? getTeamColor(curTeam) : "^" + colors[0];
+          var scoreColor = colors[1] == "0" ? getTeamColor(curTeam) : "^" + colors[1];
+          var badge = colors[2].toUpperCase() != "X" && players[i].badge ? "^" + colors[2] + players[i].badge : "";
+          if (format == "list")
+            out.push(nameColor + pad(players[i].name, 10).substr(0, 10) + " " + scoreColor + pad(players[i].elo, -4) + badge);
+          else
+            out.push(nameColor + players[i].name + " " + scoreColor + players[i].elo + badge);
+        }
+        return lines;
+      }
+
+      function getTableLines(players, hasTeams) {
+        var playersColumns = [[], [], []];
+        if (hasTeams) {
+          $.each(players, function(i, p) {
+            playersColumns[p.team == 1 || p.team == 2 ? p.team - 1: 2].push(p);
+          });
+        } else {
+          var playerCount = players.reduce(function (count, p) { return p.team == 0 ? count + 1 : count; }, 0);
+          var nonplayerCount = players.length - playerCount;
+          var playerSlots = Math.max(Math.floor((playerCount + 1) / 2), nonplayerCount);
+          $.each(players, function (i, p) {            
+            playersColumns[p.team == 0 ? (playersColumns[0].length < playerSlots ? 0 : 1) : 2].push(p);
+          });
+        }
+
+        var colors = PREFS.colors;
+        var showBadge = colors[2].toLowerCase() != "x" ? 1 : 0;
+        var lines = [];
+        for (var i = 0; i < 16; i++) {
+          var line = "";
+          for (var c = 0; c < 3; c++) {
+            var separator = c < 2 ? " | " : "";
+            if (playersColumns[c].length > i) {
+              var p = playersColumns[c][i];
+              var teamColor = getTeamColor(p.team);
+              var nameColor = colors[0] == "0" ? teamColor : "^" + colors[0];
+              var scoreColor = colors[1] == "0" ? teamColor : "^" + colors[1];
+              var badgeColor = colors[2] == "0" ? teamColor : "^" + colors[2];
+
+              line += nameColor + pad(p.name, 14).substr(0, 14) + scoreColor + pad(p.elo, -4);
+              if (showBadge)
+                line += badgeColor + (p.badge || " ");
+              line += "^7" + separator;
+            } else
+              line += pad("", 14 + 4 + showBadge + separator.length);
+          }
+
+          if (line.trim())
+            lines.push(line);
+          else
+            break;
+        }
+        return lines;
       }
     }
 
@@ -1429,7 +1475,7 @@ var extraQL = window.extraQL;
         return;
       }
 
-      var currentOut = quakelive.cvars.Get("_qlrd_outputMethod", QLRD.OUTPUT[0]).value;
+      var currentOut = PREFS.method;
 
       QLRD.activeServerReq = true;
 
@@ -1444,8 +1490,9 @@ var extraQL = window.extraQL;
         }
 
         // Make sure we're using a gametype tracked by QLRanks
+        var gt;
         try {
-          var gt = mapdb.getGameTypeByID(server.game_type).title.toLowerCase();
+          gt = mapdb.getGameTypeByID(server.game_type).title.toLowerCase();
         } catch (e) {
           QLRD.igAnnounce("Unable to determine server gametype. " + e, true);
           QLRD.activeServerReq = false;
@@ -1491,12 +1538,12 @@ var extraQL = window.extraQL;
                 var gametype = QLRD.GAMETYPES[gt];
                 qz_instance.SendGameCommand(currentOut + " \"^5PLAYER_________   #" + gametype.toUpperCase() + " games completed^7\"");
                 for (var i = 0; i < games_played.length; i++) {
-                  (function(player) {
+                  (function(player, i) {
                     window.setTimeout(function() {
                       var color = player.Games < 400 ? "^3" : player.Games >= 10000 ? "^6" : "^2";
                       qz_instance.SendGameCommand(currentOut + " \"^7" + pad(player.Name, 15) + " " + color + pad(player.Games, -6) + "^7\"");
                     }, i * step);
-                  })(games_played[i]);
+                  })(games_played[i], i);
                 }
               });
           }
@@ -1648,39 +1695,42 @@ var extraQL = window.extraQL;
 
             if (diff < bestdiff) {
               bestdiff = diff;
-              p.newTeam = p.candidateTeam;
+              for (var p = 0; p < players.length; p++)
+                players[p].team = players[p].candidateTeam;
             }
           }
+
+          // Sort players by team
+          players = players.sort(sortPlayerFunc("team"));
 
           if (doit) {
             var commands = [];
             for (var i = 0; i < players.length; i++) {
               if (players[i].team == players[i].oldTeam)
                 continue;
-              var command = ("put " + players[i].clientid + " s;");
+              var command = ("put " + players[i].clientid + " s");
               commands.push(command);
             }
 
             for (var i = 0; i < players.length; i++) {
               if (players[i].team == players[i].oldTeam)
                 continue;
-              var command = ("put " + (players[i].clientid) + " " + (players[i].team == 1 ? "r" : "b") + ";");
+              var command = ("put " + players[i].clientid + " " + (players[i].team == 1 ? "r" : "b"));
               commands.push(command);
-              QLRD.igAnnounce(command);
+              extraQL.echo("^5" + command + "  ^2// " + players[i].name);
             }
 
             var delay = 0;
-            for (var i = 0; i < players.length; i++) {
-              var put_command = commands[i];
+            for (var i = 0; i < commands.length; i++) {
               (function(command, delay) {
                 window.setTimeout(function() { qz_instance.SendGameCommand(command); }, delay);
-              })(put_command, delay);
+              })(commands[i], delay);
               delay += 1100;
             }
-          }
 
-          // Sort players by team
-          players.sort(sortPlayerFunc("team"));
+            if (commands.length == 0)
+              extraQL.echo("^3No shuffle required^7");
+          }
 
           displayPlayers(players, doit ? "Arranging" : "Suggested");
         });
@@ -1748,7 +1798,7 @@ var extraQL = window.extraQL;
     function pad(text, minLength, paddingChar) {
       if (text === undefined || text == null) text = "";
       text = text.toString();
-      if (paddingChar === undefined || paddingChar == null) paddingChar = " ";
+      if (paddingChar === undefined || paddingChar == null || paddingChar == "") paddingChar = " ";
       if (minLength === undefined) minLength = 0;
       var padLeft = minLength < 0;
       minLength = Math.abs(minLength);
@@ -1768,9 +1818,8 @@ var extraQL = window.extraQL;
 
   (function modifyPlayerNameLinks() {
     /**
-   * Watch for hovering over profile links to show a QLRanks data title/tooltip
-   */
-    var RE_profile = /profile\/summary\/(\w+)/i;
+    * Watch for hovering over profile links to show a QLRanks data title/tooltip
+    */
 
     $("body").on("mouseover", "a", function() {
       if (this.qlndSkip) return;
