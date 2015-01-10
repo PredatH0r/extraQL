@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        2.6
+// @version        2.7
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,10 @@
 // ==/UserScript==
 
 /*
+
+Version 2.7
+- fixed backward compatibility with qlrdOutputMethod alias
+- allow "table" format for output method "say"
 
 Version 2.6
 - another attempt at "/elo shuffle!" (put everyone into spec first to prevent exceeding teamsize while rearranging)
@@ -996,43 +1000,20 @@ var extraQL = window.extraQL;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
   (function inGameCommands() {
-    /**
-     * Fill in any missing aliases and cvars
-     * NOTE: keep in sync with QLRD.OUTPUT
-     */
-    var cvarDefaults = {
-      // These track the current output method and position in "cycling" through the methods, respectively
-      "_qlrd_outputMethod": QLRD.OUTPUT[0],
-      "_qlrd_output": "vstr _qlrd_output1",
-      // These are the possible output method states
-      "_qlrd_output0": "seta _qlrd_outputMethod echo; set _qlrd_output vstr _qlrd_output1; echo ^2QLRD: ^7output method is now ^5echo; print ^2[QLRD] ^7output method is now ^5echo ^7(check the console!)",
-      "_qlrd_output1": "seta _qlrd_outputMethod print; set _qlrd_output vstr _qlrd_output2; print ^2QLRD: ^7output method is now ^5print",
-      "_qlrd_output2": "seta _qlrd_outputMethod say_team; set _qlrd_output vstr _qlrd_output3; print ^2QLRD: ^7output method is now ^5say_team",
-      "_qlrd_output3": "seta _qlrd_outputMethod say; set _qlrd_output vstr _qlrd_output0; print ^2QLRD: ^7output method is now ^5say"
-    }
-
     var aliasDefaults = {
       "qlrdDisplayGamesCompleted": "seta _gamescomp 0; seta _gamescomp 1;",
       "qlrdShuffle": "seta _qlrd_shuffle 0; seta _qlrd_shuffle 1;",
       "qlrdShufflePerform": "seta _qlrd_shuffle_perform 0; seta _qlrd_shuffle_perform 1;",
       "qlrdAnnounce": "seta _qlrd_announce 0; seta _qlrd_announce 1;",
-      "qlrdChangeOutput": "vstr _qlrd_output"
+      "qlrdChangeOutput": "vstr _qlrd_output" 
     }
 
-    // create cvars with default values if missing
-    $.each(cvarDefaults, function(name, def) {
-      var cvar = quakelive.cvars.Get(name);
-      if (!cvar || !cvar.value) {
-        logMsg("setting " + cvar + " to default: " + def);
-        // NOTE: quakelive.cvars.Set doesn't quote the value, so we update and second the command ourselves
-        quakelive.cvars.Update(name, def, true, false);
-        qz_instance.SendGameCommand('seta ' + name + ' "' + def + '"');
-      }
-    });
+    // NOTE: users may have bound "vstr _qlrd_output" to a key instead of the "qlrdChangeOutput" alias, so we keep this cvar for backward compatibility
+    quakelive.cvars.Set("_qlrd_output", "\"seta _qlrd_cycleOutputMethod 0; seta _qlrd_cycleOutputMethod 1;\"");
 
     // always set the aliases
     $.each(aliasDefaults, function(alias, def) {
-      qz_instance.SendGameCommand('alias ' + alias + ' "' + def + '"');
+      qz_instance.SendGameCommand("alias " + alias + " \"" + def + "\"");
     });
 
     /**
@@ -1045,27 +1026,38 @@ var extraQL = window.extraQL;
     var oldOnCvarChanged = window.OnCvarChanged;
     window.OnCvarChanged = function(name, val, replicate) {
       switch (name) {
-      case CMD_NAME:
-        handleQlrdCommand(val);
-        break;
+        case CMD_NAME:
+          handleQlrdCommand(val);
+          break;
 
-      case "_qlrd_outputMethod":
-        val = setOutputMethod(val);
-        replicate = 1;
-        break;
+        case "_qlrd_cycleOutputMethod":
+          if (val == "1")
+            cycleOutputMethod();
+          break;
 
-      case "_qlrd_announce":
-        announce(PREFS.method, PREFS.format);
-        break;
+        case "_qlrd_outputMethod":
+          if (QLRD.OUTPUT.indexOf(val) >= 0)
+            PREFS.set("method", val);
+          break;
 
-      case "_gamescomp":
-        games(val);
-        break;
+        case "_qlrd_announce":
+          if (val == "1") {
+            announce(PREFS.method, PREFS.format);
+            if (PREFS.method == "echo")
+              qz_instance.SendGameCommand("print ^2QLRD: ^7QLRanks information was written to your console");
+          }
+          break;
 
-      case "_qlrd_shuffle":
-      case "_qlrd_shuffle_perform":
-        shuffle(val, name == "_qlrd_shuffle_perform");
-        break;
+        case "_gamescomp":
+          if (val == "1")
+            games(val);
+          break;
+
+        case "_qlrd_shuffle":
+        case "_qlrd_shuffle_perform":
+          if (val == "1")
+            shuffle(val, name == "_qlrd_shuffle_perform");
+          break;
       }
       oldOnCvarChanged.call(null, name, val, replicate);
     }
@@ -1155,17 +1147,10 @@ var extraQL = window.extraQL;
         qz_instance.SendGameCommand("echo ^1Invalid value.^7 Use ^5/elo colors^7 for help");
     }
 
-    function setOutputMethod(val) {
-      // See if the value is valid.  If not, set it to a good one.
-      var oi = 0;
-      val = $.trim((val + "")).toLowerCase();
-      for (var i = 0, e = QLRD.OUTPUT.length; i < e; ++i) {
-        if (val == QLRD.OUTPUT[i]) {
-          oi = i;
-          break;
-        }
-      }
-      return PREFS.output = QLRD.OUTPUT[oi];
+    function cycleOutputMethod() {
+      var currentMethodIndex = QLRD.OUTPUT.indexOf(PREFS.method);
+      PREFS.set("method", QLRD.OUTPUT[(currentMethodIndex + 1) % QLRD.OUTPUT.length]);
+      qz_instance.SendGameCommand("print ^2QLRD: ^7Output method is now ^5" + PREFS.method + "^7.");
     }
 
     function announce(method, format) {
@@ -1304,17 +1289,17 @@ var extraQL = window.extraQL;
       }
     }
 
-    function displayPlayers(players, verb, currentOut, format) {
+    function displayPlayers(players, verb, method, format) {
       // Display the results.
       // NOTE: mul is "1" to separate the header from the results
-      if (!currentOut)
-        currentOut = PREFS.method;
+      if (!method)
+        method = PREFS.method;
       if (!format)
         format = PREFS.format;
 
       // Show the chat pane for 10 seconds if output method is 'print',
       // otherwise it will be difficult to notice.
-      if ("print" == currentOut) {
+      if ("print" == method) {
         qz_instance.SendGameCommand("+chat;");
         window.setTimeout(function() {
           qz_instance.SendGameCommand("-chat;");
@@ -1327,18 +1312,18 @@ var extraQL = window.extraQL;
       var avgInfo = hasTeams ?
         verb + " teams: " + stats.teamSummary + " ^7Avg: " + stats.allavg + "(" + stats.allcount + ")" :
         "^3Avg rating: " + stats.allavg + "(" + stats.allcount + ")";
-      qz_instance.SendGameCommand(currentOut + "\"" + avgInfo + "\"");
+      qz_instance.SendGameCommand(method + "\"" + avgInfo + "\"");
 
       // generate output lines
-      if (currentOut != "echo")
+      if (!(method == "echo" || (method == "say" && format != "table")))
         format = "simple";
-      var lines = format == "table" ? getTableLines(players, hasTeams) : getSequentialLines(players, format);
+      var lines = format == "table" ? getTableLines(players, hasTeams, method) : getSequentialLines(players, format);
 
       // print output lines
-      var mul = 1, step = $.inArray(currentOut, ["echo", "print"]) > -1 ? 100 : 1000;
+      var mul = 1, step = $.inArray(method, ["echo", "print"]) > -1 ? 100 : 1000;
       $.each(lines, function(i, line) {
         window.setTimeout(function(txt) {
-          qz_instance.SendGameCommand(currentOut + " \"" + txt + "\";");
+          qz_instance.SendGameCommand(method + " \"" + txt + "\";");
         }.bind(null, line), mul++ * step);
       });
 
@@ -1374,7 +1359,7 @@ var extraQL = window.extraQL;
         return lines;
       }
 
-      function getTableLines(players, hasTeams) {
+      function getTableLines(players, hasTeams, method) {
         var playersColumns = [[], [], []];
         if (hasTeams) {
           $.each(players, function(i, p) {
@@ -1391,27 +1376,30 @@ var extraQL = window.extraQL;
 
         var colors = PREFS.colors;
         var showBadge = colors[2].toLowerCase() != "x" ? 1 : 0;
+        var nameWidth = method == "say" ? 12 : 14;
         var lines = [];
         for (var i = 0; i < 16; i++) {
           var line = "";
+          var hasInfo = false;
           for (var c = 0; c < 3; c++) {
-            var separator = c < 2 ? " | " : "";
+            var separator = c < 2 ? (method == "say" ? "^7|"  : "^7 | ") : "";
             if (playersColumns[c].length > i) {
+              hasInfo = true;
               var p = playersColumns[c][i];
               var teamColor = getTeamColor(p.team);
               var nameColor = colors[0] == "0" ? teamColor : "^" + colors[0];
               var scoreColor = colors[1] == "0" ? teamColor : "^" + colors[1];
               var badgeColor = colors[2] == "0" ? teamColor : "^" + colors[2];
 
-              line += nameColor + pad(p.name, 14).substr(0, 14) + scoreColor + pad(p.elo, -4);
+              line += nameColor + pad(p.name, nameWidth).substr(0, nameWidth) + scoreColor + pad(p.elo, -4);
               if (showBadge)
                 line += badgeColor + (p.badge || " ");
-              line += "^7" + separator;
+              line += separator;
             } else
-              line += pad("", 14 + 4 + showBadge + separator.length);
+              line += pad("", nameWidth + 4 + showBadge) + separator;
           }
 
-          if (line.trim())
+          if (hasInfo)
             lines.push(line);
           else
             break;
@@ -1995,9 +1983,7 @@ var extraQL = window.extraQL;
   }
 
   function getSortStyle() {
-    var sortStyle = quakelive.cvars.Get("_qlrd_browserSort");
-    if (sortStyle)
-      sortStyle = sortStyle.value;
+    var sortStyle = PREFS.sort;
     if (sortStyle != "elo" && sortStyle != "team")
       sortStyle = "";
     return sortStyle;
