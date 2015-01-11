@@ -1,14 +1,19 @@
 ﻿// ==UserScript==
 // @id             152168
 // @name           Quake Live In-Game Friend Commands
-// @version        0.104
+// @version        0.105
 // @author         https://github.com/rulex/
+// @contributor    PredatH0r
 // @description    List online friends in console. Show info about friend who are ingame. Use /join <friend> to join friends game
 // @include        http://*.quakelive.com/*
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 0.105
+- allow "/clantag 0" to disable clan tag
+- allow commands that don't need a server connection to be executed when not connected (e.g. clans, clantag, ...)
 
 Version 0.104
 - adjusted header fields to work with extraQL
@@ -85,6 +90,7 @@ Version 0.104
     var commands = {
       invite: {
         params: true,
+        connected: true,
         dft: 'a ^1PRO^7 command to invite someone to the current server',
         fn: function(val) {
           if (!quakelive.currentServerId) {
@@ -107,6 +113,7 @@ Version 0.104
       },
       addfriend: {
         params: true,
+        connected: false,
         dft: 'a command to accept or send a friend invite',
         fn: function(val) {
           var incoming = quakelive.mod_friends.roster.pendingRequests, found, i;
@@ -151,6 +158,7 @@ Version 0.104
       },
       accept: {
         params: true,
+        connected: false,
         dft: 'a command to accept a friend invite (use /pending to list)',
         fn: function(val) {
           var incoming = quakelive.mod_friends.roster.pendingRequests,
@@ -167,26 +175,32 @@ Version 0.104
       },
       clantag: {
         params: true,
+        connected: false,
         dft: 'a command to activate a clantag (use /clans to list)',
         fn: function(val) {
           var i, j = 0, p = parseInt(val);
-          for (i in quakelive.clandb) {
-            j++;
-            if (p == j) {
-              quakelive.mod_clans.ActivateClan(i);
-              qz_instance.SendGameCommand('echo Activated clantag ' + quakelive.clandb[i].pretty_tag + '^7, please /reconnect in 5 seconds.;');
-              break;
+          if (p == 0)
+            quakelive.mod_clans.ActivateClan(0);
+          else {
+            for (i in quakelive.clandb) {
+              j++;
+              if (p == j) {
+                quakelive.mod_clans.ActivateClan(i);
+                qz_instance.SendGameCommand('echo Activated clantag ' + quakelive.clandb[i].pretty_tag + '^7, please /reconnect in 5 seconds.;');
+                break;
+              }
             }
           }
           if (!j) {
             qz_instance.SendGameCommand("echo You're not in any clans.;");
           } else if (isNaN(p) || p < 1 || p > j) {
-            qz_instance.SendGameCommand('echo Please enter a number between 1 and ' + j + '.;');
+            qz_instance.SendGameCommand('echo Please enter a number between 0 and ' + j + '.;');
           }
         }
       },
       pending: {
         params: false,
+        connected: false,
         dft: 0,
         fn: function() {
           var incoming = quakelive.mod_friends.roster.pendingRequests, i;
@@ -200,9 +214,11 @@ Version 0.104
       },
       clans: {
         params: false,
+        connected: false,
         dft: 0,
         fn: function() {
           var i, j = 0;
+          qz_instance.SendGameCommand('echo 0 none');
           for (i in quakelive.clandb) {
             j++;
             qz_instance.SendGameCommand('echo ' + parseInt(j) + ' ' + quakelive.clandb[i].pretty_tag + ';');
@@ -214,6 +230,7 @@ Version 0.104
       },
       show: {
         params: true,
+        connected: false,
         dft: "info about friends game. Use /friends",
         fn: function(val) {
           val = val.toLowerCase();
@@ -285,6 +302,7 @@ Version 0.104
       },
       join: {
         params: true,
+        connected: false,
         dft: "join a friend who is in game. Use /friends.",
         fn: function(val) {
           val = val.toLowerCase();
@@ -304,6 +322,7 @@ Version 0.104
       },
       invited: {
         params: false,
+        connected: false,
         dft: 0,
         fn: function() {
           $.ajax({
@@ -329,6 +348,7 @@ Version 0.104
       },
       revoke: {
         params: true,
+        connected: true,
         dft: "Revoke an invite to server, use /invited to get number",
         fn: function(val) {
           var nr = 0;
@@ -348,6 +368,7 @@ Version 0.104
       },
       friends: {
         params: false,
+        connected: false,
         dft: 0,
         fn: function() {
           qz_instance.SendGameCommand('echo _ For more server info /show <nick>, or /join <nick> to join;');
@@ -401,19 +422,22 @@ Version 0.104
     var oldLaunchGame = window.LaunchGame, ready;
     window.LaunchGame = function(params, server) {
       ready = false;
+      return oldLaunchGame.call(this, params, server);
+    }
+
+    function installCommands() {
       var i;
       for (i in commands) {
         if (commands[i].params) {
-          params.Append('+set ' + i + ' "^7"');
-          params.Append('+set ' + i + ' "' + commands[i].dft + '"');
+          quakelive.cvars.Set(i, "\"" + commands[i].dft + "\"");
         } else {
           commands[i].dft = 0;
-          params.Append('+set GM_qlfc_' + i + ' "0"');
-          params.Append('+alias ' + i + ' "set GM_qlfc_' + i + ' 1"');
+          quakelive.cvars.Set("GM_qlfc_" + i, "0");
+          qz_instance.SendGameCommand("alias " + i + "set GM_qlfc_" + i + " 1");
         }
       }
-      return oldLaunchGame.call(this, params, server);
-    }
+    };
+    installCommands();
 
     var oldOnCommNotice = window.OnCommNotice;
     window.OnCommNotice = function(error, json) {
@@ -432,7 +456,7 @@ Version 0.104
       for (i in commands) {
         if ((commands[i].params && name == i) || (!commands[i].params && name == 'GM_qlfc_' + i)) {
           if (value != commands[i].dft) {
-            if (ready) {
+            if (!commands[i].connected || ready) {
               commands[i].fn(value);
             }
             qz_instance.SendGameCommand('set ' + name + ' "' + commands[i].dft + '";');
