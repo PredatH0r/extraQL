@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        2.8
+// @version        2.9
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,9 @@
 // ==/UserScript==
 
 /*
+
+Version 2.9
+- show "Time Left" or "Time Elapsed" in server browser details
 
 Version 2.8
 - yet another attempt of fixing "/elo shuffle!" by increasing the delay between /put commands (also disabled putting everyone into spec first)
@@ -1725,9 +1728,9 @@ var extraQL = window.extraQL;
             }
 
             if (commands.length == 0)
-              qz_instance.SendGameCommand("print ^3QLRD:^7 No shuffle required");
+              qz_instance.SendGameCommand("print ^2QLRD:^7 No shuffle required");
             else
-              window.setTimeout(function () { qz_instance.SendGameCommand("say ^3QLRD:^7 Elo shuffle complete"); }, delay - 1000);
+              window.setTimeout(function () { qz_instance.SendGameCommand("say ^2QLRD:^7 Elo shuffle complete"); }, delay - 1000);
           }
 
           displayPlayers(players, doit ? "Arranging" : "Suggested");
@@ -1874,9 +1877,12 @@ var extraQL = window.extraQL;
     var oldRenderMatchDetails = quakelive.matchcolumn.RenderMatchDetails;
     var currentServer;
 
-    quakelive.matchcolumn.RenderMatchDetails = function(node, server) {
+    quakelive.matchcolumn.RenderMatchDetails = function (node, server) {
+      window.serverInfo = server;
       currentServer = server;
       oldRenderMatchDetails.call(quakelive.matchcolumn, node, server);
+
+      showTimeLeftOrElapsed(server);
 
       if (!(server.gt.name.toLowerCase() in QLRD.GAMETYPES))
         return;
@@ -1968,6 +1974,29 @@ var extraQL = window.extraQL;
             $("#joinServerButton").addClass("eloMatch");
         }
       });
+    }
+
+    function showTimeLeftOrElapsed(server) {
+      if (server.timelimit) {
+        var secondsLeft;
+        if (server.g_levelstarttime && server.g_gamestate == "IN_PROGRESS") {
+          secondsLeft = server.timelimit * 60 - (Math.floor(new Date().getTime() / 1000) - server.g_levelstarttime);
+          if (secondsLeft > 0 && secondsLeft <= server.timelimit * 60)
+            secondsLeft = Math.floor(secondsLeft / 60) + ":" + ("0" + (secondsLeft % 60)).substr(-2, 2);
+          else
+            secondsLeft = "?";
+        } else
+          secondsLeft = server.timelimit + ":00";
+        $(".serverinfo").append("<li>Time Left<b>" + secondsLeft + "</b></li>");
+      } else {
+        var secondsElapsed;
+        if (server.g_levelstarttime && server.g_gamestate == "IN_PROGRESS") {
+          secondsElapsed = Math.floor(new Date().getTime() / 1000) - server.g_levelstarttime;
+          secondsElapsed = Math.floor(secondsElapsed / 60) + ":" + ("0" + secondsElapsed % 60).substr(-2, 2);
+        } else
+          secondsElapsed = "0:00";
+        $(".serverinfo").append("<li>Time Elapsed<b>" + secondsElapsed + "</b></li>");
+      }
     }
   })();
   
