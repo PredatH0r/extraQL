@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        2.7
+// @version        2.8
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,9 @@
 // ==/UserScript==
 
 /*
+
+Version 2.8
+- yet another attempt of fixing "/elo shuffle!" by increasing the delay between /put commands (also disabled putting everyone into spec first)
 
 Version 2.7
 - fixed backward compatibility with qlrdOutputMethod alias
@@ -1693,12 +1696,17 @@ var extraQL = window.extraQL;
 
           if (doit) {
             var commands = [];
+
+            // putting people into spec first didn't fix the issue of some players not being moved properly despite issuing the correct PUT command
+
+            /*
             for (var i = 0; i < players.length; i++) {
               if (players[i].team == players[i].oldTeam)
                 continue;
               var command = ("put " + players[i].clientid + " s");
               commands.push(command);
             }
+            */
 
             for (var i = 0; i < players.length; i++) {
               if (players[i].team == players[i].oldTeam)
@@ -1713,11 +1721,13 @@ var extraQL = window.extraQL;
               (function(command, delay) {
                 window.setTimeout(function() { qz_instance.SendGameCommand(command); }, delay);
               })(commands[i], delay);
-              delay += 1100;
+              delay += 1500;
             }
 
             if (commands.length == 0)
-              extraQL.echo("^3No shuffle required^7");
+              qz_instance.SendGameCommand("print ^3QLRD:^7 No shuffle required");
+            else
+              window.setTimeout(function () { qz_instance.SendGameCommand("say ^3QLRD:^7 Elo shuffle complete"); }, delay - 1000);
           }
 
           displayPlayers(players, doit ? "Arranging" : "Suggested");
