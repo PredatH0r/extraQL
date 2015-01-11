@@ -1,12 +1,15 @@
 ﻿// ==UserScript==
 // @name        Quake Live Twich.tv Streams and VODs
-// @version     1.6
+// @version     1.7
 // @author      PredatH0r
 // @description	Shows a list of twitch.tv QL live streams and videos
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.7
+- added "Quake III Arena" to game list for live streams
 
 Version 1.6
 - fixed archive and VODs not showing videos for certain channels
@@ -38,7 +41,7 @@ Version 1.0
   var extraQL = window.extraQL;
 
   // config
-  var games = ["Quake Live", "Quake II", "Quake"];
+  var games = ["Quake Live", "Quake III Arena", "Quake II", "Quake"];
   var videoChannels = ["quakecon", "faceittv", "zlive", "leveluptv", "tastyspleentv" ];
   var groupVideosByChannel = true;
 
