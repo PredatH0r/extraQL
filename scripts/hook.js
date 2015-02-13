@@ -56,7 +56,44 @@ function main_hook() {
   if (location.protocol == "https:") // Account Settings uses https which doesn't allow running scripts from a http server
     return;
 
+  installTimeoutAndIntervalLogger();
+
   HOOK_MANAGER.init();
+}
+
+function installTimeoutAndIntervalLogger() {
+  var oldSetTimeout = window.setTimeout;
+  var oldClearTimeout = window.clearTimeout;
+  var oldSetInterval = window.setInterval;
+  var oldClearInterval = window.clearInterval;
+
+  window.timeoutLog = {};
+  window.intervalLog = {};
+
+  window.setTimeout = function(fn, ms) {
+    var id = oldSetTimeout(function() {
+      delete window.timeoutLog[id];
+      fn();
+    }, ms);
+    window.timeoutLog[id] = { "fn": fn.toString(), "ms": ms };
+    return id;
+  }
+
+  window.clearTimeout = function (id) {
+    delete window.timeoutLog[id];
+    oldClearTimeout(id);
+  }
+
+  window.setInterval = function (fn, ms) {
+    var id = oldSetInterval(fn, ms);
+    window.intervalLog[id] = { "fn": fn.toString(), "ms": ms };
+    return id;
+  }
+
+  window.clearInterval = function(id) {
+    delete window.intervalLog[id];
+    oldClearInterval(id);
+  }
 }
 
 // referenced globals

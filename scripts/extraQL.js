@@ -34,11 +34,12 @@ Version 0.102
   }
 
   // public: add CSS rules
-  // params: string...
+  // params: string... or string[]
   function addStyle( /*...*/) {
     var css = "";
-    for (var i = 0; i < arguments.length; i++)
-      css += "\n" + arguments[i];
+    var args = arguments.length == 1 && Array.isArray(arguments[0]) ? arguments[0] : arguments; 
+    for (var i = 0; i < args.length; i++)
+      css += "\n" + args[i];
     $("head").append("<style>" + css + "\n</style>");
   }
 

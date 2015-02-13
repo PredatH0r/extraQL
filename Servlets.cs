@@ -22,6 +22,7 @@ namespace ExtraQL
     private readonly string baseDir;
     private readonly ScriptRepository scriptRepository;
     private readonly Form form;
+    private string joinServer, joinPass;
 
     public Action<string> Log;
     
@@ -68,6 +69,7 @@ namespace ExtraQL
       RegisterServlet("/extraQL.exe", ExtraQlExe);
       RegisterServlet("/condump", GetCondump);
       RegisterServlet("/serverinfo", GetServerInfo);
+      RegisterServlet("/join", JoinGame);
     }
 
     #endregion
@@ -590,6 +592,48 @@ namespace ExtraQL
       }
       return sb.ToString();
     }
+    #endregion
+
+    #region JoinGame()
+
+    /// <summary>
+    /// Stores/returns server and password for joining a game
+    /// External apps can show links like http://127.0.0.1:27963/join/91.198.152.211:27003/tdm
+    /// and when the user clicks on it, the browser calls the servlet which stores server and password.
+    /// The joinGame.usr.js userscript inside QL polls this information and connects you to the server.
+    /// </summary>
+    private void JoinGame(Stream stream, Uri uri, string request)
+    {
+      if (!this.EnablePrivateServlets)
+      {
+        HttpForbidden(stream);
+        return;
+      }
+
+      int idx = uri.LocalPath.IndexOf("/", 1);
+      if (idx >= 0) // store server/pass
+      {
+        string path = uri.LocalPath.Substring(idx + 1);
+        idx = path.IndexOf("/");
+        this.joinServer = idx < 0 ? path : path.Substring(0, idx);
+        this.joinPass = idx < 0 ? null : path.Substring(idx + 1);
+        HttpOk(stream, 
+          "<html><body>\n" +
+          "<p>extraQL will connect you in a second...</p>\n" +
+          "<p>(this window closes in 5 secs)</p>\n" +
+          "<script type='text/javascript'>\n" +
+          "window.setTimeout(function(){ window.close(); }, 5000);\n"+
+          "</script></body></html>");
+      }
+      else // poll server/pass
+      {
+        var json = "{ \"server\":\"" + this.joinServer + "\", \"pass\":\"" + this.joinPass + "\" }";
+        this.joinServer = null;
+        this.joinPass = null;
+        HttpOk(stream, json);
+      }
+    }
+
     #endregion
 
     // internal methods
