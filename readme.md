@@ -26,6 +26,7 @@ Changelog
 
 Version 1.18
 ---
+- added "Demo Browser" servlet and userscript. Accessible through the "Play" menu
 - added servlet and userscript to handle http://127.0.0.1:27963/join/91.198.152.211:27003/passwd URLs and connect to the game when clicked
 
 Version 1.17

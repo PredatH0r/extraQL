@@ -2,12 +2,15 @@
 // @name        extraQL
 // @description extraQL userscript tool library
 // @author      PredatH0r
-// @version     1.3
+// @version     1.4
 
 This script provides common functions to various Quake Live user scripts.
 
 In bundle with extraQL.exe and the modified version of QLHM/hook.js, this
 script also acts as the boot strapper to load the locally installed scripts.
+
+Version 1.4
+- added error() method
 
 Version 1.3
 - fixed echo() when text contains backslashes
@@ -61,6 +64,10 @@ Version 0.102
       qz_instance.SendGameCommand("echo \"" + msg.replace('"', "'").replace("\\", "\\\\") + "\"");
     else
       console.log(msg);
+  }
+
+  function error(msg) {
+    log("^1" + msg);
   }
 
   function echo(text) {
@@ -247,6 +254,7 @@ Version 0.102
     rlog: rlog,
     echo: echo,
     debug: debug,
+    error: error,
     addStyle: addStyle,
     escapeHtml: escapeHtml,
     store: store,

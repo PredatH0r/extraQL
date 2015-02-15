@@ -131,6 +131,7 @@
     <None Include="images\topright.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="scripts\demoBrowser.usr.js" />
     <None Include="scripts\joinGame.usr.js" />
     <None Include="scripts\links.usr.js" />
     <None Include="scripts\extraQL.js" />

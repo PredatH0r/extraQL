@@ -70,6 +70,7 @@ namespace ExtraQL
       RegisterServlet("/condump", GetCondump);
       RegisterServlet("/serverinfo", GetServerInfo);
       RegisterServlet("/join", JoinGame);
+      RegisterServlet("/demos", ListDemos);
     }
 
     #endregion
@@ -632,6 +633,32 @@ namespace ExtraQL
         this.joinPass = null;
         HttpOk(stream, json);
       }
+    }
+
+    #endregion
+
+    #region ListDemos()
+
+    private void ListDemos(Stream stream, Uri uri, string request)
+    {
+      if (!this.EnablePrivateServlets)
+      {
+        HttpForbidden(stream);
+        return;
+      }
+
+      var json = new StringBuilder();
+      json.Append("[");
+      foreach (var file in Directory.GetFiles(this.QuakeConfigFolder + "\\demos", "*.dm_*"))
+      {
+        if (json.Length > 1)
+          json.Append(",");
+        json.Append("{\"file\":\"").Append(Path.GetFileName(file)).Append("\"");
+        json.Append(",\"date\":\"").Append(File.GetCreationTime(file).ToString("s")).Append("\"");
+        json.Append("}");
+      }
+      json.Append("]");
+      HttpOk(stream, json.ToString());
     }
 
     #endregion
