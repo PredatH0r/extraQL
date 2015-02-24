@@ -1,15 +1,21 @@
 ﻿// ==UserScript==
 // @id             152168
 // @name           Quake Live In-Game Friend Commands
-// @version        0.105
+// @version        0.106
 // @author         https://github.com/rulex/
 // @contributor    PredatH0r
+// @contributor    WalkerX
 // @description    List online friends in console. Show info about friend who are ingame. Use /join <friend> to join friends game
 // @include        http://*.quakelive.com/*
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 0.106
+- fixed bad alias for commands without parameters
+- fixed /friensd command not showing friends who are in the "Active Chat" group
+- added /inviteall command to invite all friends to the current server (thx to WalkerX for this)
 
 Version 0.105
 - allow "/clantag 0" to disable clan tag
@@ -106,6 +112,34 @@ Version 0.104
               },
               success: function(data) {
                 qz_instance.SendGameCommand('echo ' + val + (data.ECODE ? ' could not be invited.;' : ' has been invited to the server.;'));
+              }
+            });
+          }
+        }
+      },
+      inviteall: {
+        params: false,
+        connected: true,
+        dft: 0,
+        fn: function () {
+          if (!quakelive.currentServerId) {
+            qz_instance.SendGameCommand("echo Can't invite to a practice match!;");
+          } else {
+            jQuery.each(quakelive.mod_friends.roster.fullRoster, function () {
+              var name = this.name;
+              if (this.group) {
+                jQuery.ajax({
+                  url: '/request/invite',
+                  type: 'post',
+                  dataType: 'json',
+                  data: {
+                    user: name,
+                    server_id: quakelive.currentServerId
+                  },
+                  success: function (data) {
+                    qz_instance.SendGameCommand('echo ' + name + (data.ECODE ? ' could not be invited.;' : ' has been invited to the server.;'));
+                  }
+                });
               }
             });
           }
@@ -379,7 +413,7 @@ Version 0.104
             var clan = "";
             //clan = this.clan;
             name = this.name;
-            if (this.group == "online") {
+            if (this.group) {
               if (this.inGame) {
                 if (this.gameStatus.BOT_GAME == 0) {
                   ids = this.gameStatus.SERVER_ID;
@@ -433,7 +467,7 @@ Version 0.104
         } else {
           commands[i].dft = 0;
           quakelive.cvars.Set("GM_qlfc_" + i, "0");
-          qz_instance.SendGameCommand("alias " + i + "set GM_qlfc_" + i + " 1");
+          qz_instance.SendGameCommand("alias " + i + " \"set GM_qlfc_" + i + " 1\"");
         }
       }
     };
