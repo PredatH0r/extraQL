@@ -154,12 +154,21 @@ namespace ExtraQL
     #region GetDefaultLauncherPath()
     private string GetDefaultLauncherPath()
     {
-      string path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\id Software\Quake Live", null, null) as string;
-      if (path != null && File.Exists(path += "\\Launcher.exe"))
-        return path;
-      path = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Quake Live", "UninstallString", null) as string;
-      if (path != null && File.Exists(path = path.Replace("uninstall.exe", "Launcher.exe")))
-        return path;
+      try
+      {
+        string path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\id Software\Quake Live", null, null) as string;
+        if (path != null && File.Exists(path += "\\Launcher.exe"))
+          return path;
+      }
+      catch { } // fails on Mono
+      
+      try
+      {
+        string path = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Quake Live", "UninstallString", null) as string;
+        if (path != null && File.Exists(path = path.Replace("uninstall.exe", "Launcher.exe")))
+          return path;
+      }
+      catch { }
       return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\Quake Live\\Launcher.exe";
     }
     #endregion

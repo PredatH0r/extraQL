@@ -94,7 +94,7 @@ namespace ExtraQL
         }
       }
 
-      updateTimer.Interval = 5000; // sourceforge silently drops requests when hammered
+      updateTimer.Interval = 500; // sourceforge silently drops requests when hammered
       updateTimer.Start();
     }
 
@@ -104,7 +104,7 @@ namespace ExtraQL
 
     private void LoadUpdatesFromMasterServer()
     {
-      var client = new XWebClient(5000);
+      var client = new XWebClient(2000);
       client.DownloadStringCompleted += RepositoryJsonDownloadCompleted;
       var url = new Uri(string.Format(SCRIPTINDEX_URL_FORMAT, masterServer));
       client.DownloadStringAsync(url, new WebRequestState(url));
@@ -116,7 +116,7 @@ namespace ExtraQL
 
     private void RepositoryJsonDownloadCompleted(object sender, DownloadStringCompletedEventArgs e)
     {
-      var client = (WebClient) sender;
+      var client = (XWebClient) sender;
       var state = (WebRequestState) e.UserState;
 
       if (e.Error == null)
@@ -135,7 +135,6 @@ namespace ExtraQL
         Log("Update server on " + state.Uri + " is not responding, using sourceforge.com instead (slow)...");
         LoadUpdatesFromDownloadsource(); // fallback to script source
       }
-      client.Dispose();
     }
 
     #endregion
@@ -190,7 +189,7 @@ namespace ExtraQL
 
         try
         {
-          var client = new XWebClient(1000);
+          var client = new XWebClient(2500);
           client.DownloadDataCompleted += ScriptFile_DownloadDataCompleted;
           client.DownloadDataAsync(queueItem.Uri, queueItem);
         }
@@ -209,7 +208,6 @@ namespace ExtraQL
     {
       try
       {
-        ((WebClient) sender).Dispose();
         var queueItem = (UpdateQueueItem) e.UserState;
         if (e.Error != null)
         {
@@ -221,7 +219,10 @@ namespace ExtraQL
         ScriptHeaderFields remoteMeta = ParseHeaderFields(remoteCode);
         string remoteVersion = remoteMeta.Get("version");
         if (remoteVersion == null)
+        {
+          Log("Missing version info in script header of " + queueItem.Uri);
           return;
+        }
         if (queueItem.ScritpInfo == null || IsNewer(remoteVersion, queueItem.ScritpInfo.Metadata.Get("version")))
         {
           string scriptPath = queueItem.ScritpInfo != null ? queueItem.ScritpInfo.Filepath : Path.Combine(ScriptDir, Path.GetFileName(queueItem.Uri.LocalPath));

@@ -33,9 +33,8 @@ namespace ExtraQL
     {
       try
       {
-        using (var client = new XWebClient())
+        using (var client = new XWebClient(1000))
         {
-          client.Timeout = 1000;
           client.Encoding = Encoding.UTF8;
 
           string url = config.GetString("masterServer") + "/version";
@@ -94,7 +93,7 @@ namespace ExtraQL
       {
         using (var client = new XWebClient())
         {
-          client.Timeout = 5000;
+          client.Timeout = 10000;
           client.Encoding = Encoding.UTF8;
           byte[] bin = client.DownloadData(new Uri(config.GetString("masterServer") + "/extraQL.exe"));
           ExeDownloadComplete(bin);

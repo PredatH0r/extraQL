@@ -1,11 +1,2 @@
-bin/*
-obj/*
-extraQL.sln.DotSettings
-extraQL.sln.DotSettings.user
-extraQL.v12.suo
-extraQL.zip
-images/Thumbs.db
-resources/Thumbs.db
-extraQL*.zip
-extraQL.ini
-resources/localhost.pvk
+source/_ReSharper*/
+bin/

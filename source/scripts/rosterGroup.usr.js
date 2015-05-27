@@ -27,13 +27,13 @@ contentEval(function () {
 
 	// TODO: make this actually configurable :)
 	var groupname1 = "huhu";
-	var groupmembers1str = "Barracouda Bananas NetMaori";
+	var groupmembers1str = "Barracouda Bananas NetMaori monja Fillekiller baanze jala1 bakwardsman jaszman macen nathanfadezz niewi rklacks scaretaker somnabulant";
 	var groupmembers1 = groupmembers1str.toLowerCase().replace(/ /g,',').replace(/,,/g,',').split(',');
-	var groupname2 = "Chill";
-	var groupmembers2str = "Jorinde ins";
+	var groupname2 = "";
+	var groupmembers2str = "";
 	var groupmembers2 = groupmembers2str.toLowerCase().replace(/ /g,',').replace(/,,/g,',').split(',');
-	var groupname3 = "";
-	var groupmembers3str = "";
+	var groupname3 = "FFA";
+	var groupmembers3str = "sya_ oswrap bogotac yakumo crowax gandim nrn437 ghenghis";
 	var groupmembers3 = groupmembers3str.toLowerCase().replace(/ /g,',').replace(/,,/g,',').split(',');
 
 //	var oldOnRosterUpdated = quakelive.mod_friends.roster.UI_OnRosterUpdated;
@@ -141,14 +141,14 @@ contentEval(function () {
 });
 
 
-GM_addStyle( "#im-group1, #im-group2, #im-group3 { display: none }'" );
+extraQL.addStyle( "#im-group1, #im-group2, #im-group3 { display: none }'" );
 
-GM_addStyle( '#im-group1 .itemlist, #im-group2 .itemlist, #im-group3 .itemlist {\
+extraQL.addStyle( '#im-group1 .itemlist, #im-group2 .itemlist, #im-group3 .itemlist {\
 	color: #000000; display: block; font-family: Arial; font-size: 12px;\
 	font-style: normal; list-style: none outside none; margin: 0;\
 	padding: 0; text-align: center; top: 0; vertical-align: text-top; }' );
 
-GM_addStyle( '#im-group1 h1, #im-group2 h1, #im-group3 h1 { display: block;\
+extraQL.addStyle( '#im-group1 h1, #im-group2 h1, #im-group3 h1 { display: block;\
     height: 21px; margin: 0; padding: 0;\
     text-align: left; width: 300px; padding-left: 30px; color:black;\
     text-shadow: 0.1em 0.1em 0.2em white; font-family: Arial; font-style: italic;\

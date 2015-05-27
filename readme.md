@@ -24,6 +24,11 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.19
+---
+- improved timeout handling for web requests (e.g. to extraQL master server for update check)
+- faster script update from sourceforge.net
+
 Version 1.18
 ---
 - added "Demo Browser" servlet and userscript. Accessible through the "Play" menu
