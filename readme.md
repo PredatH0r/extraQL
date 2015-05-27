@@ -16,7 +16,7 @@ A) Full local installation (recommended)
 
 B) hook.js only (reduced functionality)
 ---
-- download hook.js (or if you have the ZIP, use the extraQL\\scripts\\hook.js file)
+- download [hook.js](https://raw.githubusercontent.com/PredatH0r/extraQL/master/source/scripts/hook.js) (or if you have the ZIP, use the extraQL\\scripts\\hook.js file)
 - save hook.js to your Quake Live config directory:
    * For the standalone launcher on Windows XP this is: %appdata%\\id software\\quakelive\\home\\baseq3
    * For the standalone launcher on Win Vista and later: %appdata%\\..\\LocalLow\\id software\\home\\baseq3
