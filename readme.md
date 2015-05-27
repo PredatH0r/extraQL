@@ -1,5 +1,7 @@
 ﻿[extraQL Download Page](https://github.com/PredatH0r/extraQL/releases) | [Help / Wiki](https://github.com/PredatH0r/extraQL/wiki) | [Discussion Forum](https://github.com/PredatH0r/extraQL/issues)
 
+![screenshot](http://i.imgur.com/MgcdmG0.png)
+
 Installation
 ============
 
