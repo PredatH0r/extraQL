@@ -1,4 +1,4 @@
-﻿[extraQL Download Page](https://sourceforge.net/projects/extraql/files/) | [Help / Wiki](https://sourceforge.net/p/extraql/wiki/Home/) | [Discussion Forum](https://sourceforge.net/p/extraql/discussion/)
+﻿[extraQL Download Page](https://github.com/PredatH0r/extraQL/releases) | [Help / Wiki](https://github.com/PredatH0r/extraQL/wiki) | [Discussion Forum](https://github.com/PredatH0r/extraQL/issues)
 
 Installation
 ============
@@ -23,6 +23,10 @@ B) hook.js only (reduced functionality)
 
 Changelog
 =========
+
+Version 1.20
+---
+- moved source code repository from SourceForge to Github
 
 Version 1.19
 ---

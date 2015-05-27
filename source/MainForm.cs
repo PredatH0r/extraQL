@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.19";
+    public const string Version = "1.20";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -235,7 +235,7 @@ namespace ExtraQL
     #region linkAbout_LinkClicked
     private void linkAbout_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-      Process.Start("https://sourceforge.net/p/extraql/wiki/Home/");
+      Process.Start("https://github.com/PredatH0r/extraQL/wiki");
     }
     #endregion
 

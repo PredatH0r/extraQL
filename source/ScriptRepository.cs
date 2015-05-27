@@ -12,7 +12,7 @@ namespace ExtraQL
   {
     private const string SCRIPTINDEX_URL_FORMAT = "{0}/repository.json?all";
     private const string SCRIPTFILE_URL_FORMAT = "{0}/scripts/{1}";
-    internal const string DEFAULT_DOWNLOADSOURCE_URL = "http://sourceforge.net/p/extraql/source/ci/master/tree/scripts/{0}?format=raw";
+    internal const string DEFAULT_DOWNLOADSOURCE_URL = "https://raw.githubusercontent.com/PredatH0r/extraQL/master/source/scripts/{0}";
     private readonly Dictionary<string, ScriptInfo> scriptByFileName = new Dictionary<string, ScriptInfo>();
     private readonly Dictionary<string, ScriptInfo> scriptById = new Dictionary<string, ScriptInfo>();
     private readonly List<UpdateQueueItem> updateQueue = new List<UpdateQueueItem>();
@@ -94,7 +94,7 @@ namespace ExtraQL
         }
       }
 
-      updateTimer.Interval = 500; // sourceforge silently drops requests when hammered
+      updateTimer.Interval = 500; // source code repo might dros requests when too many requests are made
       updateTimer.Start();
     }
 
@@ -132,7 +132,7 @@ namespace ExtraQL
           client.DownloadStringAsync(state.Uri, state);
           return;
         }
-        Log("Update server on " + state.Uri + " is not responding, using sourceforge.com instead (slow)...");
+        Log("Update server on " + state.Uri + " is not responding, using Github.com instead (slow)...");
         LoadUpdatesFromDownloadsource(); // fallback to script source
       }
     }

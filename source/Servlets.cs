@@ -14,7 +14,7 @@ namespace ExtraQL
 {
   internal class Servlets
   {
-    private static readonly string[] DomainsAllowedForProxy = { "esreality.com", "quakelive.com", "sourceforge.net", "github.com" };
+    private static readonly string[] DomainsAllowedForProxy = { "esreality.com", "quakelive.com", "github.com" };
     private const string AddScriptRoute = "/addScript";
     private const string CondumpFile = "extraql_condump.txt";
     private readonly HttpServer server;
