@@ -1,7 +1,7 @@
 // ==UserScript==
 // @id             111519
 // @name           QLRanks.com Display with Team Extension
-// @version        2.9
+// @version        2.10
 // @description    Overlay quakelive.com with Elo data from QLRanks.com.  Use in-game too (/elo help, bind o "qlrdChangeOutput", bind r "qlrdAnnounce", bind k "qlrdDisplayGamesCompleted", bind l "qlrdShuffle" (if even number of players) )
 // @namespace      phob.net
 // @homepage       http://www.qlranks.com
@@ -16,6 +16,9 @@
 // ==/UserScript==
 
 /*
+
+Version 2.10
+- changed "/elo shuffle!" so that it will make the minimum amount of moves and alternates moves between red and blue
 
 Version 2.9
 - show "Time Left" or "Time Elapsed" in server browser details
@@ -1694,37 +1697,68 @@ var extraQL = window.extraQL;
             }
           }
 
+          // swap teams if more people would be moved than stay
+          var cntStay = 0, cntMove = 0;
+          for (var i = 0; i < players.length; i++) {
+            if (players[i].team == players[i].oldTeam)
+              ++cntStay;
+            else
+              ++cntMove;
+          }
+          if (cntMove > cntStay) {
+            for (var i = 0; i < players.length; i++)
+              players[i].team = 3 - players[i].team; // 2=>1, 1=>2
+          }
+
           // Sort players by team
           players = players.sort(sortPlayerFunc("team"));
 
           if (doit) {
             var commands = [];
 
-            // putting people into spec first didn't fix the issue of some players not being moved properly despite issuing the correct PUT command
-
-            /*
+            // find out where players should be moved to
+            var move = [[],[]]; // [to-red, to-blue]
             for (var i = 0; i < players.length; i++) {
-              if (players[i].team == players[i].oldTeam)
-                continue;
-              var command = ("put " + players[i].clientid + " s");
-              commands.push(command);
-            }
-            */
-
-            for (var i = 0; i < players.length; i++) {
-              if (players[i].team == players[i].oldTeam)
-                continue;
-              var command = ("put " + players[i].clientid + " " + (players[i].team == 1 ? "r" : "b"));
-              commands.push(command);
-              extraQL.echo("^5" + command + "  ^2// " + players[i].name);
+              if (players[i].team != players[i].oldTeam)
+                move[players[i].team - 1].push(i);
             }
 
+            // move excessive blue players to red
+            while (move[0].length > move[1].length) {
+              var i = move[0][0];
+              var command = "put " + players[i].clientid + " r";
+              commands.push(command);
+              move[0].splice(0, 1);
+            }
+
+            // move excessive red players to blue
+            while (move[1].length > move[0].length) {
+              var i = move[1][0];
+              var command = "put " + players[i].clientid + " b";
+              commands.push(command);
+              move[1].splice(0, 1);
+            }
+
+            // red and blue are now equal size and can be exchanged in pairs
+            for (var i = 0; i < move[0].length; i++) {
+              var p = move[0][i];
+              var command = "put " + players[p].clientid + " r";
+              commands.push(command);
+              extraQL.echo("^5" + command + "  ^2// " + players[p].name);
+
+              var p = move[1][i];
+              var command = "put " + players[p].clientid + " b";
+              commands.push(command);
+              extraQL.echo("^5" + command + "  ^2// " + players[p].name);
+            }
+
+            // send the put commands. needs at least 1sec delay due to server command flood protection
             var delay = 0;
             for (var i = 0; i < commands.length; i++) {
               (function(command, delay) {
                 window.setTimeout(function() { qz_instance.SendGameCommand(command); }, delay);
               })(commands[i], delay);
-              delay += 1500;
+              delay += 1100;
             }
 
             if (commands.length == 0)
