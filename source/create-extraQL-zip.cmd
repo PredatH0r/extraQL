@@ -11,6 +11,8 @@ mkdir extraQL\scripts
 mkdir extraQL\images
 mkdir extraQL\https
 xcopy "%abs%\bin\Debug\extraQL.exe" extraQL\ >nul
+xcopy "%abs%\bin\Debug\steam_api.dll" extraQL\ >nul
+xcopy "%abs%\bin\Debug\steam_appid.txt" extraQL\ >nul
 xcopy "%abs%\scripts" extraQL\scripts >nul
 xcopy /s "%abs%\images" extraQL\images >nul
 xcopy /s "%abs%\https" extraQL\https >nul

@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "1.20";
+    public const string Version = "1.21";
 
     private readonly Config config;
     private readonly Updater updater;
@@ -573,7 +573,10 @@ namespace ExtraQL
     private void UpdateServletSettings()
     {
       if (this.servlets != null)
-        this.servlets.QuakeConfigFolder = this.GetConfigFolder(this.rbUseSteam.Checked);      
+      {
+        this.servlets.QuakeConfigFolder = this.GetConfigFolder(this.rbUseSteam.Checked);
+        this.servlets.QuakeSteamFolder = this.GetBaseq3Path(true);
+      }
     }
     #endregion
 

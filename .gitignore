@@ -1,3 +1,4 @@
 source/_ReSharper*/
 bin/
 extraQL*
+source/.vs/config/applicationhost.config

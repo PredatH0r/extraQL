@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -47,6 +48,8 @@ namespace ExtraQL
 
     public string QuakeConfigFolder { get; set; }
 
+    public string QuakeSteamFolder { get; set; }
+
     #region RegisterServlets()
 
     /// <summary>
@@ -71,6 +74,7 @@ namespace ExtraQL
       RegisterServlet("/serverinfo", GetServerInfo);
       RegisterServlet("/join", JoinGame);
       RegisterServlet("/demos", ListDemos);
+      RegisterServlet("/steamnick", SetSteamNick);
     }
 
     #endregion
@@ -663,6 +667,69 @@ namespace ExtraQL
 
     #endregion
 
+    #region SetSteamNick()
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate bool Init();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate IntPtr SteamFriends();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void SetPersonaName(IntPtr handle, string name);
+
+    /// <summary>
+    /// </summary>
+    private void SetSteamNick(Stream stream, Uri uri, string request)
+    {
+      if (!this.EnablePrivateServlets)
+      {
+        HttpForbidden(stream);
+        return;
+      }
+
+      NameValueCollection args = HttpUtility.ParseQueryString(uri.Query);
+      string name = args.Get("name");
+      string dllDir = Application.StartupPath + "\\";
+
+      bool ok = false;
+      if (!string.IsNullOrEmpty(name))
+      {        
+        // any app-id that is freely available will do (13260=Unreal Development Kit)
+        if (!File.Exists(dllDir + "steam_appid.txt"))
+          File.WriteAllText(dllDir + "steam_appid.txt", "13260");
+
+        var hModule = Win32.LoadLibrary(dllDir + "steam_api.dll");
+        if (hModule != IntPtr.Zero)
+        {
+
+          IntPtr pInit = Win32.GetProcAddress(hModule, "SteamAPI_Init");
+          Init init = (Init)Marshal.GetDelegateForFunctionPointer(pInit, typeof(Init));
+
+          if (init())
+          {
+            IntPtr pSteamFriends = Win32.GetProcAddress(hModule, "SteamFriends");
+            SteamFriends steamFriends = (SteamFriends)Marshal.GetDelegateForFunctionPointer(pSteamFriends, typeof(SteamFriends));
+
+            IntPtr pSetPersonaName = Win32.GetProcAddress(hModule, "SteamAPI_ISteamFriends_SetPersonaName");
+            SetPersonaName setPersonaName = (SetPersonaName)Marshal.GetDelegateForFunctionPointer(pSetPersonaName, typeof(SetPersonaName));
+
+            var handle = steamFriends();
+            setPersonaName(handle, name);
+            ok = true;
+          }
+          Win32.FreeLibrary(hModule);
+        }
+      }
+
+      if (ok)
+        HttpOk(stream);
+      else
+        HttpUnavailable(stream, "steam_api.dll could not be initialized. Make sure your Steam client is running.");
+    }
+
+    #endregion
+
     // internal methods
 
     #region EnableScripts
@@ -830,6 +897,19 @@ namespace ExtraQL
       writer.WriteLine();
 
       writer.WriteLine(msg ?? "This function is not available from a remote extraQL.exe server");
+      writer.Flush();
+    }
+    #endregion
+
+    #region HttpUnavailable()
+    private void HttpUnavailable(Stream stream, string msg = null)
+    {
+      var writer = new StreamWriter(stream);
+      writer.WriteLine("HTTP/1.1 503 Unavailable");
+      writer.WriteLine("Access-Control-Allow-Origin: *");
+      writer.WriteLine();
+
+      writer.WriteLine(msg ?? "The requested operation is not supported");
       writer.Flush();
     }
     #endregion

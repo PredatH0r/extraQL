@@ -144,6 +144,7 @@
     <None Include="images\topright.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="scripts\steamNick.js" />
     <None Include="scripts\demoBrowser.usr.js" />
     <None Include="scripts\joinGame.usr.js" />
     <None Include="scripts\links.usr.js" />

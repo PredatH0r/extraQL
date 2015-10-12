@@ -37,8 +37,14 @@ namespace ExtraQL
     [DllImportAttribute("user32.dll")]
     public static extern bool ReleaseCapture();
 
+    [DllImportAttribute("user32.dll")]
+    public static extern bool IsWindowUnicode(IntPtr hWnd);
+
     public delegate bool EnumWindowProc(IntPtr hWnd, IntPtr lParam);
 
+    public const int WM_CHAR = 0x0102;
+    public const int WM_UNICHAR = 0x0109;
+    public const int WM_IME_CHAR = 0x0286;
     public const int WM_MOUSEMOVE = 0x0200;
     public const int WM_LBUTTONDOWN = 0x0201;
     public const int WM_LBUTTONUP = 0x0202;
@@ -120,5 +126,16 @@ namespace ExtraQL
     }
 
     #endregion
+
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr LoadLibrary(string steamApiDll);
+
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr FreeLibrary(IntPtr hModule);
+
+
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+
   }
 }

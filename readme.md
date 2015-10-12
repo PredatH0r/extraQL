@@ -26,6 +26,10 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 1.21
+---
+- added a /steamnick servlet for the steamNick userscript, which can be used with the steam-exlusive QL build
+
 Version 1.20
 ---
 - moved source code repository from SourceForge to Github
