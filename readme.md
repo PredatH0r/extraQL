@@ -26,6 +26,16 @@ B) hook.js only (reduced functionality)
 Changelog
 =========
 
+Version 2.0.1
+---
+- added Unicode support for /steamnick
+
+Version 2.0
+---
+- new steam-exclusive version of QuakeLive made all existing scripts obsolete. This is a restart of extraQL
+- everything related to the old QL Launcher.exe was removed
+- auto-update handling was removed. This is now handled through the Steam Workshop
+
 Version 1.21
 ---
 - added a /steamnick servlet for the steamNick userscript, which can be used with the steam-exlusive QL build

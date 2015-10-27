@@ -690,7 +690,7 @@ namespace ExtraQL
     private delegate IntPtr SteamFriends();
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void SetPersonaName(IntPtr handle, string name);
+    private delegate void SetPersonaName(IntPtr handle, byte[] utf8name);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate bool Shutdown();
@@ -735,7 +735,8 @@ namespace ExtraQL
             Shutdown shutdown = (Shutdown)Marshal.GetDelegateForFunctionPointer(pShutdown, typeof(Shutdown));
 
             var handle = steamFriends();
-            setPersonaName(handle, name);
+            var cName = Encoding.UTF8.GetBytes(name + "\0");
+            setPersonaName(handle, cName);
             ok = true;
 
             shutdown();
