@@ -12,8 +12,6 @@ namespace ExtraQL
     private readonly Dictionary<string,string> settings = new Dictionary<string, string>();
 
     public readonly string AppBaseDir;
-    public readonly Dictionary<string, string> Accounts = new Dictionary<string, string>();
-    public readonly List<string> RealmHistory = new List<string>();
 
     #region ctor()
     public Config()
@@ -28,28 +26,19 @@ namespace ExtraQL
     public void LoadSettings()
     {
       this.settings.Clear();
-      this.settings["email"] = "";
-      this.settings["password"] = "";
-      this.settings["lastEmail"] = "";
-      this.settings["focus"] = "";
       this.settings["advanced"] = "0";
-      this.settings["realm"] = "";
-      this.settings["realmHistory"] = "";
       this.settings["launcherExe"] = GetDefaultLauncherPath();
       this.settings["bindToAll"] = "0";
       this.settings["systemTray"] = "0";
       this.settings["startMinimized"] = "0";
       this.settings["checkUpdates"] = "1";
       this.settings["autostart"] = "0";
-      this.settings["runAsCommandLine"] = "0";
-      this.settings["masterServer"] = "http://ql.beham.biz:27963";
       this.settings["log"] = "0";
       this.settings["followLog"] = "0";
       this.settings["https"] = "0";
       this.settings["logAllRequests"] = "0";
       this.settings["autoquit"] = "0";
       this.settings["quakelive_steam.exe"] = "";
-      this.settings["steam"] = "0";
 
       var configFile = this.ConfigFile;
       if (File.Exists(configFile))
@@ -63,31 +52,6 @@ namespace ExtraQL
           settings[parts[0].Trim()] = value;
         }
       }
-
-      string email = settings["email"];
-      if (!String.IsNullOrEmpty(email))
-      {
-        string pass = settings["password"];
-        string[] pwds = String.IsNullOrEmpty(pass) ? new string[0] : Cypher.DecryptString(pass).Split('\t');
-
-        int i = 0;
-        foreach (var mail in email.Split('\t'))
-        {          
-          pass = i < pwds.Length ? pwds[i++] : "";
-          this.Accounts[mail] = pass;
-        }
-      }
-
-      string realms = settings["realmHistory"];
-      if (!String.IsNullOrEmpty(realms))
-      {
-        foreach (var realm in realms.Trim().Split('\t'))
-          this.RealmHistory.Add(realm);
-      }
-
-      string masterServer = settings["masterServer"];
-      if (!masterServer.StartsWith("http"))
-        this.Set("masterServer", "http://" + masterServer);
     }
     #endregion
 
@@ -121,21 +85,6 @@ namespace ExtraQL
     #region SaveSettings()
     public void SaveSettings()
     {
-      string emails = "";
-      string pwds = "";
-      foreach (var entry in this.Accounts)
-      {
-        emails += "\t" + entry.Key;
-        pwds += "\t" + entry.Value;
-      }
-      this.Set("email", emails.Substring(1));
-      this.Set("password", Cypher.EncryptString(pwds.Substring(1)));
-
-      string realmHistory = "";
-      foreach (var realm in this.RealmHistory)
-        realmHistory += realm + "\t";
-      this.Set("realmHistory", realmHistory);
-
       StringBuilder config = new StringBuilder();
       config.AppendLine("[extraQL]");
       foreach (var entry in this.settings)
@@ -145,10 +94,8 @@ namespace ExtraQL
     #endregion
 
     #region ConfigFile
-    private string ConfigFile
-    {
-      get { return Path.Combine(this.AppBaseDir, "extraQL.ini"); }
-    }
+    private string ConfigFile => Path.Combine(this.AppBaseDir, "extraQL.ini");
+
     #endregion
 
     #region GetDefaultLauncherPath()
