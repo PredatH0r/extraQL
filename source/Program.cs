@@ -5,7 +5,6 @@ namespace ExtraQL
 {
   static class Program
   {
-    public const string PostUpdateSwitch = "-postupdate";
     public const string WinServiceSwitch = "-service";
 
     #region Main()
@@ -17,20 +16,14 @@ namespace ExtraQL
 
       try
       {
-        bool isPostUpdate = Environment.CommandLine == PostUpdateSwitch;
-
         Config config = new Config();
         config.LoadSettings();
-        if (!isPostUpdate && ActivateRunningInstance(config.GetBool("https"))) 
+        if (ActivateRunningInstance(config.GetBool("https"))) 
           return;
 
         Application.EnableVisualStyles();
 
-        var updater = new Updater(config);
-        if (!isPostUpdate)
-          updater.Run();
-
-        var mainForm = new MainForm(config, updater);
+        var mainForm = new MainForm(config);
         if (Environment.CommandLine.Contains(WinServiceSwitch))
           WinService.Start(mainForm);
         else

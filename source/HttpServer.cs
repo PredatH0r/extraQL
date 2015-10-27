@@ -266,6 +266,16 @@ namespace ExtraQL
           string conn;
           keepAlive = header.TryGetValue("Connection", out conn) && conn == "keep-alive";
 
+          // Check that the user agent is Awesomium and not a regular browser
+          // This should prevent abuse of extraQL URLs embedded in regular web pages
+          //string userAgent;
+          //if (!header.TryGetValue("User-Agent", out userAgent) || !userAgent.Contains("Awesomium"))
+          //{
+          //  var b = enc.GetBytes("HTTP/1.1 401 Unauthorized\r\n\r\nextraQL URLs may only be called from within QuakeLive scripts");
+          //  stream.Write(b, 0, b.Length);
+          //  continue;
+          //}
+
           if (!data.StartsWith("POST ") && !data.StartsWith("GET "))
           {
             var b = enc.GetBytes("HTTP/1.1 405 Method Not Allowed\r\n\r\n");

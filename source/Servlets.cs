@@ -225,7 +225,21 @@ namespace ExtraQL
         HttpForbidden(stream);
         return;
       }
-      Win32.PostMessage(QLWindowHandle, Win32.WM_SYSKEYDOWN, (int) Keys.Enter, 0);
+
+      NameValueCollection args = HttpUtility.ParseQueryString(uri.Query);
+      int mode;
+      if (!int.TryParse(args.Get("mode"), out mode))
+        return;
+
+      var hWnd = QLWindowHandle;
+      Win32.RECT rect;
+      Win32.GetWindowRect(hWnd, out rect);
+      var screen = Screen.FromHandle(hWnd);
+      bool isFullscreen = rect.Width == screen.Bounds.Width && rect.Height == screen.Bounds.Height;
+
+      bool wantFullscreen = mode == 1;
+      if (isFullscreen != wantFullscreen)
+        Win32.PostMessage(QLWindowHandle, Win32.WM_SYSKEYDOWN, (int)Keys.Enter, 43 << 16);
       HttpOk(stream, "Ok");
     }
 
@@ -678,6 +692,9 @@ namespace ExtraQL
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void SetPersonaName(IntPtr handle, string name);
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate bool Shutdown();
+
     /// <summary>
     /// </summary>
     private void SetSteamNick(Stream stream, Uri uri, string request)
@@ -694,10 +711,10 @@ namespace ExtraQL
 
       bool ok = false;
       if (!string.IsNullOrEmpty(name))
-      {        
-        // any app-id that is freely available will do (13260=Unreal Development Kit)
+      {
+        // any app-id that is freely available will do (282440=Quake Live)
         if (!File.Exists(dllDir + "steam_appid.txt"))
-          File.WriteAllText(dllDir + "steam_appid.txt", "13260");
+          File.WriteAllText(dllDir + "steam_appid.txt", "282440");
 
         var hModule = Win32.LoadLibrary(dllDir + "steam_api.dll");
         if (hModule != IntPtr.Zero)
@@ -714,9 +731,14 @@ namespace ExtraQL
             IntPtr pSetPersonaName = Win32.GetProcAddress(hModule, "SteamAPI_ISteamFriends_SetPersonaName");
             SetPersonaName setPersonaName = (SetPersonaName)Marshal.GetDelegateForFunctionPointer(pSetPersonaName, typeof(SetPersonaName));
 
+            IntPtr pShutdown = Win32.GetProcAddress(hModule, "SteamAPI_Shutdown");
+            Shutdown shutdown = (Shutdown)Marshal.GetDelegateForFunctionPointer(pShutdown, typeof(Shutdown));
+
             var handle = steamFriends();
             setPersonaName(handle, name);
             ok = true;
+
+            shutdown();
           }
           Win32.FreeLibrary(hModule);
         }

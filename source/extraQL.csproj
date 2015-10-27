@@ -89,7 +89,6 @@
     <Compile Include="UpdateForm.Designer.cs">
       <DependentUpon>UpdateForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Updater.cs" />
     <Compile Include="WinService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -100,9 +99,9 @@
     <None Include="https\install.cmd" />
     <None Include="https\localhost.cer" />
     <None Include="https\localhost.pfx" />
-    <None Include="scripts\autoExec.usr.js" />
-    <None Include="scripts\openChat.usr.js" />
-    <None Include="scripts\startpage.usr.js" />
+    <None Include="scripts\attic\autoExec.usr.js" />
+    <None Include="scripts\attic\openChat.usr.js" />
+    <None Include="scripts\attic\startpage.usr.js" />
     <Compile Include="Servlets.cs" />
     <Compile Include="ScriptRepository.cs" />
     <Compile Include="Win32.cs" />
@@ -135,21 +134,29 @@
     <None Include="images\maxsize.png" />
     <None Include="images\minsize.png" />
     <None Include="scripts\attic\toolTip.usr.js" />
-    <None Include="scripts\twitter.usr.js" />
-    <None Include="scripts\resizeLayout.usr.js" />
-    <None Include="scripts\docker.usr.js" />
+    <None Include="scripts\attic\twitter.usr.js" />
+    <None Include="scripts\attic\resizeLayout.usr.js" />
+    <None Include="scripts\attic\docker.usr.js" />
     <None Include="images\right.png" />
     <None Include="images\top.png" />
     <None Include="images\topleft.png" />
     <None Include="images\topright.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="scripts\attic\autoInvite.usr.js" />
+    <Content Include="scripts\attic\demoBrowser.usr.js" />
+    <Content Include="scripts\attic\esreality.usr.js" />
+    <Content Include="scripts\attic\extStats.usr.js" />
+    <Content Include="scripts\attic\friendCommands.usr.js" />
+    <Content Include="scripts\attic\gametype.usr.js" />
+    <Content Include="scripts\attic\irc.usr.js" />
+    <Content Include="scripts\attic\joinGame.usr.js" />
+    <None Include="scripts\postalDump.js" />
+    <None Include="scripts\autoExec.js" />
     <None Include="scripts\steamNick.js" />
-    <None Include="scripts\demoBrowser.usr.js" />
-    <None Include="scripts\joinGame.usr.js" />
-    <None Include="scripts\links.usr.js" />
-    <None Include="scripts\extraQL.js" />
-    <None Include="scripts\rosterGroup.usr.js" />
+    <None Include="scripts\attic\links.usr.js" />
+    <None Include="scripts\attic\extraQL.js" />
+    <None Include="scripts\attic\rosterGroup.usr.js" />
     <None Include="resources\background.png" />
     <Content Include="c:\users\hbeham\appdata\locallow\id software\focus\home\baseq3\hook.js">
       <Link>focus\hook.js</Link>
@@ -163,30 +170,24 @@
     <None Include="resources\close.png" />
     <None Include="resources\logo.png" />
     <None Include="resources\minimize.png" />
-    <None Include="scripts\autoInvite.usr.js" />
-    <None Include="scripts\escaper.usr.js" />
-    <None Include="scripts\altBrowser.usr.js" />
+    <None Include="scripts\attic\escaper.usr.js" />
+    <Content Include="scripts\attic\altBrowser.usr.js" />
     <Content Include="scripts\attic\extGraphHist.usr.js" />
-    <None Include="scripts\extStats.usr.js" />
-    <None Include="scripts\friendCommands.usr.js" />
-    <None Include="scripts\gametype.usr.js" />
-    <None Include="scripts\hook.js" />
-    <None Include="scripts\irc.usr.js" />
-    <None Include="scripts\keyboardNav.usr.js" />
-    <None Include="scripts\linkify.usr.js" />
+    <None Include="scripts\attic\hook.js" />
+    <None Include="scripts\attic\keyboardNav.usr.js" />
+    <None Include="scripts\attic\linkify.usr.js" />
     <Content Include="scripts\attic\antiAjax.usr.js" />
-    <None Include="scripts\playerStatus.usr.js" />
-    <None Include="scripts\messageBeep.usr.js" />
-    <None Include="scripts\profileJumper.usr.js" />
+    <None Include="scripts\attic\playerStatus.usr.js" />
+    <None Include="scripts\attic\messageBeep.usr.js" />
+    <None Include="scripts\attic\profileJumper.usr.js" />
     <Content Include="scripts\attic\qlping.usr.js" />
-    <None Include="scripts\qlRanks.usr.js" />
-    <None Include="scripts\raceboard.usr.js" />
-    <None Include="scripts\raceTop10.usr.js" />
-    <None Include="scripts\samPresets.usr.js" />
-    <None Include="scripts\matchtip.usr.js" />
-    <None Include="scripts\esreality.usr.js" />
-    <None Include="scripts\twitch.usr.js" />
-    <None Include="scripts\specHelper.usr.js" />
+    <None Include="scripts\attic\qlRanks.usr.js" />
+    <None Include="scripts\attic\raceboard.usr.js" />
+    <None Include="scripts\attic\raceTop10.usr.js" />
+    <None Include="scripts\attic\samPresets.usr.js" />
+    <None Include="scripts\attic\matchtip.usr.js" />
+    <None Include="scripts\attic\twitch.usr.js" />
+    <None Include="scripts\attic\specHelper.usr.js" />
     <Content Include="scripts\attic\streamNotifier.usr.js" />
     <Content Include="scripts\attic\weightedAcc.usr.js" />
   </ItemGroup>
