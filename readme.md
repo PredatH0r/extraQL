@@ -1,26 +1,14 @@
-﻿[extraQL Download Page](https://github.com/PredatH0r/extraQL/releases) | [Help / Wiki](https://github.com/PredatH0r/extraQL/wiki) | [Discussion Forum](https://github.com/PredatH0r/extraQL/issues)
+﻿[Download](http://steamcommunity.com/sharedfiles/filedetails/?id=539252269) | [Help / Wiki](https://github.com/PredatH0r/extraQL/wiki) | [Discussion Forum](https://github.com/PredatH0r/extraQL/issues)
 
-![screenshot](http://i.imgur.com/MgcdmG0.png)
+![screenshot](http://i.imgur.com/fLDu2sK.png)
 
 Installation
 ============
 
-A) Full local installation (recommended)
----
-- download the latest extraQL ZIP file
-- unzip the extraQL ZIP file to a folder of your liking, e.g. "c:\\program files (x86)"
-- right-click on extraQL.exe and select "Create shortcut"
-- right-click the "Shortcut to extraQL.exe" and select "Cut"
-- right-click on your desktop and select "Paste"
-- rename the shortcut to "extraQL"
+Subscribe to the [Steam Workshop item](http://steamcommunity.com/sharedfiles/filedetails/?id=539252269) to download and automatically update extraQL.
 
-B) hook.js only (reduced functionality)
----
-- download [hook.js](https://raw.githubusercontent.com/PredatH0r/extraQL/master/source/scripts/hook.js) (or if you have the ZIP, use the extraQL\\scripts\\hook.js file)
-- save hook.js to your Quake Live config directory:
-   * For the standalone launcher on Windows XP this is: %appdata%\\id software\\quakelive\\home\\baseq3
-   * For the standalone launcher on Win Vista and later: %appdata%\\..\\LocalLow\\id software\\home\\baseq3
-   * For Steam version of QL this is: <steamdir>\\SteamApps\\common\\Quake Live\\<steam-user-id>\\baseq3
+After the download you can find the extraQL files under:  
+c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 
 
 Changelog
