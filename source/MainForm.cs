@@ -11,13 +11,14 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.0.1";
+    public const string Version = "2.0.2";
 
     private readonly Config config;
     private readonly HttpServer server;
     private readonly Servlets servlets;
     private readonly ScriptRepository scriptRepository;
     private bool autoQuitQlIsRunning;
+    private int panelAdvancedHeight;
 
     #region ctor()
     public MainForm(Config config)
@@ -34,7 +35,6 @@ namespace ExtraQL
 
       this.server = new HttpServer(config.AppBaseDir + @"\https\localhost.pfx");
       this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
-      this.server.UseHttps = this.cbHttps.Checked;
       this.server.LogAllRequests = this.cbLogAllRequests.Checked;
 
       this.scriptRepository = new ScriptRepository(config.AppBaseDir);
@@ -52,6 +52,7 @@ namespace ExtraQL
     protected override void OnShown(EventArgs e)
     {
       base.OnShown(e);
+      this.panelAdvancedHeight = this.panelAdvanced.Height;
 
       this.scriptRepository.RegisterScripts();
       this.RestartHttpServer();
@@ -137,14 +138,14 @@ namespace ExtraQL
     {
       if (this.cbAdvanced.Checked)
       {
-        this.Height += panelAdvanced.Height;
+        this.Height += panelAdvancedHeight;
         this.panelAdvanced.BringToFront();
         this.panelAdvanced.Visible = true;
       }
       else
       {
         this.panelAdvanced.Visible = false;
-        this.Height -= panelAdvanced.Height;
+        this.Height -= panelAdvancedHeight;
       }
     }
     #endregion
@@ -209,13 +210,6 @@ namespace ExtraQL
 
     #region cbBindAll_CheckedChanged
     private void cbBindAll_CheckedChanged(object sender, EventArgs e)
-    {
-      this.RestartHttpServer();
-    }
-    #endregion
-
-    #region cbHttps_CheckedChanged
-    private void cbHttps_CheckedChanged(object sender, EventArgs e)
     {
       this.RestartHttpServer();
     }
@@ -295,7 +289,6 @@ namespace ExtraQL
       this.cbAutostart.Checked = config.GetString("autostart") != "0";
       this.cbLog.Checked = config.GetBool("log");
       this.cbFollowLog.Checked = config.GetBool("followLog");
-      this.cbHttps.Checked = config.GetBool("https");
       this.cbLogAllRequests.Checked = config.GetBool("logAllRequests");
       this.cbAutoQuit.Checked = config.GetBool("autoquit");
     }
@@ -315,7 +308,6 @@ namespace ExtraQL
         config.Set("autostart", this.cbAutostart.Checked ? "1" : "0");
         config.Set("log", this.cbLog.Checked);
         config.Set("followLog", this.cbFollowLog.Checked);
-        config.Set("https", this.cbHttps.Checked);
         config.Set("logAllRequests", this.cbLogAllRequests.Checked);
         config.Set("autoquit", this.cbAutoQuit.Checked);
         config.SaveSettings();
@@ -330,7 +322,7 @@ namespace ExtraQL
     #region CheckIfStartedFromWorkshopFolder()
     private void CheckIfStartedFromWorkshopFolder()
     {
-      var exeDir = Path.GetDirectoryName(Application.ExecutablePath).ToLower().Replace("/", "\\").TrimEnd('\\');
+      var exeDir = (Path.GetDirectoryName(Application.ExecutablePath) ?? "").ToLower().Replace("/", "\\").TrimEnd('\\');
       var wsDir = this.GetSteamWorkshopPath().ToLower().TrimEnd('\\');
       if (exeDir != wsDir)
       {
@@ -392,7 +384,6 @@ namespace ExtraQL
         return;
       this.server.Stop();
       this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
-      this.server.UseHttps = this.cbHttps.Checked;
       this.servlets.EnablePrivateServlets = !this.cbBindToAll.Checked;
       if (this.server.Start())
         this.Log("extraQL server listening on " + this.server.EndPointUrl);

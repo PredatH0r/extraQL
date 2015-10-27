@@ -14,6 +14,11 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.0.2
+---
+- fixed UI getting larger every time the options were hidden and shown again
+- removed HTTPS server code
+
 Version 2.0.1
 ---
 - added Unicode support for /steamnick

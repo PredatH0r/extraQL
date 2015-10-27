@@ -42,7 +42,6 @@ namespace ExtraQL
       this.lblSteamExe = new System.Windows.Forms.Label();
       this.btnSteamExe = new System.Windows.Forms.Button();
       this.cbAutoQuit = new System.Windows.Forms.CheckBox();
-      this.cbHttps = new System.Windows.Forms.CheckBox();
       this.cbAutostart = new System.Windows.Forms.CheckBox();
       this.cbStartMinimized = new System.Windows.Forms.CheckBox();
       this.cbSystemTray = new System.Windows.Forms.CheckBox();
@@ -95,7 +94,7 @@ namespace ExtraQL
       this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
       this.panelAdvanced.Location = new System.Drawing.Point(0, 143);
       this.panelAdvanced.Name = "panelAdvanced";
-      this.panelAdvanced.Size = new System.Drawing.Size(429, 198);
+      this.panelAdvanced.Size = new System.Drawing.Size(429, 167);
       this.panelAdvanced.TabIndex = 4;
       // 
       // grpAdvanced
@@ -107,7 +106,6 @@ namespace ExtraQL
       this.grpAdvanced.Controls.Add(this.lblSteamExe);
       this.grpAdvanced.Controls.Add(this.btnSteamExe);
       this.grpAdvanced.Controls.Add(this.cbAutoQuit);
-      this.grpAdvanced.Controls.Add(this.cbHttps);
       this.grpAdvanced.Controls.Add(this.cbAutostart);
       this.grpAdvanced.Controls.Add(this.cbStartMinimized);
       this.grpAdvanced.Controls.Add(this.cbSystemTray);
@@ -115,7 +113,7 @@ namespace ExtraQL
       this.grpAdvanced.ForeColor = System.Drawing.Color.White;
       this.grpAdvanced.Location = new System.Drawing.Point(12, 7);
       this.grpAdvanced.Name = "grpAdvanced";
-      this.grpAdvanced.Size = new System.Drawing.Size(405, 179);
+      this.grpAdvanced.Size = new System.Drawing.Size(405, 148);
       this.grpAdvanced.TabIndex = 0;
       this.grpAdvanced.TabStop = false;
       this.grpAdvanced.Text = "Options";
@@ -157,22 +155,11 @@ namespace ExtraQL
       this.cbAutoQuit.AutoSize = true;
       this.cbAutoQuit.Location = new System.Drawing.Point(209, 99);
       this.cbAutoQuit.Name = "cbAutoQuit";
-      this.cbAutoQuit.Size = new System.Drawing.Size(138, 17);
+      this.cbAutoQuit.Size = new System.Drawing.Size(159, 17);
       this.cbAutoQuit.TabIndex = 13;
-      this.cbAutoQuit.Text = "Autoquit when QL quits";
+      this.cbAutoQuit.Text = "Quit extraQL when QL quits";
       this.cbAutoQuit.UseVisualStyleBackColor = true;
       this.cbAutoQuit.CheckedChanged += new System.EventHandler(this.cbAutoQuit_CheckedChanged);
-      // 
-      // cbHttps
-      // 
-      this.cbHttps.AutoSize = true;
-      this.cbHttps.Location = new System.Drawing.Point(10, 145);
-      this.cbHttps.Name = "cbHttps";
-      this.cbHttps.Size = new System.Drawing.Size(365, 17);
-      this.cbHttps.TabIndex = 15;
-      this.cbHttps.Text = "Use HTTPS  (requires setup through https\\install.cmd as Administrator)";
-      this.cbHttps.UseVisualStyleBackColor = true;
-      this.cbHttps.CheckedChanged += new System.EventHandler(this.cbHttps_CheckedChanged);
       // 
       // cbAutostart
       // 
@@ -210,9 +197,9 @@ namespace ExtraQL
       this.cbBindToAll.AutoSize = true;
       this.cbBindToAll.Location = new System.Drawing.Point(10, 122);
       this.cbBindToAll.Name = "cbBindToAll";
-      this.cbBindToAll.Size = new System.Drawing.Size(310, 17);
+      this.cbBindToAll.Size = new System.Drawing.Size(305, 17);
       this.cbBindToAll.TabIndex = 14;
-      this.cbBindToAll.Text = "Allow other computers to access your extraQL HTTP server";
+      this.cbBindToAll.Text = "Allow other computers to access this extraQL HTTP server";
       this.cbBindToAll.UseVisualStyleBackColor = true;
       this.cbBindToAll.CheckedChanged += new System.EventHandler(this.cbBindAll_CheckedChanged);
       // 
@@ -409,7 +396,7 @@ namespace ExtraQL
       this.panelLog.Dock = System.Windows.Forms.DockStyle.Right;
       this.panelLog.Location = new System.Drawing.Point(429, 0);
       this.panelLog.Name = "panelLog";
-      this.panelLog.Size = new System.Drawing.Size(495, 341);
+      this.panelLog.Size = new System.Drawing.Size(495, 310);
       this.panelLog.TabIndex = 5;
       // 
       // grpLog
@@ -424,7 +411,7 @@ namespace ExtraQL
       this.grpLog.ForeColor = System.Drawing.Color.White;
       this.grpLog.Location = new System.Drawing.Point(12, 7);
       this.grpLog.Name = "grpLog";
-      this.grpLog.Size = new System.Drawing.Size(471, 323);
+      this.grpLog.Size = new System.Drawing.Size(471, 291);
       this.grpLog.TabIndex = 0;
       this.grpLog.TabStop = false;
       this.grpLog.Text = "Log";
@@ -473,7 +460,7 @@ namespace ExtraQL
       this.txtLog.Name = "txtLog";
       this.txtLog.ReadOnly = true;
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.txtLog.Size = new System.Drawing.Size(453, 259);
+      this.txtLog.Size = new System.Drawing.Size(453, 233);
       this.txtLog.TabIndex = 3;
       // 
       // autoQuitTimer
@@ -486,7 +473,7 @@ namespace ExtraQL
       this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
       this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-      this.ClientSize = new System.Drawing.Size(924, 341);
+      this.ClientSize = new System.Drawing.Size(924, 310);
       this.ControlBox = false;
       this.Controls.Add(this.panelAdvanced);
       this.Controls.Add(this.panelTop);
@@ -497,7 +484,7 @@ namespace ExtraQL
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MaximizeBox = false;
-      this.MinimumSize = new System.Drawing.Size(430, 160);
+      this.MinimumSize = new System.Drawing.Size(430, 143);
       this.Name = "MainForm";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.Text = "extraQL";
@@ -545,7 +532,6 @@ namespace ExtraQL
     private TextBox txtLog;
     private Button btnClearLog;
     private CheckBox cbFollowLog;
-    private CheckBox cbHttps;
     private CheckBox cbLogAllRequests;
     private CheckBox cbAutoQuit;
     private Timer autoQuitTimer;

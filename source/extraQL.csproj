@@ -96,9 +96,6 @@
     <EmbeddedResource Include="UpdateForm.resx">
       <DependentUpon>UpdateForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="https\install.cmd" />
-    <None Include="https\localhost.cer" />
-    <None Include="https\localhost.pfx" />
     <None Include="scripts\attic\autoExec.usr.js" />
     <None Include="scripts\attic\openChat.usr.js" />
     <None Include="scripts\attic\startpage.usr.js" />
