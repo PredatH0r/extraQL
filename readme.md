@@ -14,6 +14,12 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.1
+- fixed: Quake Live could not be restarted after extraQL loaded the steam_api.dll and used QL's application ID
+  (it's now using the QL Dedicated Server ID instead)
+- added cvars sn_clan and sn_name which can be individually changed and are combined into /steamnick
+- inside sn_clan, sn_name and steamnick a \ can be used in addition to ^ to start a color code
+
 Version 2.0.2
 ---
 - fixed UI getting larger every time the options were hidden and shown again

@@ -148,6 +148,7 @@
     <Content Include="scripts\attic\gametype.usr.js" />
     <Content Include="scripts\attic\irc.usr.js" />
     <Content Include="scripts\attic\joinGame.usr.js" />
+    <Content Include="scripts\_cycle.js" />
     <None Include="scripts\postalDump.js" />
     <None Include="scripts\autoExec.js" />
     <None Include="scripts\steamNick.js" />

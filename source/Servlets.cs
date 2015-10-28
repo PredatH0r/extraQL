@@ -712,9 +712,8 @@ namespace ExtraQL
       bool ok = false;
       if (!string.IsNullOrEmpty(name))
       {
-        // any app-id that is freely available will do (282440=Quake Live)
-        if (!File.Exists(dllDir + "steam_appid.txt"))
-          File.WriteAllText(dllDir + "steam_appid.txt", "282440");
+        // using the QL Dedicated Linux Server app-id so it won't block the QL client (282440) from starting
+        File.WriteAllText(dllDir + "steam_appid.txt", "349090");
 
         var hModule = Win32.LoadLibrary(dllDir + "steam_api.dll");
         if (hModule != IntPtr.Zero)
