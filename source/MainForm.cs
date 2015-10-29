@@ -11,14 +11,14 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.0.2";
+    public const string Version = "2.2";
 
     private readonly Config config;
     private readonly HttpServer server;
     private readonly Servlets servlets;
     private readonly ScriptRepository scriptRepository;
-    private bool autoQuitQlIsRunning;
     private int panelAdvancedHeight;
+    private bool qlStarted;
 
     #region ctor()
     public MainForm(Config config)
@@ -33,7 +33,7 @@ namespace ExtraQL
       this.lblVersion.Parent = this.picLogo;
       this.trayIcon.Icon = this.Icon;
 
-      this.server = new HttpServer(config.AppBaseDir + @"\https\localhost.pfx");
+      this.server = new HttpServer(null);
       this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
       this.server.LogAllRequests = this.cbLogAllRequests.Checked;
 
@@ -172,6 +172,20 @@ namespace ExtraQL
 
     // controls in Options view
 
+    #region btnNickStart_Click
+    private void btnNickStart_Click(object sender, EventArgs e)
+    {
+      servlets.SetSteamNick(this.txtNickStart.Text);
+    }
+    #endregion
+
+    #region  btnNickEnd_Click
+    private void btnNickEnd_Click(object sender, EventArgs e)
+    {
+      servlets.SetSteamNick(this.txtNickEnd.Text);
+    }
+    #endregion
+
     #region btnSteamExe_Click
     private void btnSteamExe_Click(object sender, EventArgs e)
     {
@@ -196,15 +210,6 @@ namespace ExtraQL
       this.picMinimize.Visible = !this.cbSystemTray.Checked;
       if (this.picMinimize.Visible)
         this.picMinimize.BringToFront();
-    }
-    #endregion
-
-    #region cbAutoQuit_CheckedChanged()
-    private void cbAutoQuit_CheckedChanged(object sender, EventArgs e)
-    {
-      if (this.cbAutoQuit.Checked)
-        this.autoQuitQlIsRunning = false;
-      this.autoQuitTimer.Enabled = this.cbAutoQuit.Checked;
     }
     #endregion
 
@@ -266,10 +271,16 @@ namespace ExtraQL
     private void autoQuitTimer_Tick(object sender, EventArgs e)
     {
       bool running = Servlets.QLWindowHandle != IntPtr.Zero;
-      if (this.autoQuitQlIsRunning && !running)
+
+      if (running)
+        qlStarted = true;
+      else if (qlStarted)
+        servlets.SetSteamNick(this.txtNickEnd.Text);
+
+      if (this.cbAutoQuit.Checked && qlStarted && !running)
         this.Close();
-      else if (running)
-        this.autoQuitQlIsRunning = true;
+
+      this.qlStarted = running;
     }
     #endregion
 
@@ -279,7 +290,8 @@ namespace ExtraQL
     private void LoadSettings()
     {
       this.txtSteamExe.Text = config.GetString("quakelive_steam.exe");
-
+      this.txtNickStart.Text = config.GetString("nickQuake");
+      this.txtNickEnd.Text = config.GetString("nickSteam");
       this.cbAdvanced.Checked = config.GetBool("advanced");
       this.cbBindToAll.Checked = config.GetBool("bindToAll");
       this.cbSystemTray.Checked = config.GetBool("systemTray");
@@ -301,6 +313,8 @@ namespace ExtraQL
       try
       {
         config.Set("quakelive_steam.exe", this.txtSteamExe.Text);
+        config.Set("nickQuake", this.txtNickStart.Text);
+        config.Set("nickSteam", this.txtNickEnd.Text);
         config.Set("advanced", this.cbAdvanced.Checked);
         config.Set("bindToAll", this.cbBindToAll.Checked);
         config.Set("systemTray", this.cbSystemTray.Checked);
@@ -327,11 +341,11 @@ namespace ExtraQL
       if (exeDir != wsDir)
       {
         var answer = MessageBox.Show(this,
-          "extraQL 2.0 is now a Steam Workshop item.\n" +
+          "extraQL 2.x is now a Steam Workshop item.\n" +
           "To keep extraQL updated, delete your old extraQL directory,\n" +
           "subscribe to the Workshop item and update your desktop shortcut.\n\n" +
           "Do you want to open the Steam Workshop page now?",
-          "extraQL 2.0 Steam Workshop",
+          "extraQL 2.x Steam Workshop",
           MessageBoxButtons.YesNo, MessageBoxIcon.Question);
         if (answer == DialogResult.Yes)
           Process.Start("steam://url/CommunityFilePage/539252269");
@@ -424,6 +438,7 @@ namespace ExtraQL
     {
       SaveSettings();
       InstallScripts();
+      servlets.SetSteamNick(this.txtNickStart.Text);
       StartQuakeLive();
     }
     #endregion
@@ -535,5 +550,6 @@ namespace ExtraQL
       }
     }
     #endregion
+
   }
 }

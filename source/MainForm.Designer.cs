@@ -38,6 +38,10 @@ namespace ExtraQL
       this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
       this.panelAdvanced = new System.Windows.Forms.Panel();
       this.grpAdvanced = new System.Windows.Forms.GroupBox();
+      this.txtNickEnd = new System.Windows.Forms.TextBox();
+      this.label2 = new System.Windows.Forms.Label();
+      this.txtNickStart = new System.Windows.Forms.TextBox();
+      this.label1 = new System.Windows.Forms.Label();
       this.txtSteamExe = new System.Windows.Forms.TextBox();
       this.lblSteamExe = new System.Windows.Forms.Label();
       this.btnSteamExe = new System.Windows.Forms.Button();
@@ -69,6 +73,8 @@ namespace ExtraQL
       this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.txtLog = new System.Windows.Forms.TextBox();
       this.autoQuitTimer = new System.Windows.Forms.Timer(this.components);
+      this.btnNickStart = new System.Windows.Forms.Button();
+      this.btnNickEnd = new System.Windows.Forms.Button();
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -94,14 +100,20 @@ namespace ExtraQL
       this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
       this.panelAdvanced.Location = new System.Drawing.Point(0, 143);
       this.panelAdvanced.Name = "panelAdvanced";
-      this.panelAdvanced.Size = new System.Drawing.Size(429, 167);
-      this.panelAdvanced.TabIndex = 4;
+      this.panelAdvanced.Size = new System.Drawing.Size(429, 213);
+      this.panelAdvanced.TabIndex = 1;
       // 
       // grpAdvanced
       // 
       this.grpAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpAdvanced.Controls.Add(this.btnNickEnd);
+      this.grpAdvanced.Controls.Add(this.btnNickStart);
+      this.grpAdvanced.Controls.Add(this.txtNickEnd);
+      this.grpAdvanced.Controls.Add(this.label2);
+      this.grpAdvanced.Controls.Add(this.txtNickStart);
+      this.grpAdvanced.Controls.Add(this.label1);
       this.grpAdvanced.Controls.Add(this.txtSteamExe);
       this.grpAdvanced.Controls.Add(this.lblSteamExe);
       this.grpAdvanced.Controls.Add(this.btnSteamExe);
@@ -113,10 +125,48 @@ namespace ExtraQL
       this.grpAdvanced.ForeColor = System.Drawing.Color.White;
       this.grpAdvanced.Location = new System.Drawing.Point(12, 7);
       this.grpAdvanced.Name = "grpAdvanced";
-      this.grpAdvanced.Size = new System.Drawing.Size(405, 148);
+      this.grpAdvanced.Size = new System.Drawing.Size(405, 194);
       this.grpAdvanced.TabIndex = 0;
       this.grpAdvanced.TabStop = false;
       this.grpAdvanced.Text = "Options";
+      // 
+      // txtNickEnd
+      // 
+      this.txtNickEnd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.txtNickEnd.ForeColor = System.Drawing.Color.Black;
+      this.txtNickEnd.Location = new System.Drawing.Point(209, 85);
+      this.txtNickEnd.Name = "txtNickEnd";
+      this.txtNickEnd.Size = new System.Drawing.Size(163, 21);
+      this.txtNickEnd.TabIndex = 6;
+      // 
+      // label2
+      // 
+      this.label2.AutoSize = true;
+      this.label2.Location = new System.Drawing.Point(209, 69);
+      this.label2.Name = "label2";
+      this.label2.Size = new System.Drawing.Size(181, 13);
+      this.label2.TabIndex = 5;
+      this.label2.Text = "Change Steam name when QL quits:";
+      // 
+      // txtNickStart
+      // 
+      this.txtNickStart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.txtNickStart.ForeColor = System.Drawing.Color.Black;
+      this.txtNickStart.Location = new System.Drawing.Point(10, 85);
+      this.txtNickStart.Name = "txtNickStart";
+      this.txtNickStart.Size = new System.Drawing.Size(163, 21);
+      this.txtNickStart.TabIndex = 3;
+      // 
+      // label1
+      // 
+      this.label1.AutoSize = true;
+      this.label1.Location = new System.Drawing.Point(10, 69);
+      this.label1.Name = "label1";
+      this.label1.Size = new System.Drawing.Size(186, 13);
+      this.label1.TabIndex = 2;
+      this.label1.Text = "Change Steam name when QL starts:";
       // 
       // txtSteamExe
       // 
@@ -125,7 +175,7 @@ namespace ExtraQL
       this.txtSteamExe.ForeColor = System.Drawing.Color.Black;
       this.txtSteamExe.Location = new System.Drawing.Point(10, 37);
       this.txtSteamExe.Name = "txtSteamExe";
-      this.txtSteamExe.Size = new System.Drawing.Size(358, 21);
+      this.txtSteamExe.Size = new System.Drawing.Size(362, 21);
       this.txtSteamExe.TabIndex = 1;
       // 
       // lblSteamExe
@@ -142,10 +192,11 @@ namespace ExtraQL
       this.btnSteamExe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.btnSteamExe.BackColor = System.Drawing.SystemColors.ButtonFace;
       this.btnSteamExe.ForeColor = System.Drawing.Color.Black;
-      this.btnSteamExe.Location = new System.Drawing.Point(374, 37);
+      this.btnSteamExe.Location = new System.Drawing.Point(371, 37);
       this.btnSteamExe.Name = "btnSteamExe";
       this.btnSteamExe.Size = new System.Drawing.Size(23, 21);
       this.btnSteamExe.TabIndex = 2;
+      this.btnSteamExe.TabStop = false;
       this.btnSteamExe.Text = "…";
       this.btnSteamExe.UseVisualStyleBackColor = false;
       this.btnSteamExe.Click += new System.EventHandler(this.btnSteamExe_Click);
@@ -153,41 +204,40 @@ namespace ExtraQL
       // cbAutoQuit
       // 
       this.cbAutoQuit.AutoSize = true;
-      this.cbAutoQuit.Location = new System.Drawing.Point(209, 99);
+      this.cbAutoQuit.Location = new System.Drawing.Point(209, 142);
       this.cbAutoQuit.Name = "cbAutoQuit";
       this.cbAutoQuit.Size = new System.Drawing.Size(159, 17);
-      this.cbAutoQuit.TabIndex = 13;
+      this.cbAutoQuit.TabIndex = 11;
       this.cbAutoQuit.Text = "Quit extraQL when QL quits";
       this.cbAutoQuit.UseVisualStyleBackColor = true;
-      this.cbAutoQuit.CheckedChanged += new System.EventHandler(this.cbAutoQuit_CheckedChanged);
       // 
       // cbAutostart
       // 
       this.cbAutostart.AutoSize = true;
-      this.cbAutostart.Location = new System.Drawing.Point(10, 99);
+      this.cbAutostart.Location = new System.Drawing.Point(10, 142);
       this.cbAutostart.Name = "cbAutostart";
       this.cbAutostart.Size = new System.Drawing.Size(128, 17);
-      this.cbAutostart.TabIndex = 12;
+      this.cbAutostart.TabIndex = 10;
       this.cbAutostart.Text = "Autostart Quake Live";
       this.cbAutostart.UseVisualStyleBackColor = true;
       // 
       // cbStartMinimized
       // 
       this.cbStartMinimized.AutoSize = true;
-      this.cbStartMinimized.Location = new System.Drawing.Point(209, 76);
+      this.cbStartMinimized.Location = new System.Drawing.Point(209, 119);
       this.cbStartMinimized.Name = "cbStartMinimized";
       this.cbStartMinimized.Size = new System.Drawing.Size(98, 17);
-      this.cbStartMinimized.TabIndex = 11;
+      this.cbStartMinimized.TabIndex = 9;
       this.cbStartMinimized.Text = "Start Minimized";
       this.cbStartMinimized.UseVisualStyleBackColor = true;
       // 
       // cbSystemTray
       // 
       this.cbSystemTray.AutoSize = true;
-      this.cbSystemTray.Location = new System.Drawing.Point(10, 76);
+      this.cbSystemTray.Location = new System.Drawing.Point(10, 119);
       this.cbSystemTray.Name = "cbSystemTray";
       this.cbSystemTray.Size = new System.Drawing.Size(126, 17);
-      this.cbSystemTray.TabIndex = 10;
+      this.cbSystemTray.TabIndex = 8;
       this.cbSystemTray.Text = "Show in System Tray";
       this.cbSystemTray.UseVisualStyleBackColor = true;
       this.cbSystemTray.CheckedChanged += new System.EventHandler(this.cbSystemTray_CheckedChanged);
@@ -195,10 +245,10 @@ namespace ExtraQL
       // cbBindToAll
       // 
       this.cbBindToAll.AutoSize = true;
-      this.cbBindToAll.Location = new System.Drawing.Point(10, 122);
+      this.cbBindToAll.Location = new System.Drawing.Point(10, 165);
       this.cbBindToAll.Name = "cbBindToAll";
       this.cbBindToAll.Size = new System.Drawing.Size(305, 17);
-      this.cbBindToAll.TabIndex = 14;
+      this.cbBindToAll.TabIndex = 12;
       this.cbBindToAll.Text = "Allow other computers to access this extraQL HTTP server";
       this.cbBindToAll.UseVisualStyleBackColor = true;
       this.cbBindToAll.CheckedChanged += new System.EventHandler(this.cbBindAll_CheckedChanged);
@@ -230,7 +280,7 @@ namespace ExtraQL
       this.cbLog.Location = new System.Drawing.Point(341, 112);
       this.cbLog.Name = "cbLog";
       this.cbLog.Size = new System.Drawing.Size(43, 17);
-      this.cbLog.TabIndex = 4;
+      this.cbLog.TabIndex = 6;
       this.cbLog.Text = "Log";
       this.cbLog.UseVisualStyleBackColor = true;
       this.cbLog.CheckedChanged += new System.EventHandler(this.cbLog_CheckedChanged);
@@ -243,7 +293,7 @@ namespace ExtraQL
       this.cbAdvanced.Location = new System.Drawing.Point(341, 89);
       this.cbAdvanced.Name = "cbAdvanced";
       this.cbAdvanced.Size = new System.Drawing.Size(63, 17);
-      this.cbAdvanced.TabIndex = 3;
+      this.cbAdvanced.TabIndex = 5;
       this.cbAdvanced.Text = "Options";
       this.cbAdvanced.UseVisualStyleBackColor = true;
       this.cbAdvanced.CheckedChanged += new System.EventHandler(this.cbAdvanced_CheckedChanged);
@@ -257,7 +307,7 @@ namespace ExtraQL
       this.linkAbout.Location = new System.Drawing.Point(196, 108);
       this.linkAbout.Name = "linkAbout";
       this.linkAbout.Size = new System.Drawing.Size(115, 18);
-      this.linkAbout.TabIndex = 2;
+      this.linkAbout.TabIndex = 4;
       this.linkAbout.TabStop = true;
       this.linkAbout.Text = "Open extraQL website";
       this.linkAbout.UseCompatibleTextRendering = true;
@@ -275,7 +325,7 @@ namespace ExtraQL
       this.btnStartQL.Location = new System.Drawing.Point(11, 89);
       this.btnStartQL.Name = "btnStartQL";
       this.btnStartQL.Size = new System.Drawing.Size(135, 37);
-      this.btnStartQL.TabIndex = 0;
+      this.btnStartQL.TabIndex = 2;
       this.btnStartQL.Text = "Start Quake Live";
       this.btnStartQL.UseVisualStyleBackColor = false;
       this.btnStartQL.Click += new System.EventHandler(this.btnStartQL_Click);
@@ -321,7 +371,7 @@ namespace ExtraQL
       this.linkConfig.Location = new System.Drawing.Point(196, 88);
       this.linkConfig.Name = "linkConfig";
       this.linkConfig.Size = new System.Drawing.Size(136, 20);
-      this.linkConfig.TabIndex = 1;
+      this.linkConfig.TabIndex = 3;
       this.linkConfig.TabStop = true;
       this.linkConfig.Text = "Open QL Config Folder";
       this.linkConfig.UseCompatibleTextRendering = true;
@@ -396,8 +446,8 @@ namespace ExtraQL
       this.panelLog.Dock = System.Windows.Forms.DockStyle.Right;
       this.panelLog.Location = new System.Drawing.Point(429, 0);
       this.panelLog.Name = "panelLog";
-      this.panelLog.Size = new System.Drawing.Size(495, 310);
-      this.panelLog.TabIndex = 5;
+      this.panelLog.Size = new System.Drawing.Size(495, 356);
+      this.panelLog.TabIndex = 2;
       // 
       // grpLog
       // 
@@ -411,7 +461,7 @@ namespace ExtraQL
       this.grpLog.ForeColor = System.Drawing.Color.White;
       this.grpLog.Location = new System.Drawing.Point(12, 7);
       this.grpLog.Name = "grpLog";
-      this.grpLog.Size = new System.Drawing.Size(471, 291);
+      this.grpLog.Size = new System.Drawing.Size(471, 337);
       this.grpLog.TabIndex = 0;
       this.grpLog.TabStop = false;
       this.grpLog.Text = "Log";
@@ -460,20 +510,49 @@ namespace ExtraQL
       this.txtLog.Name = "txtLog";
       this.txtLog.ReadOnly = true;
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.txtLog.Size = new System.Drawing.Size(453, 233);
+      this.txtLog.Size = new System.Drawing.Size(453, 279);
       this.txtLog.TabIndex = 3;
       // 
       // autoQuitTimer
       // 
+      this.autoQuitTimer.Enabled = true;
       this.autoQuitTimer.Interval = 2000;
       this.autoQuitTimer.Tick += new System.EventHandler(this.autoQuitTimer_Tick);
+      // 
+      // btnNickStart
+      // 
+      this.btnNickStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnNickStart.BackColor = System.Drawing.SystemColors.ButtonFace;
+      this.btnNickStart.ForeColor = System.Drawing.Color.Black;
+      this.btnNickStart.Location = new System.Drawing.Point(171, 85);
+      this.btnNickStart.Name = "btnNickStart";
+      this.btnNickStart.Size = new System.Drawing.Size(23, 21);
+      this.btnNickStart.TabIndex = 4;
+      this.btnNickStart.TabStop = false;
+      this.btnNickStart.Text = "√";
+      this.btnNickStart.UseVisualStyleBackColor = false;
+      this.btnNickStart.Click += new System.EventHandler(this.btnNickStart_Click);
+      // 
+      // btnNickEnd
+      // 
+      this.btnNickEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnNickEnd.BackColor = System.Drawing.SystemColors.ButtonFace;
+      this.btnNickEnd.ForeColor = System.Drawing.Color.Black;
+      this.btnNickEnd.Location = new System.Drawing.Point(371, 85);
+      this.btnNickEnd.Name = "btnNickEnd";
+      this.btnNickEnd.Size = new System.Drawing.Size(23, 21);
+      this.btnNickEnd.TabIndex = 7;
+      this.btnNickEnd.TabStop = false;
+      this.btnNickEnd.Text = "√";
+      this.btnNickEnd.UseVisualStyleBackColor = false;
+      this.btnNickEnd.Click += new System.EventHandler(this.btnNickEnd_Click);
       // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
       this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-      this.ClientSize = new System.Drawing.Size(924, 310);
+      this.ClientSize = new System.Drawing.Size(924, 356);
       this.ControlBox = false;
       this.Controls.Add(this.panelAdvanced);
       this.Controls.Add(this.panelTop);
@@ -539,6 +618,12 @@ namespace ExtraQL
     private TextBox txtSteamExe;
     private Label lblSteamExe;
     private Button btnSteamExe;
+    private TextBox txtNickEnd;
+    private Label label2;
+    private TextBox txtNickStart;
+    private Label label1;
+    private Button btnNickEnd;
+    private Button btnNickStart;
   }
 }
 

@@ -39,6 +39,8 @@ namespace ExtraQL
       this.settings["logAllRequests"] = "0";
       this.settings["autoquit"] = "0";
       this.settings["quakelive_steam.exe"] = "";
+      this.settings["nickQuake"] = "";
+      this.settings["nickSteam"] = "";
 
       var configFile = this.ConfigFile;
       if (File.Exists(configFile))

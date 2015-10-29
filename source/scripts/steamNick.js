@@ -82,7 +82,9 @@ Version 1.0
 
     // if any of the sn_* cvars was changed, combine them into "steamnick", which will cause another call to this function
     if (data.name != STEAMNICK_CVAR) {
-      qz_instance.SetCvar(STEAMNICK_CVAR, qz_instance.GetCvar(CLAN_CVAR) + qz_instance.GetCvar(NAME_CVAR));
+      var newNick = qz_instance.GetCvar(CLAN_CVAR) + qz_instance.GetCvar(NAME_CVAR);
+      if (newNick)
+        qz_instance.SetCvar(STEAMNICK_CVAR, newNick);
       return;
     }
    

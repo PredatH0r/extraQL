@@ -14,6 +14,9 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.2
+- added options to change steam nickname when starting/quitting QL in the GUI. This works even with /quit
+
 Version 2.1
 - fixed: Quake Live could not be restarted after extraQL loaded the steam_api.dll and used QL's application ID
   (it's now using the QL Dedicated Server ID instead)
