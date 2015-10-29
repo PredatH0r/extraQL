@@ -25,7 +25,7 @@ Version 2.0
     var channel = postal.channel();
     channel.subscribe("game.start", onGameStart);
     channel.subscribe("game.end", onGameEnd);
-    log("autoExec.js installed");
+    echo("^2autoExec.js installed");
   }
 
   function log(msg) {
@@ -37,7 +37,7 @@ Version 2.0
   }
 
   function onGameStart() {
-    echo("autoExec.js: executing gamestart.cfg");
+    echo("^3autoExec.js: executing gamestart.cfg");
     qz_instance.SendGameCommand("exec gamestart.cfg");
     autoSwitchFullscreen(1);
   }
@@ -51,7 +51,7 @@ Version 2.0
       return;
     lastGameEndTimestamp = now;
 
-    echo("autoExec.js: executing gameend.cfg");
+    echo("^3autoExec.js: executing gameend.cfg");
     qz_instance.SendGameCommand("exec gameend.cfg");
     autoSwitchFullscreen(0);
   }
@@ -60,7 +60,7 @@ Version 2.0
     var auto = qz_instance.GetCvar("r_autoFullscreen");
     var mask = enter ? 0x01 : 0x02;
     if (auto != "" && (parseInt(auto) & mask) && qz_instance.GetCvar("r_fullscreen") != enter) {
-      log("autoExec.js: switching to " + (enter ? "fullscreen" : "windowed mode"));
+      //log("autoExec.js: switching to " + (enter ? "fullscreen" : "windowed mode"));
       extraQl_SetFullscreen(enter);
 
       // extraQL may not be running or QL might have ignored the Alt+Enter keypress (when disconnecting), so check again after a timeout

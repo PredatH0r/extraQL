@@ -11,13 +11,12 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.2";
+    public const string Version = "2.3";
 
     private readonly Config config;
     private readonly HttpServer server;
     private readonly Servlets servlets;
     private readonly ScriptRepository scriptRepository;
-    private int panelAdvancedHeight;
     private bool qlStarted;
 
     #region ctor()
@@ -52,7 +51,6 @@ namespace ExtraQL
     protected override void OnShown(EventArgs e)
     {
       base.OnShown(e);
-      this.panelAdvancedHeight = this.panelAdvanced.Height;
 
       this.scriptRepository.RegisterScripts();
       this.RestartHttpServer();
@@ -138,14 +136,14 @@ namespace ExtraQL
     {
       if (this.cbAdvanced.Checked)
       {
-        this.Height += panelAdvancedHeight;
+        this.Height += panelAdvanced.Height;
         this.panelAdvanced.BringToFront();
         this.panelAdvanced.Visible = true;
       }
       else
       {
         this.panelAdvanced.Visible = false;
-        this.Height -= panelAdvancedHeight;
+        this.Height -= panelAdvanced.Height;
       }
     }
     #endregion
@@ -439,7 +437,8 @@ namespace ExtraQL
       SaveSettings();
       InstallScripts();
       servlets.SetSteamNick(this.txtNickStart.Text);
-      StartQuakeLive();
+      if ((ModifierKeys & Keys.Control) == 0) // ctrl+Start button just re-installs the scripts (during development)
+        StartQuakeLive();
     }
     #endregion
 
@@ -447,44 +446,80 @@ namespace ExtraQL
 
     private void InstallScripts(bool force = false)
     {
+      bool installScriptsInQlFolder = this.cbInstallInBaseq3.Checked;
+
+      // modify config files in <steam-user-id>\baseq3 directories
       string path = this.GetQuakeLivePath();
       if (path == null)
-      {
         this.Log("Unable to detect Quake Live's baseq3 directory");
-        return;
-      }
-
-      // copy hook.js to all <steam-user-id>\baseq3 directories
-      var dirs = Directory.GetDirectories(path);
-      foreach (var dir in dirs)
+      else
       {
-        if (Regex.IsMatch(Path.GetFileName(dir) ?? "", "\\d{5,}"))
-          InstallScripts(dir + "\\baseq3\\", force);
+        var dirs = Directory.GetDirectories(path);
+        foreach (var dir in dirs)
+        {
+          if (Regex.IsMatch(Path.GetFileName(dir) ?? "", "\\d{5,}"))
+          {
+            InstallConfigFiles(dir + @"\baseq3\");
+            InstallJavaScripts(dir, installScriptsInQlFolder);
+          }
+        }
       }
+
+      // install scripts
+      var workshopFolder = this.GetSteamWorkshopPath();
+      InstallJavaScripts(workshopFolder, !installScriptsInQlFolder);
+
     }
+    #endregion
 
-    private void InstallScripts(string baseq3Path, bool force)
+    #region InstallConfigFiles()
+    private void InstallConfigFiles(string baseq3Path)
     {
-      // delete obsolete extraQL 1.x stuff
-      File.Delete(baseq3Path + "hook.js");
-      File.Delete(baseq3Path + "hook_.js");
-      File.Delete(scriptRepository.ScriptDir + "hook.js");
-      File.Delete(scriptRepository.ScriptDir + "extraQL.js");
-      foreach (var oldScript in Directory.GetFiles(scriptRepository.ScriptDir, "*.usr.js"))
-        File.Delete(oldScript);
-
-      // install new scripts
-      var ws = this.GetSteamWorkshopPath();
-      var wsScripts = Path.Combine(ws, @"baseq3\js");
       try
       {
-        Directory.CreateDirectory(wsScripts);
-        foreach(var script in scriptRepository.GetScripts())
-          File.Copy(script.Filepath, Path.Combine(wsScripts, Path.GetFileName(script.Filepath) ?? ""), true);
+        // delete obsolete extraQL 1.x stuff
+        File.Delete(baseq3Path + "hook.js");
+        File.Delete(baseq3Path + "hook_.js");
+        File.Delete(scriptRepository.ScriptDir + "hook.js");
+        File.Delete(scriptRepository.ScriptDir + "extraQL.js");
+        foreach (var oldScript in Directory.GetFiles(scriptRepository.ScriptDir, "*.usr.js"))
+          File.Delete(oldScript);
+
+        // create informational gamestart.cfg and gameend.cfg files for autoExec.js
+        var file = baseq3Path + "gamestart.cfg";
+        if (!File.Exists(file))
+          File.WriteAllText(file, "// this file will be executed by extraQL/autoExec.js every time a map is loaded\n// you can use commands like /steamnick <nickname> to change your steam nickname when you enter a game.");
+        file = baseq3Path + "gameendcfg";
+        if (!File.Exists(file))
+          File.WriteAllText(file, "// this file will be executed by extraQL/autoExec.js every time a map is unloaded\n// you can use commands like /steamnick <nickname> to change your steam nickname when you enter a game.");
       }
       catch (Exception ex)
       {
-        MessageBox.Show(this, "Unable to copy userscripts\nfrom: " + scriptRepository.ScriptDir + "\nto: " + wsScripts + "\n\nError: " + ex.Message,
+        // some like to make their config directory read-only. bad luck.
+        this.Log("Unable to update files in Quake Live's <steam-id>/baseq3: " + ex.Message);
+      }
+    }
+    #endregion
+
+    #region InstallJavaScripts()
+    private void InstallJavaScripts(string folder, bool install)
+    {
+      var jsFolder = Path.Combine(folder, @"baseq3\js");
+      try
+      {
+        Directory.CreateDirectory(jsFolder);
+        foreach (var script in scriptRepository.GetScripts())
+        {
+          var targetFile = Path.Combine(jsFolder, Path.GetFileName(script.Filepath) ?? "");
+          if (install)
+            File.Copy(script.Filepath, targetFile, true);
+          else
+            File.Delete(targetFile);
+        }
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show(this, "Unable to update userscripts\nfrom: " + scriptRepository.ScriptDir + "\nto: " + jsFolder + "\n\nError: " + ex.Message,
           "extraQL", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
     }

@@ -23,7 +23,7 @@ uncomment the last line of this script to get all "postal" notifications logged 
     var postal = window.req("postal");
     var channel = postal.channel();
     channel.subscribe("#", onPostalEvent);
-    log("postalDump.js installed");
+    echo("^2postalDump.js installed");
   }
 
   function log(msg) {

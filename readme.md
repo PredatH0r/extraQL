@@ -14,6 +14,14 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.3
+- added option to install script in "Steam Apps/common/Quake Live/<steam-id>/baseq3/js" instead of the workshop folder
+  (to track down issues where users reported that script are not executed)
+- fixed wrong window size when starting and the options pane was hidden
+- scripts echo to the QL console when they were started
+- code cleanup
+
+
 Version 2.2
 - added options to change steam nickname when starting/quitting QL in the GUI. This works even with /quit
 

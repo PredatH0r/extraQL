@@ -38,6 +38,8 @@ namespace ExtraQL
       this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
       this.panelAdvanced = new System.Windows.Forms.Panel();
       this.grpAdvanced = new System.Windows.Forms.GroupBox();
+      this.btnNickEnd = new System.Windows.Forms.Button();
+      this.btnNickStart = new System.Windows.Forms.Button();
       this.txtNickEnd = new System.Windows.Forms.TextBox();
       this.label2 = new System.Windows.Forms.Label();
       this.txtNickStart = new System.Windows.Forms.TextBox();
@@ -73,8 +75,7 @@ namespace ExtraQL
       this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.txtLog = new System.Windows.Forms.TextBox();
       this.autoQuitTimer = new System.Windows.Forms.Timer(this.components);
-      this.btnNickStart = new System.Windows.Forms.Button();
-      this.btnNickEnd = new System.Windows.Forms.Button();
+      this.cbInstallInBaseq3 = new System.Windows.Forms.CheckBox();
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -100,7 +101,7 @@ namespace ExtraQL
       this.panelAdvanced.Dock = System.Windows.Forms.DockStyle.Fill;
       this.panelAdvanced.Location = new System.Drawing.Point(0, 143);
       this.panelAdvanced.Name = "panelAdvanced";
-      this.panelAdvanced.Size = new System.Drawing.Size(429, 213);
+      this.panelAdvanced.Size = new System.Drawing.Size(429, 234);
       this.panelAdvanced.TabIndex = 1;
       // 
       // grpAdvanced
@@ -108,6 +109,7 @@ namespace ExtraQL
       this.grpAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpAdvanced.Controls.Add(this.cbInstallInBaseq3);
       this.grpAdvanced.Controls.Add(this.btnNickEnd);
       this.grpAdvanced.Controls.Add(this.btnNickStart);
       this.grpAdvanced.Controls.Add(this.txtNickEnd);
@@ -125,10 +127,38 @@ namespace ExtraQL
       this.grpAdvanced.ForeColor = System.Drawing.Color.White;
       this.grpAdvanced.Location = new System.Drawing.Point(12, 7);
       this.grpAdvanced.Name = "grpAdvanced";
-      this.grpAdvanced.Size = new System.Drawing.Size(405, 194);
+      this.grpAdvanced.Size = new System.Drawing.Size(405, 215);
       this.grpAdvanced.TabIndex = 0;
       this.grpAdvanced.TabStop = false;
       this.grpAdvanced.Text = "Options";
+      // 
+      // btnNickEnd
+      // 
+      this.btnNickEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnNickEnd.BackColor = System.Drawing.SystemColors.ButtonFace;
+      this.btnNickEnd.ForeColor = System.Drawing.Color.Black;
+      this.btnNickEnd.Location = new System.Drawing.Point(371, 85);
+      this.btnNickEnd.Name = "btnNickEnd";
+      this.btnNickEnd.Size = new System.Drawing.Size(23, 21);
+      this.btnNickEnd.TabIndex = 7;
+      this.btnNickEnd.TabStop = false;
+      this.btnNickEnd.Text = "√";
+      this.btnNickEnd.UseVisualStyleBackColor = false;
+      this.btnNickEnd.Click += new System.EventHandler(this.btnNickEnd_Click);
+      // 
+      // btnNickStart
+      // 
+      this.btnNickStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnNickStart.BackColor = System.Drawing.SystemColors.ButtonFace;
+      this.btnNickStart.ForeColor = System.Drawing.Color.Black;
+      this.btnNickStart.Location = new System.Drawing.Point(171, 85);
+      this.btnNickStart.Name = "btnNickStart";
+      this.btnNickStart.Size = new System.Drawing.Size(23, 21);
+      this.btnNickStart.TabIndex = 4;
+      this.btnNickStart.TabStop = false;
+      this.btnNickStart.Text = "√";
+      this.btnNickStart.UseVisualStyleBackColor = false;
+      this.btnNickStart.Click += new System.EventHandler(this.btnNickStart_Click);
       // 
       // txtNickEnd
       // 
@@ -446,7 +476,7 @@ namespace ExtraQL
       this.panelLog.Dock = System.Windows.Forms.DockStyle.Right;
       this.panelLog.Location = new System.Drawing.Point(429, 0);
       this.panelLog.Name = "panelLog";
-      this.panelLog.Size = new System.Drawing.Size(495, 356);
+      this.panelLog.Size = new System.Drawing.Size(495, 377);
       this.panelLog.TabIndex = 2;
       // 
       // grpLog
@@ -461,7 +491,7 @@ namespace ExtraQL
       this.grpLog.ForeColor = System.Drawing.Color.White;
       this.grpLog.Location = new System.Drawing.Point(12, 7);
       this.grpLog.Name = "grpLog";
-      this.grpLog.Size = new System.Drawing.Size(471, 337);
+      this.grpLog.Size = new System.Drawing.Size(471, 358);
       this.grpLog.TabIndex = 0;
       this.grpLog.TabStop = false;
       this.grpLog.Text = "Log";
@@ -510,7 +540,7 @@ namespace ExtraQL
       this.txtLog.Name = "txtLog";
       this.txtLog.ReadOnly = true;
       this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.txtLog.Size = new System.Drawing.Size(453, 279);
+      this.txtLog.Size = new System.Drawing.Size(453, 300);
       this.txtLog.TabIndex = 3;
       // 
       // autoQuitTimer
@@ -519,40 +549,22 @@ namespace ExtraQL
       this.autoQuitTimer.Interval = 2000;
       this.autoQuitTimer.Tick += new System.EventHandler(this.autoQuitTimer_Tick);
       // 
-      // btnNickStart
+      // cbInstallInBaseq3
       // 
-      this.btnNickStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnNickStart.BackColor = System.Drawing.SystemColors.ButtonFace;
-      this.btnNickStart.ForeColor = System.Drawing.Color.Black;
-      this.btnNickStart.Location = new System.Drawing.Point(171, 85);
-      this.btnNickStart.Name = "btnNickStart";
-      this.btnNickStart.Size = new System.Drawing.Size(23, 21);
-      this.btnNickStart.TabIndex = 4;
-      this.btnNickStart.TabStop = false;
-      this.btnNickStart.Text = "√";
-      this.btnNickStart.UseVisualStyleBackColor = false;
-      this.btnNickStart.Click += new System.EventHandler(this.btnNickStart_Click);
-      // 
-      // btnNickEnd
-      // 
-      this.btnNickEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnNickEnd.BackColor = System.Drawing.SystemColors.ButtonFace;
-      this.btnNickEnd.ForeColor = System.Drawing.Color.Black;
-      this.btnNickEnd.Location = new System.Drawing.Point(371, 85);
-      this.btnNickEnd.Name = "btnNickEnd";
-      this.btnNickEnd.Size = new System.Drawing.Size(23, 21);
-      this.btnNickEnd.TabIndex = 7;
-      this.btnNickEnd.TabStop = false;
-      this.btnNickEnd.Text = "√";
-      this.btnNickEnd.UseVisualStyleBackColor = false;
-      this.btnNickEnd.Click += new System.EventHandler(this.btnNickEnd_Click);
+      this.cbInstallInBaseq3.AutoSize = true;
+      this.cbInstallInBaseq3.Location = new System.Drawing.Point(10, 188);
+      this.cbInstallInBaseq3.Name = "cbInstallInBaseq3";
+      this.cbInstallInBaseq3.Size = new System.Drawing.Size(342, 17);
+      this.cbInstallInBaseq3.TabIndex = 13;
+      this.cbInstallInBaseq3.Text = "Install scripts in <steam-id>/baseq3/js instead of workshop folder";
+      this.cbInstallInBaseq3.UseVisualStyleBackColor = true;
       // 
       // MainForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
       this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-      this.ClientSize = new System.Drawing.Size(924, 356);
+      this.ClientSize = new System.Drawing.Size(924, 377);
       this.ControlBox = false;
       this.Controls.Add(this.panelAdvanced);
       this.Controls.Add(this.panelTop);
@@ -624,6 +636,7 @@ namespace ExtraQL
     private Label label1;
     private Button btnNickEnd;
     private Button btnNickStart;
+    private CheckBox cbInstallInBaseq3;
   }
 }
 

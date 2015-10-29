@@ -61,7 +61,7 @@ Version 1.0
     channel.subscribe("cvar." + STEAMNICK_CVAR, onSteamNickCvarChanged);
     channel.subscribe("cvar." + CLAN_CVAR, onSteamNickCvarChanged);
     channel.subscribe("cvar." + NAME_CVAR, onSteamNickCvarChanged);
-    log("steamNick.js installed");
+    echo("^2steamNick.js installed");
   }
 
   function log(msg) {
