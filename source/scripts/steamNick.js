@@ -90,7 +90,7 @@ Version 1.0
     }
    
     // don't allow empty steam nicknames
-    if (!value)
+    if (!value || value == qz_instance.GetCvar("name"))
       return;
 
     // call the extraQL.exe servlet which changes the Steam nickname through a steam_api.dll call
@@ -99,10 +99,15 @@ Version 1.0
     xhttp.onload = function () {
       if (xhttp.status == 200)
         echo("^3/" + data.name + " changed successfully.^7");
-      else
+      else {
         echo("^1/" + data.name + " failed: ^7" + xhttp.responseText);
+        qz_instance.SetCvar(STEAMNICK_CVAR, qz_instance.GetCvar("name"));
+      }
     }
-    xhttp.onerror = function () { echo("^1/" + STEAMNICK_CVAR + " timed out. ^7Please make sure extraQL.exe 2.0 (or newer) is running on your PC."); }
+    xhttp.onerror = function() {
+       echo("^1/" + STEAMNICK_CVAR + " timed out. ^7Please make sure extraQL.exe 2.0 (or newer) is running on your PC.");
+       qz_instance.SetCvar(STEAMNICK_CVAR, qz_instance.GetCvar("name"));
+    }
     xhttp.open("GET", "http://localhost:27963/steamnick?name=" + encodeURIComponent(value), true);
     xhttp.send();
   }

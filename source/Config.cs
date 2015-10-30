@@ -41,6 +41,8 @@ namespace ExtraQL
       this.settings["quakelive_steam.exe"] = "";
       this.settings["nickQuake"] = "";
       this.settings["nickSteam"] = "";
+      this.settings["skipWorkshopNotice"] = "0";
+      this.settings["steamAppId"] = "349090";
 
       var configFile = this.ConfigFile;
       if (File.Exists(configFile))
@@ -74,7 +76,7 @@ namespace ExtraQL
     public void Set(string setting, string value)
     {
       if (!settings.ContainsKey(setting))
-        throw new ArgumentOutOfRangeException("setting", value);
+        throw new ArgumentOutOfRangeException(nameof(setting), value);
       this.settings[setting] = value;
     }
 

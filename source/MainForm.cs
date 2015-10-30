@@ -18,6 +18,7 @@ namespace ExtraQL
     private readonly Servlets servlets;
     private readonly ScriptRepository scriptRepository;
     private bool qlStarted;
+    private bool skipWorkshopNotice;
 
     #region ctor()
     public MainForm(Config config)
@@ -301,6 +302,12 @@ namespace ExtraQL
       this.cbFollowLog.Checked = config.GetBool("followLog");
       this.cbLogAllRequests.Checked = config.GetBool("logAllRequests");
       this.cbAutoQuit.Checked = config.GetBool("autoquit");
+      this.skipWorkshopNotice = config.GetBool("skipWorkshopNotice");
+
+      int appId;
+      int.TryParse(config.GetString("steamAppId"), out appId);
+      if (appId != 0)
+        Steamworks.AppID = appId;
     }
 
     #endregion
@@ -322,6 +329,7 @@ namespace ExtraQL
         config.Set("followLog", this.cbFollowLog.Checked);
         config.Set("logAllRequests", this.cbLogAllRequests.Checked);
         config.Set("autoquit", this.cbAutoQuit.Checked);
+        config.Set("skipWorkshopNotice", this.skipWorkshopNotice);
         config.SaveSettings();
       }
       catch (Exception ex)
@@ -334,6 +342,8 @@ namespace ExtraQL
     #region CheckIfStartedFromWorkshopFolder()
     private void CheckIfStartedFromWorkshopFolder()
     {
+      if (this.skipWorkshopNotice)
+        return;
       var exeDir = (Path.GetDirectoryName(Application.ExecutablePath) ?? "").ToLower().Replace("/", "\\").TrimEnd('\\');
       var wsDir = this.GetSteamWorkshopPath().ToLower().TrimEnd('\\');
       if (exeDir != wsDir)
@@ -345,6 +355,7 @@ namespace ExtraQL
           "Do you want to open the Steam Workshop page now?",
           "extraQL 2.x Steam Workshop",
           MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        this.skipWorkshopNotice = ModifierKeys == Keys.Control;
         if (answer == DialogResult.Yes)
           Process.Start("steam://url/CommunityFilePage/539252269");
       }
