@@ -11,7 +11,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.4beta1";
+    public const string Version = "2.4";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -448,7 +448,7 @@ namespace ExtraQL
       SaveSettings();
       InstallScripts();
       servlets.SetSteamNick(this.txtNickStart.Text);
-      if ((ModifierKeys & Keys.Control) == 0) // ctrl+Start button just re-installs the scripts (during development)
+      if ((ModifierKeys & Keys.Control) == 0) // use ctrl+Start button just re-installs the scripts (during development)
         StartQuakeLive();
     }
     #endregion
@@ -491,6 +491,7 @@ namespace ExtraQL
         // delete obsolete extraQL 1.x stuff
         File.Delete(baseq3Path + "hook.js");
         File.Delete(baseq3Path + "hook_.js");
+        File.Delete(baseq3Path + "gameendcfg"); // typo in 2.3
         File.Delete(scriptRepository.ScriptDir + "hook.js");
         File.Delete(scriptRepository.ScriptDir + "extraQL.js");
         foreach (var oldScript in Directory.GetFiles(scriptRepository.ScriptDir, "*.usr.js"))
@@ -500,7 +501,7 @@ namespace ExtraQL
         var file = baseq3Path + "gamestart.cfg";
         if (!File.Exists(file))
           File.WriteAllText(file, "// this file will be executed by extraQL/autoExec.js every time a map is loaded\n// you can use commands like /steamnick <nickname> to change your steam nickname when you enter a game.");
-        file = baseq3Path + "gameendcfg";
+        file = baseq3Path + "gameend.cfg";
         if (!File.Exists(file))
           File.WriteAllText(file, "// this file will be executed by extraQL/autoExec.js every time a map is unloaded\n// you can use commands like /steamnick <nickname> to change your steam nickname when you enter a game.");
       }
@@ -573,7 +574,7 @@ namespace ExtraQL
     #region StartQuakeLive()
     private void StartQuakeLive()
     {
-      this.Log("Starting Quake Live Steam App...");
+      this.Log("Starting Quake Live...");
       Process.Start("steam://rungameid/282440");
       this.SetFormVisibility(false);
     }

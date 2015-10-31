@@ -83,8 +83,7 @@
     <Compile Include="HttpServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SteamworksSemiStatic.cs" />
-    <None Include="SteamworksDynamic.cs" />
+    <Compile Include="Steamworks.cs" />
     <Compile Include="UpdateForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -142,9 +141,7 @@
     <None Include="images\topright.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DLL\steam_api.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="DLL\steam_api.dll" />
     <Content Include="scripts\attic\autoInvite.usr.js" />
     <Content Include="scripts\attic\demoBrowser.usr.js" />
     <Content Include="scripts\attic\esreality.usr.js" />

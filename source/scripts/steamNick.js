@@ -1,13 +1,22 @@
 ﻿// ==UserScript==
 // @id             steamNick
 // @name           steamNick
-// @version        1.0
+// @version        1.3
 // @author         PredatH0r
 // @description    add a /steamnick command to change steam nick name
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 1.3
+- added /sn_suffix
+
+Version 1.2
+- improved error handling when name change fails
+
+version 1.1
+- added /sn_name and /sn_clan
 
 Version 1.0
 - first user script designed to work with Steam exclusive version of Quake Live
@@ -22,23 +31,27 @@ Version 1.0
   // constants
   var STEAMNICK_CVAR = "steamnick";
   var NAME_CVAR = "sn_name";
-  var CLAN_CVAR = "sn_clan";
-
-  // state variables
-  var clantag;
-  var nickname;
+  var CLAN_PREFIX_CVAR = "sn_clan";
+  var CLAN_SUFFIX_CVAR = "sn_suffix";
 
   function init() {
     var steamName = qz_instance.GetCvar("name");
 
-    clantag = qz_instance.GetCvar(CLAN_CVAR);
-    if (!clantag) {
+    var clanPrefix = qz_instance.GetCvar(CLAN_PREFIX_CVAR);
+    if (!clanPrefix) {
       // make sure the CVAR exists
-      qz_instance.SetCvar(CLAN_CVAR, "");
-      clantag = "";
+      qz_instance.SetCvar(CLAN_PREFIX_CVAR, "");
+      clanPrefix = "";
     }
 
-    nickname = qz_instance.GetCvar(NAME_CVAR);
+    var clanSuffix = qz_instance.GetCvar(CLAN_SUFFIX_CVAR);
+    if (!clanSuffix) {
+      // make sure the CVAR exists
+      qz_instance.SetCvar(CLAN_SUFFIX_CVAR, "");
+      clanSuffix = "";
+    }
+
+    var nickname = qz_instance.GetCvar(NAME_CVAR);
     if (!nickname) {
       // make sure the CVAR exists
       qz_instance.SetCvar(NAME_CVAR, steamName);
@@ -46,9 +59,9 @@ Version 1.0
     }
 
 
-    // if sn_clan or sn_name are set, then modify the steam name accordingly
-    if (clantag || nickname) {
-      var steamnick = clantag + nickname;
+    // if any of the name/tag cvars are set, then modify the steam name accordingly
+    if (clanPrefix || clanSuffix || nickname) {
+      var steamnick = clanPrefix + nickname + clanSuffix;
       qz_instance.SetCvar(STEAMNICK_CVAR, steamnick);
       onSteamNickCvarChanged({ name: STEAMNICK_CVAR, value: steamnick });
     }
@@ -59,7 +72,8 @@ Version 1.0
     var postal = window.req("postal");
     var channel = postal.channel();
     channel.subscribe("cvar." + STEAMNICK_CVAR, onSteamNickCvarChanged);
-    channel.subscribe("cvar." + CLAN_CVAR, onSteamNickCvarChanged);
+    channel.subscribe("cvar." + CLAN_PREFIX_CVAR, onSteamNickCvarChanged);
+    channel.subscribe("cvar." + CLAN_SUFFIX_CVAR, onSteamNickCvarChanged);
     channel.subscribe("cvar." + NAME_CVAR, onSteamNickCvarChanged);
     echo("^2steamNick.js installed");
   }
@@ -83,7 +97,7 @@ Version 1.0
 
     // if any of the sn_* cvars was changed, combine them into "steamnick", which will cause another call to this function
     if (data.name != STEAMNICK_CVAR) {
-      var newNick = qz_instance.GetCvar(CLAN_CVAR) + qz_instance.GetCvar(NAME_CVAR);
+      var newNick = qz_instance.GetCvar(CLAN_PREFIX_CVAR) + qz_instance.GetCvar(NAME_CVAR) + qz_instance.GetCvar(CLAN_SUFFIX_CVAR);
       if (newNick)
         qz_instance.SetCvar(STEAMNICK_CVAR, newNick);
       return;

@@ -683,6 +683,8 @@ namespace ExtraQL
 
     #region SetSteamNick()
 
+    private const string MsgSteamApiInitFailed = "steam_api.dll could not be initialized. Check your extraQL Log window for details.";
+
     /// <summary>
     /// </summary>
     private void SetSteamNick(Stream stream, Uri uri, string request)
@@ -699,7 +701,7 @@ namespace ExtraQL
       if (ok)
         HttpOk(stream);
       else
-        HttpUnavailable(stream, "steam_api.dll could not be initialized. Make sure extraQL and your Steam client are running as the same Windows user.");
+        HttpUnavailable(stream, MsgSteamApiInitFailed);
     }
 
     internal bool SetSteamNick(string name)
@@ -709,7 +711,12 @@ namespace ExtraQL
         if (string.IsNullOrEmpty(name))
           return false;
 
-        return Steamworks.SetName(name);
+        if (!Steamworks.SetName(name))
+        {
+          Log("steam_api.dll could not be initialized. Make sure extraQL and your Steam client run as the same Windows user and with the same permissions (admin or not-admin).");
+          return false;
+        }
+        return true;
       }
       catch(Exception ex)
       {

@@ -14,6 +14,10 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.4
+- better error logging in case steam_api.dll could not be initialized
+- added /sn_suffix to append a text to the steam nickname
+
 Version 2.3
 - added option to install script in "Steam Apps/common/Quake Live/<steam-id>/baseq3/js" instead of the workshop folder
   (to track down issues where users reported that script are not executed)

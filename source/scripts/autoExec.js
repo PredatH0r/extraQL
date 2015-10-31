@@ -1,13 +1,16 @@
 ﻿// ==UserScript==
 // @id             autoExec
 // @name           autoExec
-// @version        2.0
+// @version        2.1
 // @author         PredatH0r
 // @description    executes commands when you start/leave a game
 // @unwrap
 // ==/UserScript==
 
 /*
+
+Version 2.1
+- create r_autoFullscreen cvar if not set
 
 Version 2.0
 - rewrite to work with Steam exclusive version of Quake Live
@@ -20,7 +23,12 @@ Version 2.0
   var console = window.console;
   var lastGameEndTimestamp;
 
-  function init() {    
+  function init() {
+    // create cvar
+    var autoFullscreen = qz_instance.GetCvar("r_autoFullscreen");
+    if (!autoFullscreen)
+      qz_instance.SetCvar("r_autoFullscreen", "0");
+
     var postal = window.req("postal");
     var channel = postal.channel();
     channel.subscribe("game.start", onGameStart);
