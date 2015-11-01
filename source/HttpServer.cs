@@ -266,19 +266,6 @@ namespace ExtraQL
           string conn;
           keepAlive = header.TryGetValue("Connection", out conn) && conn == "keep-alive";
 
-          // Check that the user agent is Awesomium and not a regular browser
-          // This should prevent abuse of extraQL URLs embedded in regular web pages
-          if (!bindToAllInterfaces)
-          {
-            string userAgent;
-            if (!header.TryGetValue("User-Agent", out userAgent) || !userAgent.Contains("Awesomium"))
-            {
-              var b = enc.GetBytes("HTTP/1.1 401 Unauthorized\r\n\r\nextraQL URLs may only be called from within QuakeLive scripts");
-              stream.Write(b, 0, b.Length);
-              continue;
-            }
-          }
-
           if (!data.StartsWith("POST ") && !data.StartsWith("GET "))
           {
             var b = enc.GetBytes("HTTP/1.1 405 Method Not Allowed\r\n\r\n");
@@ -296,7 +283,7 @@ namespace ExtraQL
             Log(url.ToString()); // ToString() displays the query string url-decoded, OriginalString doesn't
 
           string urlPath = url.AbsolutePath;
-          if (!ExecuteServlet(stream, urlPath, url, data))
+          if (!ExecuteServlet(stream, urlPath, url, data, header))
           {
             var buff = enc.GetBytes("HTTP/1.1 404 Not Found\r\n\r\n");
             stream.Write(buff, 0, buff.Length);
@@ -319,8 +306,22 @@ namespace ExtraQL
     #endregion
 
     #region ExecuteServlet()
-    private bool ExecuteServlet(Stream stream, string urlPath, Uri url, string data)
+    private bool ExecuteServlet(Stream stream, string urlPath, Uri url, string data, Dictionary<string,string> header)
     {
+      var unprotectedServlets = new[] { "/", "/version", "/bringToFront", "/scripts", "/repository.json" };
+      // Check that the user agent is Awesomium and not a regular browser
+      // This should prevent abuse of extraQL URLs embedded in regular web pages
+      if (!bindToAllInterfaces && Array.IndexOf(unprotectedServlets, urlPath) < 0)
+      {
+        string userAgent;
+        if (!header.TryGetValue("User-Agent", out userAgent) || !userAgent.Contains("Awesomium"))
+        {
+          var b = enc.GetBytes("HTTP/1.1 401 Unauthorized\r\n\r\nextraQL URLs may only be called from within QuakeLive scripts");
+          stream.Write(b, 0, b.Length);
+          return true;
+        }
+      }
+
       foreach (var entry in servlets)
       {
         if (entry.Key == urlPath || urlPath.StartsWith(entry.Key + "/"))

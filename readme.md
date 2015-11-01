@@ -14,6 +14,9 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.4.1
+- fixed starting multiple instances of extraQL
+
 Version 2.4
 - better error logging in case steam_api.dll could not be initialized
 - added /sn_suffix to append a text to the steam nickname
