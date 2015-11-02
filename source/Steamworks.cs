@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -7,7 +6,7 @@ using System.Windows.Forms;
 
 namespace ExtraQL
 {
-  partial class Steamworks
+  class Steamworks
   {
     [DllImport("steam_api.dll", CallingConvention = CallingConvention.Cdecl, CharSet=CharSet.Ansi)]
     private extern static bool SteamAPI_Init();
@@ -34,6 +33,8 @@ namespace ExtraQL
         try
         {
           var handle = SteamFriends();
+          if (handle == IntPtr.Zero)
+            return false;
           var cName = Encoding.UTF8.GetBytes(name + "\0");
           SteamAPI_ISteamFriends_SetPersonaName(handle, cName);
           return true;

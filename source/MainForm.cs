@@ -11,7 +11,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.4.1";
+    public const string Version = "2.5";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -55,7 +55,6 @@ namespace ExtraQL
 
       this.scriptRepository.RegisterScripts();
       this.RestartHttpServer();
-      this.UpdateServletSettings();
       this.CheckIfStartedFromWorkshopFolder();
       if (this.cbAutostart.Checked)
         this.Launch();
@@ -446,7 +445,9 @@ namespace ExtraQL
     private void Launch()
     {
       SaveSettings();
-      InstallScripts();
+      if (!InstallScripts())
+        return;
+      UpdateServletSettings();
       servlets.SetSteamNick(this.txtNickStart.Text);
       if ((ModifierKeys & Keys.Control) == 0) // use ctrl+Start button just re-installs the scripts (during development)
         StartQuakeLive();
@@ -455,31 +456,35 @@ namespace ExtraQL
 
     #region InstallScripts()
 
-    private void InstallScripts(bool force = false)
+    private bool InstallScripts(bool force = false)
     {
       bool installScriptsInQlFolder = this.cbInstallInBaseq3.Checked;
 
-      // modify config files in <steam-user-id>\baseq3 directories
+      // make sure we know quake's home directory
       string path = this.GetQuakeLivePath();
       if (path == null)
-        this.Log("Unable to detect Quake Live's baseq3 directory");
-      else
       {
-        var dirs = Directory.GetDirectories(path);
-        foreach (var dir in dirs)
+        this.Log("Unable to locate quakelive_steam.exe and the Quake Live baseq3 directory");
+        MessageBox.Show(this, "extraQL was not able to find your quakelive_steam.exe file.\nPlease provide the correct location in the Options pane.",
+          "extraQL", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        return false;
+      }
+
+      // modify files in <steam-user-id>\baseq3 directories
+      var dirs = Directory.GetDirectories(path);
+      foreach (var dir in dirs)
+      {
+        if (Regex.IsMatch(Path.GetFileName(dir) ?? "", "\\d{5,}"))
         {
-          if (Regex.IsMatch(Path.GetFileName(dir) ?? "", "\\d{5,}"))
-          {
-            InstallConfigFiles(dir + @"\baseq3\");
-            InstallJavaScripts(dir, installScriptsInQlFolder);
-          }
+          InstallConfigFiles(dir + @"\baseq3\");
+          InstallJavaScripts(dir, installScriptsInQlFolder);
         }
       }
 
-      // install scripts
+      // modify files in the steam workshop folder
       var workshopFolder = this.GetSteamWorkshopPath();
       InstallJavaScripts(workshopFolder, !installScriptsInQlFolder);
-
+      return true;
     }
     #endregion
 
@@ -545,7 +550,12 @@ namespace ExtraQL
       {
         try
         {
-          path = Path.GetDirectoryName(this.txtSteamExe.Text) ?? "";
+          path = this.txtSteamExe.Text;
+          if (Directory.Exists(path))
+          {
+            if (!path.EndsWith("/") && !path.EndsWith("\\"))
+              path += "quakelive_steam.exe";
+          }
         }
         catch
         {
@@ -556,10 +566,12 @@ namespace ExtraQL
       {
         path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
         if (path != null)
-          path = path.Replace("/", "\\") + @"\SteamApps\Common\Quake Live\";
+          path = path.Replace("/", "\\") + @"\SteamApps\Common\Quake Live\quakelive_steam.exe";
       }
 
-      return path != null && Directory.Exists(path) ? path : null;
+      if (!File.Exists(path))
+        return null;
+      return Path.GetDirectoryName(path);
     }
 
     #endregion
