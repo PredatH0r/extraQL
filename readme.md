@@ -14,6 +14,9 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.5.1
+- fixed incorrect detection of workshop folder
+
 Version 2.5
 - improved check for correct Quake Live and Steam Workshop directory to prevent installing scripts to a wrong folder.
 

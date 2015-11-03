@@ -11,7 +11,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.5";
+    public const string Version = "2.5.1";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -423,23 +423,6 @@ namespace ExtraQL
     }
     #endregion
 
-    #region GetConfigFolder()
-    private string GetConfigFolder()
-    {
-      var baseq3 = this.GetQuakeLivePath();
-      if (baseq3 == null) 
-        return null;
-
-      var dirs = Directory.GetDirectories(baseq3);
-      foreach (var dir in dirs)
-      {
-        if (Regex.IsMatch(Path.GetFileName(dir) ?? "", "\\d{5,}"))
-          return dir + "\\baseq3";
-      }
-      return null;
-    }
-    #endregion
-
     #region Launch()
 
     private void Launch()
@@ -571,15 +554,40 @@ namespace ExtraQL
 
       if (!File.Exists(path))
         return null;
-      return Path.GetDirectoryName(path);
+      path = Path.GetDirectoryName(path);
+      //Log("Quake Live folder: " + path);
+      return path;
     }
 
+    #endregion
+
+    #region GetConfigFolder()
+    private string GetConfigFolder()
+    {
+      var baseq3 = this.GetQuakeLivePath();
+      if (baseq3 == null)
+        return null;
+
+      var dirs = Directory.GetDirectories(baseq3);
+      foreach (var dir in dirs)
+      {
+        if (Regex.IsMatch(Path.GetFileName(dir) ?? "", "\\d{5,}"))
+        {
+          var path = Path.Combine(dir, "baseq3");
+          //Log("Config folder: " + path);
+          return path;
+        }
+      }
+      return null;
+    }
     #endregion
 
     #region GetSteamWorkshopPath()
     private string GetSteamWorkshopPath()
     {
-      return Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(this.GetQuakeLivePath()))) ?? "", @"workshop\content\282440\539252269\");
+      var path = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(this.GetQuakeLivePath())) ?? "", @"workshop\content\282440\539252269");
+      //Log("Workshop folder: " + path);
+      return path;
     }
     #endregion
 
