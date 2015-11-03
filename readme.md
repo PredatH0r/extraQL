@@ -14,20 +14,29 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.6
+---
+- using long living steam API session to prevent massive FPS drops after running the application for a while
+
 Version 2.5.1
+---
 - fixed incorrect detection of workshop folder
 
 Version 2.5
+---
 - improved check for correct Quake Live and Steam Workshop directory to prevent installing scripts to a wrong folder.
 
 Version 2.4.1
+---
 - fixed starting multiple instances of extraQL
 
 Version 2.4
+---
 - better error logging in case steam_api.dll could not be initialized
 - added /sn_suffix to append a text to the steam nickname
 
 Version 2.3
+---
 - added option to install script in "Steam Apps/common/Quake Live/<steam-id>/baseq3/js" instead of the workshop folder
   (to track down issues where users reported that script are not executed)
 - fixed wrong window size when starting and the options pane was hidden
@@ -36,9 +45,11 @@ Version 2.3
 
 
 Version 2.2
+---
 - added options to change steam nickname when starting/quitting QL in the GUI. This works even with /quit
 
 Version 2.1
+---
 - fixed: Quake Live could not be restarted after extraQL loaded the steam_api.dll and used QL's application ID
   (it's now using the QL Dedicated Server ID instead)
 - added cvars sn_clan and sn_name which can be individually changed and are combined into /steamnick
