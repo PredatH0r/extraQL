@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -13,7 +12,7 @@ using System.Windows.Forms;
 
 namespace ExtraQL
 {
-  internal class Servlets
+  internal class Servlets : IDisposable
   {
     private static readonly string[] DomainsAllowedForProxy = { "esreality.com", "quakelive.com", "github.com" };
     private const string AddScriptRoute = "/addScript";
@@ -22,6 +21,7 @@ namespace ExtraQL
     private readonly StringBuilder indexBuilder = new StringBuilder();
     private readonly string baseDir;
     private readonly ScriptRepository scriptRepository;
+    private readonly Steamworks steamworks = new Steamworks();
     private readonly Form form;
     private string joinServer, joinPass;
 
@@ -44,11 +44,18 @@ namespace ExtraQL
 
     #endregion
 
+    public void Dispose()
+    {
+      this.steamworks.Dispose();
+    }
+
     public bool EnablePrivateServlets { get; set; }
 
     public string QuakeConfigFolder { get; set; }
 
     public string QuakeSteamFolder { get; set; }
+
+    public int SteamAppId { get { return steamworks.AppID; } set { steamworks.AppID = value; } }
 
     #region RegisterServlets()
 
@@ -711,7 +718,7 @@ namespace ExtraQL
         if (string.IsNullOrEmpty(name))
           return false;
 
-        if (!Steamworks.SetName(name))
+        if (!steamworks.SetName(name))
         {
           Log("steam_api.dll could not be initialized. Make sure extraQL and your Steam client run as the same Windows user and with the same permissions (admin or not-admin).");
           return false;

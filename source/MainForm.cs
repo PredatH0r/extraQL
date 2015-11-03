@@ -11,7 +11,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.5.1";
+    public const string Version = "2.6";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -19,6 +19,7 @@ namespace ExtraQL
     private readonly ScriptRepository scriptRepository;
     private bool qlStarted;
     private bool skipWorkshopNotice;
+    private int steamAppId;
 
     #region ctor()
     public MainForm(Config config)
@@ -67,6 +68,7 @@ namespace ExtraQL
       // make sure the window can be closed even if there are exceptions
       try { this.SaveSettings(); } catch { }
       try { this.server.Stop(); } catch { }
+      try { this.servlets.Dispose(); } catch { }
       base.OnClosed(e);
     }
     #endregion
@@ -302,11 +304,7 @@ namespace ExtraQL
       this.cbLogAllRequests.Checked = config.GetBool("logAllRequests");
       this.cbAutoQuit.Checked = config.GetBool("autoquit");
       this.skipWorkshopNotice = config.GetBool("skipWorkshopNotice");
-
-      int appId;
-      int.TryParse(config.GetString("steamAppId"), out appId);
-      if (appId != 0)
-        Steamworks.AppID = appId;
+      int.TryParse(config.GetString("steamAppId"), out this.steamAppId);
     }
 
     #endregion
@@ -395,6 +393,8 @@ namespace ExtraQL
       {
         this.servlets.QuakeConfigFolder = this.GetConfigFolder();
         this.servlets.QuakeSteamFolder = this.GetQuakeLivePath();
+        if (this.steamAppId != 0)
+          this.servlets.SteamAppId = this.steamAppId;
       }
     }
     #endregion
