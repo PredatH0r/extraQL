@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using Microsoft.Win32;
 
 namespace ExtraQL
 {
@@ -27,15 +26,11 @@ namespace ExtraQL
     {
       this.settings.Clear();
       this.settings["advanced"] = "0";
-      this.settings["launcherExe"] = GetDefaultLauncherPath();
-      this.settings["bindToAll"] = "0";
       this.settings["systemTray"] = "0";
       this.settings["startMinimized"] = "0";
-      this.settings["checkUpdates"] = "1";
       this.settings["autostart"] = "0";
       this.settings["log"] = "0";
       this.settings["followLog"] = "0";
-      this.settings["https"] = "0";
       this.settings["logAllRequests"] = "0";
       this.settings["autoquit"] = "0";
       this.settings["quakelive_steam.exe"] = "";
@@ -43,6 +38,9 @@ namespace ExtraQL
       this.settings["nickSteam"] = "";
       this.settings["skipWorkshopNotice"] = "0";
       this.settings["steamAppId"] = "349090";
+      this.settings["startServerBrowser"] = "0";
+      this.settings["closeServerBrowser"] = "0";
+
 
       var configFile = this.ConfigFile;
       if (File.Exists(configFile))
@@ -100,28 +98,6 @@ namespace ExtraQL
     #region ConfigFile
     private string ConfigFile => Path.Combine(this.AppBaseDir, "extraQL.ini");
 
-    #endregion
-
-    #region GetDefaultLauncherPath()
-    private string GetDefaultLauncherPath()
-    {
-      try
-      {
-        string path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\id Software\Quake Live", null, null) as string;
-        if (path != null && File.Exists(path += "\\Launcher.exe"))
-          return path;
-      }
-      catch { } // fails on Mono
-      
-      try
-      {
-        string path = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Quake Live", "UninstallString", null) as string;
-        if (path != null && File.Exists(path = path.Replace("uninstall.exe", "Launcher.exe")))
-          return path;
-      }
-      catch { }
-      return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + "\\Quake Live\\Launcher.exe";
-    }
     #endregion
 
   }

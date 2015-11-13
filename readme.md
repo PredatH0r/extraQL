@@ -14,6 +14,14 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.7
+---
+- added command line parameter /background to start extraQL minimized (used by SteamServerBrowser when auto-starting extraQL)
+- added option to start / quit Steam Server Browser
+- fixed the "start minimized" option
+- removed option "allow other computers to use this extraQL server" (relic from old hook.js using a public extraQL master server)
+- removed option "install scripts to <steam-id>/baseq3/js" (not needed)
+
 Version 2.6
 ---
 - using long living steam API session to prevent massive FPS drops after running the application for a while

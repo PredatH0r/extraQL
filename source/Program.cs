@@ -6,6 +6,7 @@ namespace ExtraQL
   static class Program
   {
     public const string WinServiceSwitch = "-service";
+    public const string BackgroundSwitch = "-background";
 
     #region Main()
     [STAThread]
@@ -18,7 +19,7 @@ namespace ExtraQL
       {
         Config config = new Config();
         config.LoadSettings();
-        if (ActivateRunningInstance(config.GetBool("https"))) 
+        if (ActivateRunningInstance()) 
           return;
 
         Application.EnableVisualStyles();
@@ -37,14 +38,15 @@ namespace ExtraQL
     #endregion
 
     #region ActivateRunningInstance()
-    private static bool ActivateRunningInstance(bool useHttps)
+    private static bool ActivateRunningInstance()
     {
       using (var client = new XWebClient(500))
       {
         try
         {
-          var result = client.DownloadString((useHttps ? "https" : "http") + "://127.0.0.1:27963/bringToFront");
-          if (result == "ok")
+          var servlet = Environment.CommandLine.Contains(BackgroundSwitch) ? "version" : "bringToFront";
+          var result = client.DownloadString("http://127.0.0.1:27963/" + servlet);
+          if (result != null)
             return true;
         }
         catch

@@ -141,7 +141,7 @@
     <None Include="images\topright.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DLL\steam_api.dll" />
+    <Content Include="steam_api.dll" />
     <Content Include="scripts\attic\autoInvite.usr.js" />
     <Content Include="scripts\attic\demoBrowser.usr.js" />
     <Content Include="scripts\attic\esreality.usr.js" />

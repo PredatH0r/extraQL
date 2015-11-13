@@ -34,14 +34,21 @@ namespace ExtraQL
     [DllImport("user32.dll")]
     public static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
 
-    [DllImportAttribute("user32.dll")]
+    [DllImport("user32.dll")]
     public static extern bool ReleaseCapture();
 
-    [DllImportAttribute("user32.dll")]
+    [DllImport("user32.dll")]
     public static extern bool IsWindowUnicode(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindow(IntPtr handle, int flags);
 
     public delegate bool EnumWindowProc(IntPtr hWnd, IntPtr lParam);
 
+    public const int WM_ACTIVATE = 0x0006;
+    public const int WM_SETREDRAW = 0x000B;
+    public const int WM_CLOSE = 0x0010;
+    public const int WM_SHOWWINDOW = 0x0018;
     public const int WM_KEYDOWN = 0x0100;
     public const int WM_KEYUP = 0x0101;
     public const int WM_CHAR = 0x0102;
@@ -56,7 +63,11 @@ namespace ExtraQL
     public const int WM_SYSKEYDOWN = 0x0104;
     public const int WM_SYSKEYUP = 0x0105;
 
+    public const int SWP_NOSIZE = 0x0001;
+    public const int SWP_NOMOVE = 0x0002;
     public const int SWP_NOACTIVATE = 0x0010;
+    public const int SWP_SHOWWINDOW = 0x0040;
+    public const int SWP_HIDEWINDOW = 0x0080;
     public const int SWP_NOOWNERZORDER = 0x0200;
     public const int SWP_NOSENDCHANGING = 0x0400;
     public const int SWP_NOZORDER = 0x0004;

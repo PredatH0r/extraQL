@@ -11,7 +11,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.6";
+    public const string Version = "2.7";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -20,6 +20,7 @@ namespace ExtraQL
     private bool qlStarted;
     private bool skipWorkshopNotice;
     private int steamAppId;
+    private bool suppressInitialShow;
 
     #region ctor()
     public MainForm(Config config)
@@ -33,9 +34,12 @@ namespace ExtraQL
       this.lblExtra.Parent = this.picLogo;
       this.lblVersion.Parent = this.picLogo;
       this.trayIcon.Icon = this.Icon;
+      this.suppressInitialShow = Environment.CommandLine.Contains(Program.BackgroundSwitch) || this.cbStartMinimized.Checked;
+      if (this.suppressInitialShow)
+        this.WindowState = FormWindowState.Minimized;
 
       this.server = new HttpServer(null);
-      this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
+      this.server.BindToAllInterfaces = false;
       this.server.LogAllRequests = this.cbLogAllRequests.Checked;
 
       this.scriptRepository = new ScriptRepository(config.AppBaseDir);
@@ -48,6 +52,21 @@ namespace ExtraQL
     }
     #endregion
 
+    #region WndProc()
+    protected override void WndProc(ref Message m)
+    {
+      // This hack is needed because none of the documented ways to start an application window in minimized state works.
+      // this.ShowWindowWithoutActivation gets never called, this.WindowState get overwritten somehow after setting this.Visible=true, ...
+      if (m.Msg == Win32.WM_SHOWWINDOW && this.suppressInitialShow && (int)m.WParam == 1)
+      {
+        m.Result = IntPtr.Zero;
+        this.suppressInitialShow = false;
+        return;
+      }
+
+      base.WndProc(ref m);
+    }
+    #endregion
 
     #region OnShown()
     protected override void OnShown(EventArgs e)
@@ -69,6 +88,12 @@ namespace ExtraQL
       try { this.SaveSettings(); } catch { }
       try { this.server.Stop(); } catch { }
       try { this.servlets.Dispose(); } catch { }
+      try
+      {
+        if (this.cbCloseServerBrowser.Checked)
+          this.CloseServerBrowser();
+      }
+      catch { }
       base.OnClosed(e);
     }
     #endregion
@@ -213,10 +238,11 @@ namespace ExtraQL
     }
     #endregion
 
-    #region cbBindAll_CheckedChanged
-    private void cbBindAll_CheckedChanged(object sender, EventArgs e)
+    #region cbStartServerBrowser_CheckedChanged
+    private void cbStartServerBrowser_CheckedChanged(object sender, EventArgs e)
     {
-      this.RestartHttpServer();
+      if (this.cbStartServerBrowser.Checked)
+        this.StartServerBrowser();
     }
     #endregion
 
@@ -277,9 +303,13 @@ namespace ExtraQL
       else if (qlStarted)
         servlets.SetSteamNick(this.txtNickEnd.Text);
 
-      if (this.cbAutoQuit.Checked && qlStarted && !running)
-        this.Close();
-
+      if (qlStarted && !running)
+      {
+        if (this.cbAutoQuit.Checked)
+          this.Close();
+        if (this.cbCloseServerBrowser.Checked)
+          this.CloseServerBrowser();
+      }
       this.qlStarted = running;
     }
     #endregion
@@ -293,11 +323,8 @@ namespace ExtraQL
       this.txtNickStart.Text = config.GetString("nickQuake");
       this.txtNickEnd.Text = config.GetString("nickSteam");
       this.cbAdvanced.Checked = config.GetBool("advanced");
-      this.cbBindToAll.Checked = config.GetBool("bindToAll");
       this.cbSystemTray.Checked = config.GetBool("systemTray");
       this.cbStartMinimized.Checked = config.GetBool("startMinimized");
-      if (this.cbStartMinimized.Checked)
-        this.SetFormVisibility(false);
       this.cbAutostart.Checked = config.GetString("autostart") != "0";
       this.cbLog.Checked = config.GetBool("log");
       this.cbFollowLog.Checked = config.GetBool("followLog");
@@ -305,6 +332,8 @@ namespace ExtraQL
       this.cbAutoQuit.Checked = config.GetBool("autoquit");
       this.skipWorkshopNotice = config.GetBool("skipWorkshopNotice");
       int.TryParse(config.GetString("steamAppId"), out this.steamAppId);
+      this.cbStartServerBrowser.Checked = config.GetBool("startServerBrowser");
+      this.cbCloseServerBrowser.Checked = config.GetBool("closeServerBrowser");
     }
 
     #endregion
@@ -318,7 +347,6 @@ namespace ExtraQL
         config.Set("nickQuake", this.txtNickStart.Text);
         config.Set("nickSteam", this.txtNickEnd.Text);
         config.Set("advanced", this.cbAdvanced.Checked);
-        config.Set("bindToAll", this.cbBindToAll.Checked);
         config.Set("systemTray", this.cbSystemTray.Checked);
         config.Set("startMinimized", this.cbStartMinimized.Checked);
         config.Set("autostart", this.cbAutostart.Checked ? "1" : "0");
@@ -327,6 +355,8 @@ namespace ExtraQL
         config.Set("logAllRequests", this.cbLogAllRequests.Checked);
         config.Set("autoquit", this.cbAutoQuit.Checked);
         config.Set("skipWorkshopNotice", this.skipWorkshopNotice);
+        config.Set("startServerBrowser", this.cbStartServerBrowser.Checked ? "1" : "0");
+        config.Set("closeServerBrowser", this.cbCloseServerBrowser.Checked ? "1" : "0");
         config.SaveSettings();
       }
       catch (Exception ex)
@@ -405,8 +435,8 @@ namespace ExtraQL
       if (this.server == null)
         return;
       this.server.Stop();
-      this.server.BindToAllInterfaces = this.cbBindToAll.Checked;
-      this.servlets.EnablePrivateServlets = !this.cbBindToAll.Checked;
+      this.server.BindToAllInterfaces = false;
+      this.servlets.EnablePrivateServlets = true;
       if (this.server.Start())
         this.Log("extraQL server listening on " + this.server.EndPointUrl);
       else
@@ -433,7 +463,11 @@ namespace ExtraQL
       UpdateServletSettings();
       servlets.SetSteamNick(this.txtNickStart.Text);
       if ((ModifierKeys & Keys.Control) == 0) // use ctrl+Start button just re-installs the scripts (during development)
+      {
+        if (cbStartServerBrowser.Checked)
+          StartServerBrowser();
         StartQuakeLive();
+      }
     }
     #endregion
 
@@ -441,7 +475,7 @@ namespace ExtraQL
 
     private bool InstallScripts(bool force = false)
     {
-      bool installScriptsInQlFolder = this.cbInstallInBaseq3.Checked;
+      const bool installScriptsInQlFolder = false;
 
       // make sure we know quake's home directory
       string path = this.GetQuakeLivePath();
@@ -610,11 +644,37 @@ namespace ExtraQL
       }
       else
       {
+        this.WindowState = FormWindowState.Minimized;
         if (this.cbSystemTray.Checked)
           this.Hide();
-        else
-          this.WindowState = FormWindowState.Minimized;
       }
+    }
+    #endregion
+
+    #region StartServerBrowser()
+    private void StartServerBrowser()
+    {
+      var proc = Process.GetProcessesByName("ServerBrowser");
+      if (proc.Length == 0)
+      {
+        var wsPath = this.GetSteamWorkshopPath();
+        wsPath = Path.Combine(Path.GetDirectoryName(wsPath) ?? ".", @"543312745\ServerBrowser.exe");
+        if (File.Exists(wsPath))
+          Process.Start(wsPath);
+        else
+          Log("Could not find " + wsPath + ".\nMake sure you have steam workshop item 543312745 installed.");
+      }
+      else
+        Win32.ShowWindow(proc[0].MainWindowHandle, 1);
+    }
+    #endregion
+
+    #region CloseServerBrowser()
+    private void CloseServerBrowser()
+    {
+      var proc = Process.GetProcessesByName("ServerBrowser");
+      foreach (var p in proc)
+        Win32.SendMessage(p.MainWindowHandle, Win32.WM_CLOSE, 0, 0);
     }
     #endregion
 
