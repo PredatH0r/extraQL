@@ -39,18 +39,20 @@ namespace ExtraQL
       this.panelAdvanced = new System.Windows.Forms.Panel();
       this.grpAdvanced = new System.Windows.Forms.GroupBox();
       this.btnNickEnd = new System.Windows.Forms.Button();
+      this.cbCloseServerBrowser = new System.Windows.Forms.CheckBox();
+      this.cbStartServerBrowser = new System.Windows.Forms.CheckBox();
       this.btnNickStart = new System.Windows.Forms.Button();
-      this.txtNickEnd = new System.Windows.Forms.TextBox();
-      this.label2 = new System.Windows.Forms.Label();
-      this.txtNickStart = new System.Windows.Forms.TextBox();
-      this.label1 = new System.Windows.Forms.Label();
       this.txtSteamExe = new System.Windows.Forms.TextBox();
       this.lblSteamExe = new System.Windows.Forms.Label();
+      this.txtNickEnd = new System.Windows.Forms.TextBox();
       this.btnSteamExe = new System.Windows.Forms.Button();
       this.cbAutoQuit = new System.Windows.Forms.CheckBox();
+      this.label2 = new System.Windows.Forms.Label();
       this.cbAutostart = new System.Windows.Forms.CheckBox();
       this.cbStartMinimized = new System.Windows.Forms.CheckBox();
+      this.txtNickStart = new System.Windows.Forms.TextBox();
       this.cbSystemTray = new System.Windows.Forms.CheckBox();
+      this.label1 = new System.Windows.Forms.Label();
       this.panelTop = new System.Windows.Forms.Panel();
       this.cbLog = new System.Windows.Forms.CheckBox();
       this.cbAdvanced = new System.Windows.Forms.CheckBox();
@@ -74,8 +76,8 @@ namespace ExtraQL
       this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.txtLog = new System.Windows.Forms.TextBox();
       this.autoQuitTimer = new System.Windows.Forms.Timer(this.components);
-      this.cbStartServerBrowser = new System.Windows.Forms.CheckBox();
-      this.cbCloseServerBrowser = new System.Windows.Forms.CheckBox();
+      this.miOpenExtraQl = new System.Windows.Forms.ToolStripMenuItem();
+      this.miStartServerBrowser = new System.Windows.Forms.ToolStripMenuItem();
       this.panelAdvanced.SuspendLayout();
       this.grpAdvanced.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -146,6 +148,27 @@ namespace ExtraQL
       this.btnNickEnd.UseVisualStyleBackColor = false;
       this.btnNickEnd.Click += new System.EventHandler(this.btnNickEnd_Click);
       // 
+      // cbCloseServerBrowser
+      // 
+      this.cbCloseServerBrowser.AutoSize = true;
+      this.cbCloseServerBrowser.Location = new System.Drawing.Point(209, 176);
+      this.cbCloseServerBrowser.Name = "cbCloseServerBrowser";
+      this.cbCloseServerBrowser.Size = new System.Drawing.Size(175, 17);
+      this.cbCloseServerBrowser.TabIndex = 13;
+      this.cbCloseServerBrowser.Text = "Auto-quit SteamServerBrowser";
+      this.cbCloseServerBrowser.UseVisualStyleBackColor = true;
+      // 
+      // cbStartServerBrowser
+      // 
+      this.cbStartServerBrowser.AutoSize = true;
+      this.cbStartServerBrowser.Location = new System.Drawing.Point(10, 176);
+      this.cbStartServerBrowser.Name = "cbStartServerBrowser";
+      this.cbStartServerBrowser.Size = new System.Drawing.Size(176, 17);
+      this.cbStartServerBrowser.TabIndex = 12;
+      this.cbStartServerBrowser.Text = "Autostart SteamServerBrowser";
+      this.cbStartServerBrowser.UseVisualStyleBackColor = true;
+      this.cbStartServerBrowser.CheckedChanged += new System.EventHandler(this.cbStartServerBrowser_CheckedChanged);
+      // 
       // btnNickStart
       // 
       this.btnNickStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -159,44 +182,6 @@ namespace ExtraQL
       this.btnNickStart.Text = "√";
       this.btnNickStart.UseVisualStyleBackColor = false;
       this.btnNickStart.Click += new System.EventHandler(this.btnNickStart_Click);
-      // 
-      // txtNickEnd
-      // 
-      this.txtNickEnd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtNickEnd.ForeColor = System.Drawing.Color.Black;
-      this.txtNickEnd.Location = new System.Drawing.Point(209, 90);
-      this.txtNickEnd.Name = "txtNickEnd";
-      this.txtNickEnd.Size = new System.Drawing.Size(163, 21);
-      this.txtNickEnd.TabIndex = 6;
-      // 
-      // label2
-      // 
-      this.label2.AutoSize = true;
-      this.label2.Location = new System.Drawing.Point(206, 74);
-      this.label2.Name = "label2";
-      this.label2.Size = new System.Drawing.Size(181, 13);
-      this.label2.TabIndex = 5;
-      this.label2.Text = "Change Steam name when QL quits:";
-      // 
-      // txtNickStart
-      // 
-      this.txtNickStart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtNickStart.ForeColor = System.Drawing.Color.Black;
-      this.txtNickStart.Location = new System.Drawing.Point(10, 90);
-      this.txtNickStart.Name = "txtNickStart";
-      this.txtNickStart.Size = new System.Drawing.Size(163, 21);
-      this.txtNickStart.TabIndex = 3;
-      // 
-      // label1
-      // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(7, 74);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(186, 13);
-      this.label1.TabIndex = 2;
-      this.label1.Text = "Change Steam name when QL starts:";
       // 
       // txtSteamExe
       // 
@@ -216,6 +201,16 @@ namespace ExtraQL
       this.lblSteamExe.Size = new System.Drawing.Size(317, 13);
       this.lblSteamExe.TabIndex = 0;
       this.lblSteamExe.Text = "File Path to quakelive_steam.exe (leave empty for auto-detect):";
+      // 
+      // txtNickEnd
+      // 
+      this.txtNickEnd.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.txtNickEnd.ForeColor = System.Drawing.Color.Black;
+      this.txtNickEnd.Location = new System.Drawing.Point(209, 90);
+      this.txtNickEnd.Name = "txtNickEnd";
+      this.txtNickEnd.Size = new System.Drawing.Size(163, 21);
+      this.txtNickEnd.TabIndex = 6;
       // 
       // btnSteamExe
       // 
@@ -241,6 +236,15 @@ namespace ExtraQL
       this.cbAutoQuit.Text = "Quit extraQL when QL quits";
       this.cbAutoQuit.UseVisualStyleBackColor = true;
       // 
+      // label2
+      // 
+      this.label2.AutoSize = true;
+      this.label2.Location = new System.Drawing.Point(206, 74);
+      this.label2.Name = "label2";
+      this.label2.Size = new System.Drawing.Size(181, 13);
+      this.label2.TabIndex = 5;
+      this.label2.Text = "Change Steam name when QL quits:";
+      // 
       // cbAutostart
       // 
       this.cbAutostart.AutoSize = true;
@@ -261,6 +265,16 @@ namespace ExtraQL
       this.cbStartMinimized.Text = "Start Minimized";
       this.cbStartMinimized.UseVisualStyleBackColor = true;
       // 
+      // txtNickStart
+      // 
+      this.txtNickStart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.txtNickStart.ForeColor = System.Drawing.Color.Black;
+      this.txtNickStart.Location = new System.Drawing.Point(10, 90);
+      this.txtNickStart.Name = "txtNickStart";
+      this.txtNickStart.Size = new System.Drawing.Size(163, 21);
+      this.txtNickStart.TabIndex = 3;
+      // 
       // cbSystemTray
       // 
       this.cbSystemTray.AutoSize = true;
@@ -271,6 +285,15 @@ namespace ExtraQL
       this.cbSystemTray.Text = "Show in System Tray";
       this.cbSystemTray.UseVisualStyleBackColor = true;
       this.cbSystemTray.CheckedChanged += new System.EventHandler(this.cbSystemTray_CheckedChanged);
+      // 
+      // label1
+      // 
+      this.label1.AutoSize = true;
+      this.label1.Location = new System.Drawing.Point(7, 74);
+      this.label1.Name = "label1";
+      this.label1.Size = new System.Drawing.Size(186, 13);
+      this.label1.TabIndex = 2;
+      this.label1.Text = "Change Steam name when QL starts:";
       // 
       // panelTop
       // 
@@ -432,29 +455,31 @@ namespace ExtraQL
       // mnuTrayIcon
       // 
       this.mnuTrayIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miOpenExtraQl,
             this.miStartQL,
+            this.miStartServerBrowser,
             this.quitToolStripMenuItem,
             this.miQuit});
       this.mnuTrayIcon.Name = "contextMenuStrip1";
       this.mnuTrayIcon.ShowImageMargin = false;
-      this.mnuTrayIcon.Size = new System.Drawing.Size(135, 54);
+      this.mnuTrayIcon.Size = new System.Drawing.Size(154, 98);
       // 
       // miStartQL
       // 
       this.miStartQL.Name = "miStartQL";
-      this.miStartQL.Size = new System.Drawing.Size(134, 22);
+      this.miStartQL.Size = new System.Drawing.Size(153, 22);
       this.miStartQL.Text = "Start Quake Live";
       this.miStartQL.Click += new System.EventHandler(this.miStartQL_Click);
       // 
       // quitToolStripMenuItem
       // 
       this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-      this.quitToolStripMenuItem.Size = new System.Drawing.Size(131, 6);
+      this.quitToolStripMenuItem.Size = new System.Drawing.Size(150, 6);
       // 
       // miQuit
       // 
       this.miQuit.Name = "miQuit";
-      this.miQuit.Size = new System.Drawing.Size(134, 22);
+      this.miQuit.Size = new System.Drawing.Size(153, 22);
       this.miQuit.Text = "Quit extraQL";
       this.miQuit.Click += new System.EventHandler(this.miQuit_Click);
       // 
@@ -538,26 +563,19 @@ namespace ExtraQL
       this.autoQuitTimer.Interval = 2000;
       this.autoQuitTimer.Tick += new System.EventHandler(this.autoQuitTimer_Tick);
       // 
-      // cbStartServerBrowser
+      // miOpenExtraQl
       // 
-      this.cbStartServerBrowser.AutoSize = true;
-      this.cbStartServerBrowser.Location = new System.Drawing.Point(10, 176);
-      this.cbStartServerBrowser.Name = "cbStartServerBrowser";
-      this.cbStartServerBrowser.Size = new System.Drawing.Size(176, 17);
-      this.cbStartServerBrowser.TabIndex = 12;
-      this.cbStartServerBrowser.Text = "Autostart SteamServerBrowser";
-      this.cbStartServerBrowser.UseVisualStyleBackColor = true;
-      this.cbStartServerBrowser.CheckedChanged += new System.EventHandler(this.cbStartServerBrowser_CheckedChanged);
+      this.miOpenExtraQl.Name = "miOpenExtraQl";
+      this.miOpenExtraQl.Size = new System.Drawing.Size(153, 22);
+      this.miOpenExtraQl.Text = "Open extraQL";
+      this.miOpenExtraQl.Click += new System.EventHandler(this.miOpenExtraQl_Click);
       // 
-      // cbCloseServerBrowser
+      // miStartServerBrowser
       // 
-      this.cbCloseServerBrowser.AutoSize = true;
-      this.cbCloseServerBrowser.Location = new System.Drawing.Point(209, 176);
-      this.cbCloseServerBrowser.Name = "cbCloseServerBrowser";
-      this.cbCloseServerBrowser.Size = new System.Drawing.Size(148, 17);
-      this.cbCloseServerBrowser.TabIndex = 13;
-      this.cbCloseServerBrowser.Text = "Auto-quit Server Browser";
-      this.cbCloseServerBrowser.UseVisualStyleBackColor = true;
+      this.miStartServerBrowser.Name = "miStartServerBrowser";
+      this.miStartServerBrowser.Size = new System.Drawing.Size(153, 22);
+      this.miStartServerBrowser.Text = "Start Server Browser";
+      this.miStartServerBrowser.Click += new System.EventHandler(this.miStartServerBrowser_Click);
       // 
       // MainForm
       // 
@@ -637,6 +655,8 @@ namespace ExtraQL
     private Button btnNickStart;
     private CheckBox cbCloseServerBrowser;
     private CheckBox cbStartServerBrowser;
+    private ToolStripMenuItem miOpenExtraQl;
+    private ToolStripMenuItem miStartServerBrowser;
   }
 }
 

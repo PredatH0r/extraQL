@@ -14,6 +14,11 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.7.1
+---
+- fixed restoring extraQL window after it was minimized to system tray (e.g. when starting a 2nd extraQL instance)
+- added tray menu items for "Open extraQL" and "Start Server Browser" (if present)
+
 Version 2.7
 ---
 - added command line parameter /background to start extraQL minimized (used by SteamServerBrowser when auto-starting extraQL)

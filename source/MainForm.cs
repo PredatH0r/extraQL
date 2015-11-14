@@ -11,7 +11,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.7";
+    public const string Version = "2.7.1";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -47,6 +47,8 @@ namespace ExtraQL
 
       this.servlets = new Servlets(this.server, this.scriptRepository, this.Log, this, config.AppBaseDir);
       this.UpdateServletSettings();
+
+      this.miStartServerBrowser.Visible = this.GetServerBrowserExe() != null;
 
       this.ActiveControl = this.btnStartQL;
     }
@@ -277,10 +279,24 @@ namespace ExtraQL
     }
     #endregion
 
+    #region miOpenExtraQl_Click
+    private void miOpenExtraQl_Click(object sender, EventArgs e)
+    {
+      this.SetFormVisibility(true);
+    }
+    #endregion
+
     #region miStartQL_Click
     private void miStartQL_Click(object sender, EventArgs e)
     {
       this.Launch();
+    }
+    #endregion
+
+    #region miStartServerBrowser_Click()
+    private void miStartServerBrowser_Click(object sender, EventArgs e)
+    {
+      this.StartServerBrowser();
     }
     #endregion
 
@@ -644,10 +660,20 @@ namespace ExtraQL
       }
       else
       {
-        this.WindowState = FormWindowState.Minimized;
         if (this.cbSystemTray.Checked)
           this.Hide();
+        else
+          this.WindowState = FormWindowState.Minimized;
       }
+    }
+    #endregion
+
+    #region GetServerBrowserExe()
+    private string GetServerBrowserExe()
+    {
+      var wsPath = this.GetSteamWorkshopPath();
+      wsPath = Path.Combine(Path.GetDirectoryName(wsPath) ?? ".", @"543312745\ServerBrowser.exe");
+      return File.Exists(wsPath) ? wsPath : null;
     }
     #endregion
 
@@ -657,12 +683,11 @@ namespace ExtraQL
       var proc = Process.GetProcessesByName("ServerBrowser");
       if (proc.Length == 0)
       {
-        var wsPath = this.GetSteamWorkshopPath();
-        wsPath = Path.Combine(Path.GetDirectoryName(wsPath) ?? ".", @"543312745\ServerBrowser.exe");
-        if (File.Exists(wsPath))
-          Process.Start(wsPath);
+        var exe = this.GetServerBrowserExe();
+        if (exe != null)
+          Process.Start(exe);
         else
-          Log("Could not find " + wsPath + ".\nMake sure you have steam workshop item 543312745 installed.");
+          Log("Could not find ServerBrowser.exe.\nMake sure you have steam workshop item 543312745 installed.");
       }
       else
         Win32.ShowWindow(proc[0].MainWindowHandle, 1);
@@ -677,6 +702,5 @@ namespace ExtraQL
         Win32.SendMessage(p.MainWindowHandle, Win32.WM_CLOSE, 0, 0);
     }
     #endregion
-
   }
 }

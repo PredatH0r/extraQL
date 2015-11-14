@@ -440,6 +440,7 @@ namespace ExtraQL
 
       form.BeginInvoke((ThreadStart)(() =>
       {
+        this.form.Visible = true;
         this.form.WindowState = FormWindowState.Normal;
         this.form.BringToFront();
         this.form.Activate();
