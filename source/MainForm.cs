@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.8";
+    public const string Version = "2.8.1";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -56,6 +56,9 @@ namespace ExtraQL
       this.FillAlternativeUis();
 
       this.ActiveControl = this.btnStartQL;
+
+      // set current dir to .exe directory. Maybe that helps that steam_api.dll finds the steam_appid.txt file
+      Environment.CurrentDirectory = Path.GetDirectoryName(this.GetType().Assembly.Location) ?? "";
     }
     #endregion
 

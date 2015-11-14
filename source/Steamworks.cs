@@ -14,6 +14,9 @@ namespace ExtraQL
     private extern static bool SteamAPI_Init();
 
     [DllImport("steam_api.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    private extern static bool SteamAPI_IsSteamRunning();
+
+    [DllImport("steam_api.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     private extern static IntPtr SteamFriends();
 
     [DllImport("steam_api.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
@@ -51,6 +54,11 @@ namespace ExtraQL
       }
     }
     #endregion
+
+    public bool IsSteamRunning()
+    {
+      return SteamAPI_IsSteamRunning();
+    }
 
     private bool EnsureInit()
     {

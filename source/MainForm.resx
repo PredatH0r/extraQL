@@ -123,180 +123,6 @@
   <data name="openFileDialog1.Filter" xml:space="preserve">
     <value>EXE Files|*.exe</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="lblSteamNameStart.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="lblSteamNameStart.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="lblSteamNameStart.Location" type="System.Drawing.Point, System.Drawing">
-    <value>7, 27</value>
-  </data>
-  <data name="lblSteamNameStart.Size" type="System.Drawing.Size, System.Drawing">
-    <value>55, 13</value>
-  </data>
-  <data name="lblSteamNameStart.TabIndex" type="System.Int32, mscorlib">
-    <value>14</value>
-  </data>
-  <data name="lblSteamNameStart.Text" xml:space="preserve">
-    <value>QL starts:</value>
-  </data>
-  <data name="&gt;&gt;lblSteamNameStart.Name" xml:space="preserve">
-    <value>lblSteamNameStart</value>
-  </data>
-  <data name="&gt;&gt;lblSteamNameStart.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lblSteamNameStart.Parent" xml:space="preserve">
-    <value>groupBox1</value>
-  </data>
-  <data name="&gt;&gt;lblSteamNameStart.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="btnNickEnd.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
-  </data>
-  <data name="btnNickEnd.Location" type="System.Drawing.Point, System.Drawing">
-    <value>367, 55</value>
-  </data>
-  <data name="btnNickEnd.Size" type="System.Drawing.Size, System.Drawing">
-    <value>23, 21</value>
-  </data>
-  <data name="btnNickEnd.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
-  </data>
-  <data name="btnNickEnd.Text" xml:space="preserve">
-    <value>√</value>
-  </data>
-  <data name="&gt;&gt;btnNickEnd.Name" xml:space="preserve">
-    <value>btnNickEnd</value>
-  </data>
-  <data name="&gt;&gt;btnNickEnd.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnNickEnd.Parent" xml:space="preserve">
-    <value>groupBox1</value>
-  </data>
-  <data name="&gt;&gt;btnNickEnd.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="txtNickStart.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Left, Right</value>
-  </data>
-  <data name="txtNickStart.Location" type="System.Drawing.Point, System.Drawing">
-    <value>142, 24</value>
-  </data>
-  <data name="txtNickStart.Size" type="System.Drawing.Size, System.Drawing">
-    <value>226, 21</value>
-  </data>
-  <data name="txtNickStart.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;txtNickStart.Name" xml:space="preserve">
-    <value>txtNickStart</value>
-  </data>
-  <data name="&gt;&gt;txtNickStart.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;txtNickStart.Parent" xml:space="preserve">
-    <value>groupBox1</value>
-  </data>
-  <data name="&gt;&gt;txtNickStart.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="lblSteamNameEnd.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="lblSteamNameEnd.Location" type="System.Drawing.Point, System.Drawing">
-    <value>7, 59</value>
-  </data>
-  <data name="lblSteamNameEnd.Size" type="System.Drawing.Size, System.Drawing">
-    <value>50, 13</value>
-  </data>
-  <data name="lblSteamNameEnd.TabIndex" type="System.Int32, mscorlib">
-    <value>5</value>
-  </data>
-  <data name="lblSteamNameEnd.Text" xml:space="preserve">
-    <value>QL exits:</value>
-  </data>
-  <data name="&gt;&gt;lblSteamNameEnd.Name" xml:space="preserve">
-    <value>lblSteamNameEnd</value>
-  </data>
-  <data name="&gt;&gt;lblSteamNameEnd.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;lblSteamNameEnd.Parent" xml:space="preserve">
-    <value>groupBox1</value>
-  </data>
-  <data name="&gt;&gt;lblSteamNameEnd.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="txtNickEnd.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Left, Right</value>
-  </data>
-  <data name="txtNickEnd.Location" type="System.Drawing.Point, System.Drawing">
-    <value>142, 56</value>
-  </data>
-  <data name="txtNickEnd.Size" type="System.Drawing.Size, System.Drawing">
-    <value>226, 21</value>
-  </data>
-  <data name="txtNickEnd.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="&gt;&gt;txtNickEnd.Name" xml:space="preserve">
-    <value>txtNickEnd</value>
-  </data>
-  <data name="&gt;&gt;txtNickEnd.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;txtNickEnd.Parent" xml:space="preserve">
-    <value>groupBox1</value>
-  </data>
-  <data name="&gt;&gt;txtNickEnd.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="btnNickStart.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
-  </data>
-  <data name="btnNickStart.Location" type="System.Drawing.Point, System.Drawing">
-    <value>367, 24</value>
-  </data>
-  <data name="btnNickStart.Size" type="System.Drawing.Size, System.Drawing">
-    <value>23, 21</value>
-  </data>
-  <data name="btnNickStart.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
-  </data>
-  <data name="btnNickStart.Text" xml:space="preserve">
-    <value>√</value>
-  </data>
-  <data name="&gt;&gt;btnNickStart.Name" xml:space="preserve">
-    <value>btnNickStart</value>
-  </data>
-  <data name="&gt;&gt;btnNickStart.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnNickStart.Parent" xml:space="preserve">
-    <value>groupBox1</value>
-  </data>
-  <data name="&gt;&gt;btnNickStart.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="groupBox1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 16</value>
-  </data>
-  <data name="groupBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>401, 89</value>
-  </data>
-  <data name="groupBox1.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="groupBox1.Text" xml:space="preserve">
-    <value>Change Steam Nickname when ...</value>
-  </data>
   <data name="&gt;&gt;groupBox1.Name" xml:space="preserve">
     <value>groupBox1</value>
   </data>
@@ -309,8 +135,155 @@
   <data name="&gt;&gt;groupBox1.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="&gt;&gt;grpWebPak.Name" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.Parent" xml:space="preserve">
+    <value>panelOptions</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;grpOptions.Name" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;grpOptions.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grpOptions.Parent" xml:space="preserve">
+    <value>panelOptions</value>
+  </data>
+  <data name="&gt;&gt;grpOptions.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="panelOptions.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="panelOptions.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 162</value>
+  </data>
+  <data name="panelOptions.Size" type="System.Drawing.Size, System.Drawing">
+    <value>429, 531</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="panelOptions.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;panelOptions.Name" xml:space="preserve">
+    <value>panelOptions</value>
+  </data>
+  <data name="&gt;&gt;panelOptions.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;panelOptions.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;panelOptions.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
   <data name="grpWebPak.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Left, Right</value>
+  </data>
+  <data name="&gt;&gt;comboWebPak.Name" xml:space="preserve">
+    <value>comboWebPak</value>
+  </data>
+  <data name="&gt;&gt;comboWebPak.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;comboWebPak.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;comboWebPak.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;lblTranslations.Name" xml:space="preserve">
+    <value>lblTranslations</value>
+  </data>
+  <data name="&gt;&gt;lblTranslations.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblTranslations.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;lblTranslations.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;linkCroatian.Name" xml:space="preserve">
+    <value>linkCroatian</value>
+  </data>
+  <data name="&gt;&gt;linkCroatian.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;linkCroatian.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;linkCroatian.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;linkRussian.Name" xml:space="preserve">
+    <value>linkRussian</value>
+  </data>
+  <data name="&gt;&gt;linkRussian.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;linkRussian.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;linkRussian.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;lblWebPak.Name" xml:space="preserve">
+    <value>lblWebPak</value>
+  </data>
+  <data name="&gt;&gt;lblWebPak.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblWebPak.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;lblWebPak.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;lblCustomizedVersions.Name" xml:space="preserve">
+    <value>lblCustomizedVersions</value>
+  </data>
+  <data name="&gt;&gt;lblCustomizedVersions.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblCustomizedVersions.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;lblCustomizedVersions.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="grpWebPak.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 120</value>
+  </data>
+  <data name="grpWebPak.Size" type="System.Drawing.Size, System.Drawing">
+    <value>401, 157</value>
+  </data>
+  <data name="grpWebPak.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="grpWebPak.Text" xml:space="preserve">
+    <value>Alternative Quake Live UI</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.Name" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.Parent" xml:space="preserve">
+    <value>panelOptions</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <data name="comboWebPak.Location" type="System.Drawing.Point, System.Drawing">
     <value>10, 123</value>
@@ -471,30 +444,6 @@
   <data name="&gt;&gt;lblCustomizedVersions.ZOrder" xml:space="preserve">
     <value>5</value>
   </data>
-  <data name="grpWebPak.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 120</value>
-  </data>
-  <data name="grpWebPak.Size" type="System.Drawing.Size, System.Drawing">
-    <value>401, 157</value>
-  </data>
-  <data name="grpWebPak.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="grpWebPak.Text" xml:space="preserve">
-    <value>Alternative Quake Live UI</value>
-  </data>
-  <data name="&gt;&gt;grpWebPak.Name" xml:space="preserve">
-    <value>grpWebPak</value>
-  </data>
-  <data name="&gt;&gt;grpWebPak.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;grpWebPak.Parent" xml:space="preserve">
-    <value>panelOptions</value>
-  </data>
-  <data name="&gt;&gt;grpWebPak.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
   <data name="grpOptions.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
   </data>
@@ -630,28 +579,31 @@
   <data name="&gt;&gt;grpOptions.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <data name="panelOptions.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
+  <data name="btnNickEnd.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
   </data>
-  <data name="panelOptions.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 162</value>
+  <data name="btnNickEnd.Location" type="System.Drawing.Point, System.Drawing">
+    <value>367, 55</value>
   </data>
-  <data name="panelOptions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>429, 531</value>
+  <data name="btnNickEnd.Size" type="System.Drawing.Size, System.Drawing">
+    <value>23, 21</value>
   </data>
-  <data name="panelOptions.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
+  <data name="btnNickEnd.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
   </data>
-  <data name="&gt;&gt;panelOptions.Name" xml:space="preserve">
-    <value>panelOptions</value>
+  <data name="btnNickEnd.Text" xml:space="preserve">
+    <value>√</value>
   </data>
-  <data name="&gt;&gt;panelOptions.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;btnNickEnd.Name" xml:space="preserve">
+    <value>btnNickEnd</value>
   </data>
-  <data name="&gt;&gt;panelOptions.Parent" xml:space="preserve">
-    <value>$this</value>
+  <data name="&gt;&gt;btnNickEnd.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;panelOptions.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;btnNickEnd.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;btnNickEnd.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
   <data name="cbCloseServerBrowser.AutoSize" type="System.Boolean, mscorlib">
@@ -708,6 +660,33 @@
   <data name="&gt;&gt;cbStartServerBrowser.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="btnNickStart.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="btnNickStart.Location" type="System.Drawing.Point, System.Drawing">
+    <value>367, 24</value>
+  </data>
+  <data name="btnNickStart.Size" type="System.Drawing.Size, System.Drawing">
+    <value>23, 21</value>
+  </data>
+  <data name="btnNickStart.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="btnNickStart.Text" xml:space="preserve">
+    <value>√</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.Name" xml:space="preserve">
+    <value>btnNickStart</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
   <data name="txtSteamExe.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Left, Right</value>
   </data>
@@ -758,6 +737,30 @@
   </data>
   <data name="&gt;&gt;lblSteamExe.ZOrder" xml:space="preserve">
     <value>3</value>
+  </data>
+  <data name="txtNickEnd.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="txtNickEnd.Location" type="System.Drawing.Point, System.Drawing">
+    <value>142, 56</value>
+  </data>
+  <data name="txtNickEnd.Size" type="System.Drawing.Size, System.Drawing">
+    <value>226, 21</value>
+  </data>
+  <data name="txtNickEnd.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.Name" xml:space="preserve">
+    <value>txtNickEnd</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.ZOrder" xml:space="preserve">
+    <value>4</value>
   </data>
   <data name="btnSteamExe.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Right</value>
@@ -813,6 +816,33 @@
   <data name="&gt;&gt;cbAutoQuit.ZOrder" xml:space="preserve">
     <value>5</value>
   </data>
+  <data name="lblSteamNameEnd.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lblSteamNameEnd.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 59</value>
+  </data>
+  <data name="lblSteamNameEnd.Size" type="System.Drawing.Size, System.Drawing">
+    <value>50, 13</value>
+  </data>
+  <data name="lblSteamNameEnd.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="lblSteamNameEnd.Text" xml:space="preserve">
+    <value>QL exits:</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.Name" xml:space="preserve">
+    <value>lblSteamNameEnd</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
   <data name="cbAutostart.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -866,6 +896,30 @@
   </data>
   <data name="&gt;&gt;cbStartMinimized.ZOrder" xml:space="preserve">
     <value>7</value>
+  </data>
+  <data name="txtNickStart.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="txtNickStart.Location" type="System.Drawing.Point, System.Drawing">
+    <value>142, 24</value>
+  </data>
+  <data name="txtNickStart.Size" type="System.Drawing.Size, System.Drawing">
+    <value>226, 21</value>
+  </data>
+  <data name="txtNickStart.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.Name" xml:space="preserve">
+    <value>txtNickStart</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.ZOrder" xml:space="preserve">
+    <value>2</value>
   </data>
   <data name="cbSystemTray.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1944,122 +1998,14 @@
   <data name="miQuit.Text" xml:space="preserve">
     <value>Quit extraQL</value>
   </data>
-  <data name="&gt;&gt;grpLog.Name" xml:space="preserve">
-    <value>grpLog</value>
-  </data>
-  <data name="&gt;&gt;grpLog.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;grpLog.Parent" xml:space="preserve">
-    <value>panelLog</value>
-  </data>
-  <data name="&gt;&gt;grpLog.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="panelLog.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Right</value>
-  </data>
-  <data name="panelLog.Location" type="System.Drawing.Point, System.Drawing">
-    <value>429, 0</value>
-  </data>
-  <data name="panelLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>495, 693</value>
-  </data>
-  <data name="panelLog.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;panelLog.Name" xml:space="preserve">
-    <value>panelLog</value>
-  </data>
-  <data name="&gt;&gt;panelLog.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;panelLog.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;panelLog.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
   <data name="grpLog.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
-  </data>
-  <data name="&gt;&gt;cbLogAllRequests.Name" xml:space="preserve">
-    <value>cbLogAllRequests</value>
-  </data>
-  <data name="&gt;&gt;cbLogAllRequests.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;cbLogAllRequests.Parent" xml:space="preserve">
-    <value>grpLog</value>
-  </data>
-  <data name="&gt;&gt;cbLogAllRequests.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;btnClearLog.Name" xml:space="preserve">
-    <value>btnClearLog</value>
-  </data>
-  <data name="&gt;&gt;btnClearLog.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnClearLog.Parent" xml:space="preserve">
-    <value>grpLog</value>
-  </data>
-  <data name="&gt;&gt;btnClearLog.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;cbFollowLog.Name" xml:space="preserve">
-    <value>cbFollowLog</value>
-  </data>
-  <data name="&gt;&gt;cbFollowLog.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;cbFollowLog.Parent" xml:space="preserve">
-    <value>grpLog</value>
-  </data>
-  <data name="&gt;&gt;cbFollowLog.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;txtLog.Name" xml:space="preserve">
-    <value>txtLog</value>
-  </data>
-  <data name="&gt;&gt;txtLog.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;txtLog.Parent" xml:space="preserve">
-    <value>grpLog</value>
-  </data>
-  <data name="&gt;&gt;txtLog.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="grpLog.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 7</value>
-  </data>
-  <data name="grpLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>471, 674</value>
-  </data>
-  <data name="grpLog.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="grpLog.Text" xml:space="preserve">
-    <value>Log</value>
-  </data>
-  <data name="&gt;&gt;grpLog.Name" xml:space="preserve">
-    <value>grpLog</value>
-  </data>
-  <data name="&gt;&gt;grpLog.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;grpLog.Parent" xml:space="preserve">
-    <value>panelLog</value>
-  </data>
-  <data name="&gt;&gt;grpLog.ZOrder" xml:space="preserve">
-    <value>0</value>
   </data>
   <data name="cbLogAllRequests.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="cbLogAllRequests.Location" type="System.Drawing.Point, System.Drawing">
-    <value>154, 24</value>
+    <value>10, 37</value>
   </data>
   <data name="cbLogAllRequests.Size" type="System.Drawing.Size, System.Drawing">
     <value>104, 17</value>
@@ -2110,7 +2056,7 @@
     <value>True</value>
   </data>
   <data name="cbFollowLog.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 24</value>
+    <value>10, 20</value>
   </data>
   <data name="cbFollowLog.Size" type="System.Drawing.Size, System.Drawing">
     <value>122, 17</value>
@@ -2137,7 +2083,7 @@
     <value>Top, Bottom, Left, Right</value>
   </data>
   <data name="txtLog.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 52</value>
+    <value>10, 60</value>
   </data>
   <data name="txtLog.Multiline" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -2146,7 +2092,7 @@
     <value>Vertical</value>
   </data>
   <data name="txtLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>453, 616</value>
+    <value>453, 608</value>
   </data>
   <data name="txtLog.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -2163,9 +2109,183 @@
   <data name="&gt;&gt;txtLog.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
+  <data name="grpLog.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 7</value>
+  </data>
+  <data name="grpLog.Size" type="System.Drawing.Size, System.Drawing">
+    <value>471, 674</value>
+  </data>
+  <data name="grpLog.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="grpLog.Text" xml:space="preserve">
+    <value>Log</value>
+  </data>
+  <data name="&gt;&gt;grpLog.Name" xml:space="preserve">
+    <value>grpLog</value>
+  </data>
+  <data name="&gt;&gt;grpLog.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grpLog.Parent" xml:space="preserve">
+    <value>panelLog</value>
+  </data>
+  <data name="&gt;&gt;grpLog.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="panelLog.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Right</value>
+  </data>
+  <data name="panelLog.Location" type="System.Drawing.Point, System.Drawing">
+    <value>429, 0</value>
+  </data>
+  <data name="panelLog.Size" type="System.Drawing.Size, System.Drawing">
+    <value>495, 693</value>
+  </data>
+  <data name="panelLog.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;panelLog.Name" xml:space="preserve">
+    <value>panelLog</value>
+  </data>
+  <data name="&gt;&gt;panelLog.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;panelLog.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;panelLog.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
   <metadata name="autoQuitTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>861, 17</value>
   </metadata>
+  <data name="lblSteamNameStart.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lblSteamNameStart.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="lblSteamNameStart.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 27</value>
+  </data>
+  <data name="lblSteamNameStart.Size" type="System.Drawing.Size, System.Drawing">
+    <value>55, 13</value>
+  </data>
+  <data name="lblSteamNameStart.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
+  </data>
+  <data name="lblSteamNameStart.Text" xml:space="preserve">
+    <value>QL starts:</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.Name" xml:space="preserve">
+    <value>lblSteamNameStart</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.Name" xml:space="preserve">
+    <value>lblSteamNameStart</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;btnNickEnd.Name" xml:space="preserve">
+    <value>btnNickEnd</value>
+  </data>
+  <data name="&gt;&gt;btnNickEnd.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnNickEnd.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;btnNickEnd.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.Name" xml:space="preserve">
+    <value>txtNickStart</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.Name" xml:space="preserve">
+    <value>lblSteamNameEnd</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.Name" xml:space="preserve">
+    <value>txtNickEnd</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.Name" xml:space="preserve">
+    <value>btnNickStart</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.Parent" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="groupBox1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 16</value>
+  </data>
+  <data name="groupBox1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>401, 89</value>
+  </data>
+  <data name="groupBox1.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="groupBox1.Text" xml:space="preserve">
+    <value>Change Steam Nickname when ...</value>
+  </data>
+  <data name="&gt;&gt;groupBox1.Name" xml:space="preserve">
+    <value>groupBox1</value>
+  </data>
+  <data name="&gt;&gt;groupBox1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;groupBox1.Parent" xml:space="preserve">
+    <value>panelOptions</value>
+  </data>
+  <data name="&gt;&gt;groupBox1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>

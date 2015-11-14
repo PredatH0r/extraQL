@@ -14,6 +14,11 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.8.1
+---
+- setting current directory to .exe folder (hoping that will resolve some steam_api.dll init failures)
+- logging specific error message if SteamAPI_IsSteamRunning() returns false
+
 Version 2.8
 ---
 - added German translation of extraQL UI
