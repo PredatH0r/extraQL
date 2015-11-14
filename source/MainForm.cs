@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
@@ -11,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.7.1";
+    public const string Version = "2.8";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -21,6 +22,9 @@ namespace ExtraQL
     private bool skipWorkshopNotice;
     private int steamAppId;
     private bool suppressInitialShow;
+
+    private const long WorkshopWebpakRussian = 550194516;
+    private const long WorkshopWebpakCroatian = 553206606;
 
     #region ctor()
     public MainForm(Config config)
@@ -49,6 +53,7 @@ namespace ExtraQL
       this.UpdateServletSettings();
 
       this.miStartServerBrowser.Visible = this.GetServerBrowserExe() != null;
+      this.FillAlternativeUis();
 
       this.ActiveControl = this.btnStartQL;
     }
@@ -163,16 +168,16 @@ namespace ExtraQL
     #region cbAdvanced_CheckedChanged
     private void cbAdvanced_CheckedChanged(object sender, EventArgs e)
     {
-      if (this.cbAdvanced.Checked)
+      if (this.cbOptions.Checked)
       {
-        this.Height += panelAdvanced.Height;
-        this.panelAdvanced.BringToFront();
-        this.panelAdvanced.Visible = true;
+        this.Height += panelOptions.Height;
+        this.panelOptions.BringToFront();
+        this.panelOptions.Visible = true;
       }
       else
       {
-        this.panelAdvanced.Visible = false;
-        this.Height -= panelAdvanced.Height;
+        this.panelOptions.Visible = false;
+        this.Height -= panelOptions.Height;
       }
     }
     #endregion
@@ -196,6 +201,23 @@ namespace ExtraQL
       Process.Start("https://github.com/PredatH0r/extraQL/wiki");
     }
     #endregion
+
+    // controls in the UI selection screen
+
+    #region linkRussian_LinkClicked
+    private void linkRussian_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      Process.Start("steam://url/CommunityFilePage/" + WorkshopWebpakRussian);
+    }
+    #endregion
+
+    #region linkCroatian_LinkClicked
+    private void linkCroatian_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      Process.Start("steam://url/CommunityFilePage/" + WorkshopWebpakCroatian);
+    }
+    #endregion
+
 
     // controls in Options view
 
@@ -338,7 +360,7 @@ namespace ExtraQL
       this.txtSteamExe.Text = config.GetString("quakelive_steam.exe");
       this.txtNickStart.Text = config.GetString("nickQuake");
       this.txtNickEnd.Text = config.GetString("nickSteam");
-      this.cbAdvanced.Checked = config.GetBool("advanced");
+      this.cbOptions.Checked = config.GetBool("advanced");
       this.cbSystemTray.Checked = config.GetBool("systemTray");
       this.cbStartMinimized.Checked = config.GetBool("startMinimized");
       this.cbAutostart.Checked = config.GetString("autostart") != "0";
@@ -362,7 +384,7 @@ namespace ExtraQL
         config.Set("quakelive_steam.exe", this.txtSteamExe.Text);
         config.Set("nickQuake", this.txtNickStart.Text);
         config.Set("nickSteam", this.txtNickEnd.Text);
-        config.Set("advanced", this.cbAdvanced.Checked);
+        config.Set("advanced", this.cbOptions.Checked);
         config.Set("systemTray", this.cbSystemTray.Checked);
         config.Set("startMinimized", this.cbStartMinimized.Checked);
         config.Set("autostart", this.cbAutostart.Checked ? "1" : "0");
@@ -373,6 +395,7 @@ namespace ExtraQL
         config.Set("skipWorkshopNotice", this.skipWorkshopNotice);
         config.Set("startServerBrowser", this.cbStartServerBrowser.Checked ? "1" : "0");
         config.Set("closeServerBrowser", this.cbCloseServerBrowser.Checked ? "1" : "0");
+        config.Set("webpakWorkshopItem", ((QuakeLiveWebPak) this.comboWebPak.SelectedItem)?.WorkshopId.ToString() ?? "0");
         config.SaveSettings();
       }
       catch (Exception ex)
@@ -467,6 +490,48 @@ namespace ExtraQL
       if (dir != null)
         Process.Start("explorer.exe", "/e," + dir);
     }
+    #endregion
+
+    #region FillAlternativeUis()
+
+    private void FillAlternativeUis()
+    {
+      this.comboWebPak.Items.Clear();
+      var ws = this.GetSteamWorkshopPath();
+      if (ws == null) return;
+      ws = Path.GetDirectoryName(ws);
+
+      long curUi;
+      long.TryParse(this.config.GetString("webpakWorkshopItem"), out curUi);
+
+      var options = new List<QuakeLiveWebPak>();
+      foreach (var dir in Directory.GetDirectories(ws))
+      {
+        long workshopId;
+        if (!long.TryParse(Path.GetFileName(dir), out workshopId))
+          continue;
+
+        if (!File.Exists(dir + @"\web\bundle.js"))
+          continue;
+
+        var descr = dir + @"\description.txt";
+        descr = File.Exists(descr) ? File.ReadAllText(descr).Trim() 
+          : workshopId == WorkshopWebpakRussian ? "русский (Russian)" 
+          : workshopId == WorkshopWebpakCroatian ? "Hrvatski (Croation)"
+          : workshopId.ToString();
+        options.Add(new QuakeLiveWebPak(workshopId, descr, dir + @"\web"));
+      }
+      options.Sort();
+      options.Insert(0, new QuakeLiveWebPak(0, "(default)", ""));
+
+      foreach (var option in options)
+      {
+        this.comboWebPak.Items.Add(option);
+        if (option.WorkshopId == curUi)
+          this.comboWebPak.SelectedIndex = this.comboWebPak.Items.Count - 1;
+      }
+    }
+
     #endregion
 
     #region Launch()
@@ -645,9 +710,43 @@ namespace ExtraQL
     private void StartQuakeLive()
     {
       this.Log("Starting Quake Live...");
-      Process.Start("steam://rungameid/282440");
+
+      var args = "";
+      PrepareAlternativeQuakeLiveUI(ref args);
+
+      Process.Start("steam://rungameid/282440" + args);
       this.SetFormVisibility(false);
     }
+    #endregion
+
+    #region PrepareAlternativeQuakeLiveUI()
+    private void PrepareAlternativeQuakeLiveUI(ref string args)
+    {
+      try
+      {
+        var webpak = (QuakeLiveWebPak) this.comboWebPak.SelectedItem;
+        var js = this.GetConfigFolder() + @"\js\fs_webpath.js";
+        File.Delete(js);
+        if (webpak.WorkshopId != 0)
+        {
+          // adding command line args works, but steam shows a popup in that case. So instead we use a JS file to change fs_webpath
+          //args = System.Web.HttpUtility.UrlPathEncode("//+set fs_webpath \"" + webpak.Path + "\"");
+
+          File.WriteAllText(js, @"
+// extraQL script to activate an alternative Quake Live UI (if fs_webpath was not set on the command line)
+if (qz_instance.GetCvar('fs_webpath').indexOf('" + webpak.WorkshopId + @"') < 0) {
+  qz_instance.SetCvar('fs_webpath', '" + webpak.Path.Replace("\\", "\\\\") + @"');
+  qz_instance.SendGameCommand('web_reload');
+}
+");
+        }
+      }
+      catch (Exception ex)
+      {
+        Log("Failed to set alternative Quake Live UI: " + ex.Message);
+      }
+    }
+
     #endregion
 
     #region SetFormVisiblity()
@@ -703,4 +802,32 @@ namespace ExtraQL
     }
     #endregion
   }
+
+  #region class QuakeLiveWebPak
+  class QuakeLiveWebPak : IComparable<QuakeLiveWebPak>
+  {
+    public readonly long WorkshopId;
+    public readonly string Description;
+    public readonly string Path;
+
+    public QuakeLiveWebPak(long workshopId, string description, string path)
+    {
+      this.WorkshopId = workshopId;
+      this.Description = description;
+      this.Path = path;
+    }
+
+    public int CompareTo(QuakeLiveWebPak other)
+    {
+      var c = this.Description.CompareTo(other.Description);
+      if (c != 0) return c;
+      return this.WorkshopId.CompareTo(other.WorkshopId);
+    }
+
+    public override string ToString()
+    {
+      return this.Description;
+    }
+  }
+  #endregion
 }

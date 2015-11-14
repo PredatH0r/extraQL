@@ -40,6 +40,7 @@ namespace ExtraQL
       this.settings["steamAppId"] = "349090";
       this.settings["startServerBrowser"] = "0";
       this.settings["closeServerBrowser"] = "0";
+      this.settings["webpakWorkshopItem"] = "0";
 
 
       var configFile = this.ConfigFile;
