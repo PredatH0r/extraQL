@@ -5049,4 +5049,7 @@
   <data name="lblSteamNameStart.Text" xml:space="preserve">
     <value>QL startet:</value>
   </data>
+  <data name="linkGerman.Text" xml:space="preserve">
+    <value>Deutsch</value>
+  </data>
 </root>

@@ -40,7 +40,14 @@ namespace ExtraQL
     #region ActivateRunningInstance()
     private static bool ActivateRunningInstance()
     {
-      using (var client = new XWebClient(500))
+      // check for processes to avoid unnecessary waiting for a TCP timeout
+      var procList1 = System.Diagnostics.Process.GetProcessesByName("extraQL");
+      var procList2 = System.Diagnostics.Process.GetProcessesByName("extraQL.vshost"); // when started through VisualStudio debugger
+      if (procList1.Length + procList2.Length <= 1)
+        return false;
+
+      // try to connect to a running instance
+      using (var client = new XWebClient(5000))
       {
         try
         {

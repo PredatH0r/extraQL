@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.9";
+    public const string Version = "2.9.1";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -23,9 +23,11 @@ namespace ExtraQL
     private int steamAppId;
     private bool suppressInitialShow;
 
-    private const long WorkshopWebpakRussian = 550194516;
-    private const long WorkshopWebpakCroatian = 553206606;
-    private const long WorkshopWebpakGerman = 555806367;
+    private const int QuakeLiveAppId = 282440;
+    private const int WorkshopExtraQL = 539252269;
+    private const int WorkshopWebpakRussian = 550194516;
+    private const int WorkshopWebpakCroatian = 553206606;
+    private const int WorkshopWebpakGerman = 555806367;
 
     #region ctor()
     public MainForm(Config config)
@@ -124,7 +126,6 @@ namespace ExtraQL
         Point p = this.lblExtra.Location;
         p.Offset(2, 2);
         e.Graphics.DrawString("extraQL", font, shadowBrush, p);
-
         e.Graphics.DrawString("extraQL", font, textBrush, this.lblExtra.Location);
       }
     }
@@ -435,7 +436,7 @@ namespace ExtraQL
           MessageBoxButtons.YesNo, MessageBoxIcon.Question);
         this.skipWorkshopNotice = ModifierKeys == Keys.Control;
         if (answer == DialogResult.Yes)
-          Process.Start("steam://url/CommunityFilePage/539252269");
+          Process.Start("steam://url/CommunityFilePage/" + WorkshopExtraQL);
       }
     }
     #endregion
@@ -511,7 +512,7 @@ namespace ExtraQL
       this.comboWebPak.Items.Clear();
       var ws = this.GetSteamWorkshopPath();
       if (ws == null) return;
-      ws = Path.GetDirectoryName(ws);
+      ws = Path.GetDirectoryName(ws) ?? Environment.CurrentDirectory;
 
       long curUi;
       long.TryParse(this.config.GetString("webpakWorkshopItem"), out curUi);
@@ -559,7 +560,7 @@ namespace ExtraQL
         if (!steam.IsSteamRunning())
         {
           Log("starting Steam Client...");
-          Process.Start("steam://preload/282440");
+          Process.Start("steam://preload/" + QuakeLiveAppId);
         }
       }
     }
@@ -731,7 +732,7 @@ namespace ExtraQL
     #region GetSteamWorkshopPath()
     private string GetSteamWorkshopPath()
     {
-      var path = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(this.GetQuakeLivePath())) ?? "", @"workshop\content\282440\539252269");
+      var path = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(this.GetQuakeLivePath())) ?? "", @"workshop\content\" + QuakeLiveAppId + "\\" + WorkshopExtraQL);
       //Log("Workshop folder: " + path);
       return path;
     }
@@ -745,7 +746,7 @@ namespace ExtraQL
       var args = "";
       PrepareAlternativeQuakeLiveUI(ref args);
 
-      Process.Start("steam://rungameid/282440" + args);
+      Process.Start("steam://rungameid/" + QuakeLiveAppId + args);
       this.SetFormVisibility(false);
     }
     #endregion
