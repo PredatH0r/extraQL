@@ -37,7 +37,15 @@ namespace ExtraQL
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
       this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
       this.panelOptions = new System.Windows.Forms.Panel();
+      this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.lblSteamNameStart = new System.Windows.Forms.Label();
+      this.btnNickEnd = new System.Windows.Forms.Button();
+      this.txtNickStart = new System.Windows.Forms.TextBox();
+      this.lblSteamNameEnd = new System.Windows.Forms.Label();
+      this.txtNickEnd = new System.Windows.Forms.TextBox();
+      this.btnNickStart = new System.Windows.Forms.Button();
       this.grpWebPak = new System.Windows.Forms.GroupBox();
+      this.linkGerman = new System.Windows.Forms.LinkLabel();
       this.comboWebPak = new System.Windows.Forms.ComboBox();
       this.lblTranslations = new System.Windows.Forms.Label();
       this.linkCroatian = new System.Windows.Forms.LinkLabel();
@@ -45,19 +53,14 @@ namespace ExtraQL
       this.lblWebPak = new System.Windows.Forms.Label();
       this.lblCustomizedVersions = new System.Windows.Forms.Label();
       this.grpOptions = new System.Windows.Forms.GroupBox();
-      this.btnNickEnd = new System.Windows.Forms.Button();
       this.cbCloseServerBrowser = new System.Windows.Forms.CheckBox();
       this.cbStartServerBrowser = new System.Windows.Forms.CheckBox();
-      this.btnNickStart = new System.Windows.Forms.Button();
       this.txtSteamExe = new System.Windows.Forms.TextBox();
       this.lblSteamExe = new System.Windows.Forms.Label();
-      this.txtNickEnd = new System.Windows.Forms.TextBox();
       this.btnSteamExe = new System.Windows.Forms.Button();
       this.cbAutoQuit = new System.Windows.Forms.CheckBox();
-      this.lblSteamNameEnd = new System.Windows.Forms.Label();
       this.cbAutostart = new System.Windows.Forms.CheckBox();
       this.cbStartMinimized = new System.Windows.Forms.CheckBox();
-      this.txtNickStart = new System.Windows.Forms.TextBox();
       this.cbSystemTray = new System.Windows.Forms.CheckBox();
       this.panelTop = new System.Windows.Forms.Panel();
       this.cbLog = new System.Windows.Forms.CheckBox();
@@ -84,9 +87,8 @@ namespace ExtraQL
       this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.txtLog = new System.Windows.Forms.TextBox();
       this.autoQuitTimer = new System.Windows.Forms.Timer(this.components);
-      this.lblSteamNameStart = new System.Windows.Forms.Label();
-      this.groupBox1 = new System.Windows.Forms.GroupBox();
       this.panelOptions.SuspendLayout();
+      this.groupBox1.SuspendLayout();
       this.grpWebPak.SuspendLayout();
       this.grpOptions.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -96,7 +98,6 @@ namespace ExtraQL
       this.mnuTrayIcon.SuspendLayout();
       this.panelLog.SuspendLayout();
       this.grpLog.SuspendLayout();
-      this.groupBox1.SuspendLayout();
       this.SuspendLayout();
       // 
       // openFileDialog1
@@ -115,9 +116,65 @@ namespace ExtraQL
       resources.ApplyResources(this.panelOptions, "panelOptions");
       this.panelOptions.Name = "panelOptions";
       // 
+      // groupBox1
+      // 
+      this.groupBox1.Controls.Add(this.lblSteamNameStart);
+      this.groupBox1.Controls.Add(this.btnNickEnd);
+      this.groupBox1.Controls.Add(this.txtNickStart);
+      this.groupBox1.Controls.Add(this.lblSteamNameEnd);
+      this.groupBox1.Controls.Add(this.txtNickEnd);
+      this.groupBox1.Controls.Add(this.btnNickStart);
+      this.groupBox1.ForeColor = System.Drawing.Color.White;
+      resources.ApplyResources(this.groupBox1, "groupBox1");
+      this.groupBox1.Name = "groupBox1";
+      this.groupBox1.TabStop = false;
+      // 
+      // lblSteamNameStart
+      // 
+      resources.ApplyResources(this.lblSteamNameStart, "lblSteamNameStart");
+      this.lblSteamNameStart.Name = "lblSteamNameStart";
+      // 
+      // btnNickEnd
+      // 
+      resources.ApplyResources(this.btnNickEnd, "btnNickEnd");
+      this.btnNickEnd.BackColor = System.Drawing.SystemColors.ButtonFace;
+      this.btnNickEnd.ForeColor = System.Drawing.Color.Black;
+      this.btnNickEnd.Name = "btnNickEnd";
+      this.btnNickEnd.TabStop = false;
+      this.btnNickEnd.UseVisualStyleBackColor = false;
+      this.btnNickEnd.Click += new System.EventHandler(this.btnNickEnd_Click);
+      // 
+      // txtNickStart
+      // 
+      resources.ApplyResources(this.txtNickStart, "txtNickStart");
+      this.txtNickStart.ForeColor = System.Drawing.Color.Black;
+      this.txtNickStart.Name = "txtNickStart";
+      // 
+      // lblSteamNameEnd
+      // 
+      resources.ApplyResources(this.lblSteamNameEnd, "lblSteamNameEnd");
+      this.lblSteamNameEnd.Name = "lblSteamNameEnd";
+      // 
+      // txtNickEnd
+      // 
+      resources.ApplyResources(this.txtNickEnd, "txtNickEnd");
+      this.txtNickEnd.ForeColor = System.Drawing.Color.Black;
+      this.txtNickEnd.Name = "txtNickEnd";
+      // 
+      // btnNickStart
+      // 
+      resources.ApplyResources(this.btnNickStart, "btnNickStart");
+      this.btnNickStart.BackColor = System.Drawing.SystemColors.ButtonFace;
+      this.btnNickStart.ForeColor = System.Drawing.Color.Black;
+      this.btnNickStart.Name = "btnNickStart";
+      this.btnNickStart.TabStop = false;
+      this.btnNickStart.UseVisualStyleBackColor = false;
+      this.btnNickStart.Click += new System.EventHandler(this.btnNickStart_Click);
+      // 
       // grpWebPak
       // 
       resources.ApplyResources(this.grpWebPak, "grpWebPak");
+      this.grpWebPak.Controls.Add(this.linkGerman);
       this.grpWebPak.Controls.Add(this.comboWebPak);
       this.grpWebPak.Controls.Add(this.lblTranslations);
       this.grpWebPak.Controls.Add(this.linkCroatian);
@@ -127,6 +184,15 @@ namespace ExtraQL
       this.grpWebPak.ForeColor = System.Drawing.Color.White;
       this.grpWebPak.Name = "grpWebPak";
       this.grpWebPak.TabStop = false;
+      // 
+      // linkGerman
+      // 
+      resources.ApplyResources(this.linkGerman, "linkGerman");
+      this.linkGerman.LinkColor = System.Drawing.Color.Gold;
+      this.linkGerman.Name = "linkGerman";
+      this.linkGerman.TabStop = true;
+      this.linkGerman.UseCompatibleTextRendering = true;
+      this.linkGerman.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkGerman_LinkClicked);
       // 
       // comboWebPak
       // 
@@ -184,16 +250,6 @@ namespace ExtraQL
       this.grpOptions.Name = "grpOptions";
       this.grpOptions.TabStop = false;
       // 
-      // btnNickEnd
-      // 
-      resources.ApplyResources(this.btnNickEnd, "btnNickEnd");
-      this.btnNickEnd.BackColor = System.Drawing.SystemColors.ButtonFace;
-      this.btnNickEnd.ForeColor = System.Drawing.Color.Black;
-      this.btnNickEnd.Name = "btnNickEnd";
-      this.btnNickEnd.TabStop = false;
-      this.btnNickEnd.UseVisualStyleBackColor = false;
-      this.btnNickEnd.Click += new System.EventHandler(this.btnNickEnd_Click);
-      // 
       // cbCloseServerBrowser
       // 
       resources.ApplyResources(this.cbCloseServerBrowser, "cbCloseServerBrowser");
@@ -207,16 +263,6 @@ namespace ExtraQL
       this.cbStartServerBrowser.UseVisualStyleBackColor = true;
       this.cbStartServerBrowser.CheckedChanged += new System.EventHandler(this.cbStartServerBrowser_CheckedChanged);
       // 
-      // btnNickStart
-      // 
-      resources.ApplyResources(this.btnNickStart, "btnNickStart");
-      this.btnNickStart.BackColor = System.Drawing.SystemColors.ButtonFace;
-      this.btnNickStart.ForeColor = System.Drawing.Color.Black;
-      this.btnNickStart.Name = "btnNickStart";
-      this.btnNickStart.TabStop = false;
-      this.btnNickStart.UseVisualStyleBackColor = false;
-      this.btnNickStart.Click += new System.EventHandler(this.btnNickStart_Click);
-      // 
       // txtSteamExe
       // 
       resources.ApplyResources(this.txtSteamExe, "txtSteamExe");
@@ -227,12 +273,6 @@ namespace ExtraQL
       // 
       resources.ApplyResources(this.lblSteamExe, "lblSteamExe");
       this.lblSteamExe.Name = "lblSteamExe";
-      // 
-      // txtNickEnd
-      // 
-      resources.ApplyResources(this.txtNickEnd, "txtNickEnd");
-      this.txtNickEnd.ForeColor = System.Drawing.Color.Black;
-      this.txtNickEnd.Name = "txtNickEnd";
       // 
       // btnSteamExe
       // 
@@ -250,11 +290,6 @@ namespace ExtraQL
       this.cbAutoQuit.Name = "cbAutoQuit";
       this.cbAutoQuit.UseVisualStyleBackColor = true;
       // 
-      // lblSteamNameEnd
-      // 
-      resources.ApplyResources(this.lblSteamNameEnd, "lblSteamNameEnd");
-      this.lblSteamNameEnd.Name = "lblSteamNameEnd";
-      // 
       // cbAutostart
       // 
       resources.ApplyResources(this.cbAutostart, "cbAutostart");
@@ -266,12 +301,6 @@ namespace ExtraQL
       resources.ApplyResources(this.cbStartMinimized, "cbStartMinimized");
       this.cbStartMinimized.Name = "cbStartMinimized";
       this.cbStartMinimized.UseVisualStyleBackColor = true;
-      // 
-      // txtNickStart
-      // 
-      resources.ApplyResources(this.txtNickStart, "txtNickStart");
-      this.txtNickStart.ForeColor = System.Drawing.Color.Black;
-      this.txtNickStart.Name = "txtNickStart";
       // 
       // cbSystemTray
       // 
@@ -477,24 +506,6 @@ namespace ExtraQL
       this.autoQuitTimer.Interval = 2000;
       this.autoQuitTimer.Tick += new System.EventHandler(this.autoQuitTimer_Tick);
       // 
-      // lblSteamNameStart
-      // 
-      resources.ApplyResources(this.lblSteamNameStart, "lblSteamNameStart");
-      this.lblSteamNameStart.Name = "lblSteamNameStart";
-      // 
-      // groupBox1
-      // 
-      this.groupBox1.Controls.Add(this.lblSteamNameStart);
-      this.groupBox1.Controls.Add(this.btnNickEnd);
-      this.groupBox1.Controls.Add(this.txtNickStart);
-      this.groupBox1.Controls.Add(this.lblSteamNameEnd);
-      this.groupBox1.Controls.Add(this.txtNickEnd);
-      this.groupBox1.Controls.Add(this.btnNickStart);
-      this.groupBox1.ForeColor = System.Drawing.Color.White;
-      resources.ApplyResources(this.groupBox1, "groupBox1");
-      this.groupBox1.Name = "groupBox1";
-      this.groupBox1.TabStop = false;
-      // 
       // MainForm
       // 
       resources.ApplyResources(this, "$this");
@@ -509,6 +520,8 @@ namespace ExtraQL
       this.MaximizeBox = false;
       this.Name = "MainForm";
       this.panelOptions.ResumeLayout(false);
+      this.groupBox1.ResumeLayout(false);
+      this.groupBox1.PerformLayout();
       this.grpWebPak.ResumeLayout(false);
       this.grpWebPak.PerformLayout();
       this.grpOptions.ResumeLayout(false);
@@ -522,8 +535,6 @@ namespace ExtraQL
       this.panelLog.ResumeLayout(false);
       this.grpLog.ResumeLayout(false);
       this.grpLog.PerformLayout();
-      this.groupBox1.ResumeLayout(false);
-      this.groupBox1.PerformLayout();
       this.ResumeLayout(false);
 
     }
@@ -580,6 +591,7 @@ namespace ExtraQL
     private ComboBox comboWebPak;
     private GroupBox groupBox1;
     private Label lblSteamNameStart;
+    private LinkLabel linkGerman;
   }
 }
 

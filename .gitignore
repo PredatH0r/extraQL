@@ -3,3 +3,4 @@ bin/
 extraQL*
 source/.vs/config/applicationhost.config
 source/scripts/_cycle.js
+Thumbs.db

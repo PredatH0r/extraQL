@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.8.1";
+    public const string Version = "2.9";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -25,6 +25,7 @@ namespace ExtraQL
 
     private const long WorkshopWebpakRussian = 550194516;
     private const long WorkshopWebpakCroatian = 553206606;
+    private const long WorkshopWebpakGerman = 555806367;
 
     #region ctor()
     public MainForm(Config config)
@@ -86,6 +87,8 @@ namespace ExtraQL
       this.scriptRepository.RegisterScripts();
       this.RestartHttpServer();
       this.CheckIfStartedFromWorkshopFolder();
+      this.StartSteamClient();
+
       if (this.cbAutostart.Checked)
         this.Launch();
     }
@@ -221,6 +224,12 @@ namespace ExtraQL
     }
     #endregion
 
+    #region linkGerman_LinkClicked
+    private void linkGerman_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      Process.Start("steam://url/CommunityFilePage/" + WorkshopWebpakGerman);
+    }
+    #endregion
 
     // controls in Options view
 
@@ -521,11 +530,16 @@ namespace ExtraQL
         descr = File.Exists(descr) ? File.ReadAllText(descr).Trim() 
           : workshopId == WorkshopWebpakRussian ? "русский (Russian)" 
           : workshopId == WorkshopWebpakCroatian ? "Hrvatski (Croation)"
+          : workshopId == WorkshopWebpakGerman ? "Deutsch (German)"
           : workshopId.ToString();
         options.Add(new QuakeLiveWebPak(workshopId, descr, dir + @"\web"));
       }
       options.Sort();
-      options.Insert(0, new QuakeLiveWebPak(0, "(default)", ""));
+      options.Insert(0, new QuakeLiveWebPak(0, "default web.pak (English)", ""));
+
+      var web = this.GetQuakeLivePath() + @"\web";
+      if (File.Exists(web + "\\bundle.js"))
+        options.Insert(1, new QuakeLiveWebPak(1, "extracted web.pak folder", web));
 
       foreach (var option in options)
       {
@@ -535,6 +549,20 @@ namespace ExtraQL
       }
     }
 
+    #endregion
+
+    #region StartSteamClient()
+    private void StartSteamClient()
+    {
+      using (var steam = new Steamworks())
+      {
+        if (!steam.IsSteamRunning())
+        {
+          Log("starting Steam Client...");
+          Process.Start("steam://preload/282440");
+        }
+      }
+    }
     #endregion
 
     #region Launch()
@@ -737,10 +765,13 @@ namespace ExtraQL
 
           File.WriteAllText(js, @"
 // extraQL script to activate an alternative Quake Live UI (if fs_webpath was not set on the command line)
-if (qz_instance.GetCvar('fs_webpath').indexOf('" + webpak.WorkshopId + @"') < 0) {
-  qz_instance.SetCvar('fs_webpath', '" + webpak.Path.Replace("\\", "\\\\") + @"');
+(function() {
+var path = '" + webpak.Path.Replace("\\", "\\\\") + @"';
+if (qz_instance.GetCvar('fs_webpath') != path) {
+  qz_instance.SetCvar('fs_webpath', path);
   qz_instance.SendGameCommand('web_reload');
 }
+})();
 ");
         }
       }

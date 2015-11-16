@@ -721,7 +721,7 @@ namespace ExtraQL
 
         if (!steamworks.IsSteamRunning())
         {
-          Log("steam_api.dll reports that Steam Client is not running. Make sure the client is running as the same Windows user and with the same permissions (admin or not-admin");
+          Log("steam_api.dll reports that Steam Client is not running. Make sure the client is running as the same Windows user and with the same permissions (admin or not-admin).");
           return false;
         }
 

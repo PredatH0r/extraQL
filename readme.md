@@ -14,6 +14,12 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.9
+---
+- allows to select local expanded web.pak "web" folder as alternative QL UI
+- added link to German translation of QL UI
+- start Steam Client when it is not running
+
 Version 2.8.1
 ---
 - setting current directory to .exe folder (hoping that will resolve some steam_api.dll init failures)
