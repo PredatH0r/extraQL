@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.9.1";
+    public const string Version = "2.10";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -28,6 +28,7 @@ namespace ExtraQL
     private const int WorkshopWebpakRussian = 550194516;
     private const int WorkshopWebpakCroatian = 553206606;
     private const int WorkshopWebpakGerman = 555806367;
+    private const int WorkshopWebpakChinese = 555763644;
 
     #region ctor()
     public MainForm(Config config)
@@ -229,6 +230,13 @@ namespace ExtraQL
     private void linkGerman_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
       Process.Start("steam://url/CommunityFilePage/" + WorkshopWebpakGerman);
+    }
+    #endregion
+
+    #region linkChinese_LinkClicked
+    private void linkChinese_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      Process.Start("steam://url/CommunityFilePage/" + WorkshopWebpakChinese);
     }
     #endregion
 
@@ -518,11 +526,15 @@ namespace ExtraQL
       long.TryParse(this.config.GetString("webpakWorkshopItem"), out curUi);
 
       var options = new List<QuakeLiveWebPak>();
-      foreach (var dir in Directory.GetDirectories(ws))
+      foreach (var wsdir in Directory.GetDirectories(ws))
       {
+        var dir = wsdir;
         long workshopId;
         if (!long.TryParse(Path.GetFileName(dir), out workshopId))
           continue;
+
+        if (File.Exists(dir + @"\baseq3\web\bundle.js"))
+          dir += @"\baseq3";
 
         if (!File.Exists(dir + @"\web\bundle.js"))
           continue;
@@ -532,6 +544,7 @@ namespace ExtraQL
           : workshopId == WorkshopWebpakRussian ? "русский (Russian)" 
           : workshopId == WorkshopWebpakCroatian ? "Hrvatski (Croation)"
           : workshopId == WorkshopWebpakGerman ? "Deutsch (German)"
+          : workshopId == WorkshopWebpakChinese ? "Traditional Chinese"
           : workshopId.ToString();
         options.Add(new QuakeLiveWebPak(workshopId, descr, dir + @"\web"));
       }

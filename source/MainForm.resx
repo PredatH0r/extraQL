@@ -312,6 +312,39 @@
   <data name="grpWebPak.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Left, Right</value>
   </data>
+  <data name="linkChinese.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="linkChinese.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="linkChinese.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
+    <value>0, 99</value>
+  </data>
+  <data name="linkChinese.Location" type="System.Drawing.Point, System.Drawing">
+    <value>123, 82</value>
+  </data>
+  <data name="linkChinese.Size" type="System.Drawing.Size, System.Drawing">
+    <value>43, 18</value>
+  </data>
+  <data name="linkChinese.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="linkChinese.Text" xml:space="preserve">
+    <value>Chinese</value>
+  </data>
+  <data name="&gt;&gt;linkChinese.Name" xml:space="preserve">
+    <value>linkChinese</value>
+  </data>
+  <data name="&gt;&gt;linkChinese.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;linkChinese.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;linkChinese.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="linkGerman.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -322,7 +355,7 @@
     <value>0, 99</value>
   </data>
   <data name="linkGerman.Location" type="System.Drawing.Point, System.Drawing">
-    <value>208, 74</value>
+    <value>208, 64</value>
   </data>
   <data name="linkGerman.Size" type="System.Drawing.Size, System.Drawing">
     <value>44, 18</value>
@@ -343,7 +376,7 @@
     <value>grpWebPak</value>
   </data>
   <data name="&gt;&gt;linkGerman.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="comboWebPak.Location" type="System.Drawing.Point, System.Drawing">
     <value>10, 123</value>
@@ -364,13 +397,13 @@
     <value>grpWebPak</value>
   </data>
   <data name="&gt;&gt;comboWebPak.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="lblTranslations.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="lblTranslations.Location" type="System.Drawing.Point, System.Drawing">
-    <value>7, 74</value>
+    <value>7, 64</value>
   </data>
   <data name="lblTranslations.Size" type="System.Drawing.Size, System.Drawing">
     <value>69, 13</value>
@@ -391,7 +424,7 @@
     <value>grpWebPak</value>
   </data>
   <data name="&gt;&gt;lblTranslations.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="linkCroatian.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -400,7 +433,7 @@
     <value>0, 99</value>
   </data>
   <data name="linkCroatian.Location" type="System.Drawing.Point, System.Drawing">
-    <value>278, 74</value>
+    <value>278, 64</value>
   </data>
   <data name="linkCroatian.Size" type="System.Drawing.Size, System.Drawing">
     <value>46, 18</value>
@@ -421,7 +454,7 @@
     <value>grpWebPak</value>
   </data>
   <data name="&gt;&gt;linkCroatian.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="linkRussian.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -430,7 +463,7 @@
     <value>0, 99</value>
   </data>
   <data name="linkRussian.Location" type="System.Drawing.Point, System.Drawing">
-    <value>123, 74</value>
+    <value>123, 64</value>
   </data>
   <data name="linkRussian.Size" type="System.Drawing.Size, System.Drawing">
     <value>42, 18</value>
@@ -451,7 +484,7 @@
     <value>grpWebPak</value>
   </data>
   <data name="&gt;&gt;linkRussian.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>5</value>
   </data>
   <data name="lblWebPak.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -478,7 +511,7 @@
     <value>grpWebPak</value>
   </data>
   <data name="&gt;&gt;lblWebPak.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>6</value>
   </data>
   <data name="lblCustomizedVersions.Location" type="System.Drawing.Point, System.Drawing">
     <value>7, 27</value>
@@ -502,7 +535,7 @@
     <value>grpWebPak</value>
   </data>
   <data name="&gt;&gt;lblCustomizedVersions.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>7</value>
   </data>
   <data name="grpWebPak.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 120</value>
@@ -1710,18 +1743,6 @@
   <metadata name="mnuTrayIcon.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>434, 17</value>
   </metadata>
-  <data name="mnuTrayIcon.Size" type="System.Drawing.Size, System.Drawing">
-    <value>154, 98</value>
-  </data>
-  <data name="&gt;&gt;mnuTrayIcon.Name" xml:space="preserve">
-    <value>mnuTrayIcon</value>
-  </data>
-  <data name="&gt;&gt;mnuTrayIcon.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="trayIcon.Text" xml:space="preserve">
-    <value>extraQL</value>
-  </data>
   <data name="miOpenExtraQl.Size" type="System.Drawing.Size, System.Drawing">
     <value>153, 22</value>
   </data>
@@ -1748,6 +1769,18 @@
   </data>
   <data name="miQuit.Text" xml:space="preserve">
     <value>Quit extraQL</value>
+  </data>
+  <data name="mnuTrayIcon.Size" type="System.Drawing.Size, System.Drawing">
+    <value>154, 98</value>
+  </data>
+  <data name="&gt;&gt;mnuTrayIcon.Name" xml:space="preserve">
+    <value>mnuTrayIcon</value>
+  </data>
+  <data name="&gt;&gt;mnuTrayIcon.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="trayIcon.Text" xml:space="preserve">
+    <value>extraQL</value>
   </data>
   <data name="grpLog.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>

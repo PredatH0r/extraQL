@@ -87,6 +87,7 @@ namespace ExtraQL
       this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.txtLog = new System.Windows.Forms.TextBox();
       this.autoQuitTimer = new System.Windows.Forms.Timer(this.components);
+      this.linkChinese = new System.Windows.Forms.LinkLabel();
       this.panelOptions.SuspendLayout();
       this.groupBox1.SuspendLayout();
       this.grpWebPak.SuspendLayout();
@@ -174,6 +175,7 @@ namespace ExtraQL
       // grpWebPak
       // 
       resources.ApplyResources(this.grpWebPak, "grpWebPak");
+      this.grpWebPak.Controls.Add(this.linkChinese);
       this.grpWebPak.Controls.Add(this.linkGerman);
       this.grpWebPak.Controls.Add(this.comboWebPak);
       this.grpWebPak.Controls.Add(this.lblTranslations);
@@ -506,6 +508,15 @@ namespace ExtraQL
       this.autoQuitTimer.Interval = 2000;
       this.autoQuitTimer.Tick += new System.EventHandler(this.autoQuitTimer_Tick);
       // 
+      // linkChinese
+      // 
+      resources.ApplyResources(this.linkChinese, "linkChinese");
+      this.linkChinese.LinkColor = System.Drawing.Color.Gold;
+      this.linkChinese.Name = "linkChinese";
+      this.linkChinese.TabStop = true;
+      this.linkChinese.UseCompatibleTextRendering = true;
+      this.linkChinese.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkChinese_LinkClicked);
+      // 
       // MainForm
       // 
       resources.ApplyResources(this, "$this");
@@ -592,6 +603,7 @@ namespace ExtraQL
     private GroupBox groupBox1;
     private Label lblSteamNameStart;
     private LinkLabel linkGerman;
+    private LinkLabel linkChinese;
   }
 }
 

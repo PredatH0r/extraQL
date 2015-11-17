@@ -14,6 +14,10 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.10
+---
+- added Chinese translation of QL UI
+
 Version 2.9
 ---
 - allows to select local expanded web.pak "web" folder as alternative QL UI
