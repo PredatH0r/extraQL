@@ -52,8 +52,10 @@ namespace ExtraQL
         {
           var parts = line.Split(new[] { '=' }, 2);
           if (parts.Length < 2) continue;
+          var key = parts[0].Trim();
           var value = parts[1].Trim();
-          settings[parts[0].Trim()] = value;
+          if (settings.ContainsKey(key)) // ignore unsupported settings
+            settings[key] = value;
         }
       }
     }

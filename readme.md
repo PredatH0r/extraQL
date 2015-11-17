@@ -13,6 +13,8 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 
 Changelog
 =========
+Version 2.10.1
+- fixed Auto-start QL / ServerBrowser when extraQL was started minimized
 
 Version 2.10
 ---

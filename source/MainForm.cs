@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.10";
+    public const string Version = "2.10.1";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -22,6 +22,7 @@ namespace ExtraQL
     private bool skipWorkshopNotice;
     private int steamAppId;
     private bool suppressInitialShow;
+    private bool startupCompleted;
 
     private const int QuakeLiveAppId = 282440;
     private const int WorkshopExtraQL = 539252269;
@@ -42,9 +43,6 @@ namespace ExtraQL
       this.lblExtra.Parent = this.picLogo;
       this.lblVersion.Parent = this.picLogo;
       this.trayIcon.Icon = this.Icon;
-      this.suppressInitialShow = Environment.CommandLine.Contains(Program.BackgroundSwitch) || this.cbStartMinimized.Checked;
-      if (this.suppressInitialShow)
-        this.WindowState = FormWindowState.Minimized;
 
       this.server = new HttpServer(null);
       this.server.BindToAllInterfaces = false;
@@ -63,6 +61,13 @@ namespace ExtraQL
 
       // set current dir to .exe directory. Maybe that helps that steam_api.dll finds the steam_appid.txt file
       Environment.CurrentDirectory = Path.GetDirectoryName(this.GetType().Assembly.Location) ?? "";
+
+      this.suppressInitialShow = Environment.CommandLine.Contains(Program.BackgroundSwitch) || this.cbStartMinimized.Checked;
+      if (this.suppressInitialShow)
+      {
+        this.WindowState = FormWindowState.Minimized;
+        this.Startup(); // OnShown will never be executed when started minimized
+      }
     }
     #endregion
 
@@ -86,14 +91,7 @@ namespace ExtraQL
     protected override void OnShown(EventArgs e)
     {
       base.OnShown(e);
-
-      this.scriptRepository.RegisterScripts();
-      this.RestartHttpServer();
-      this.CheckIfStartedFromWorkshopFolder();
-      this.StartSteamClient();
-
-      if (this.cbAutostart.Checked)
-        this.Launch();
+      this.Startup();
     }
     #endregion
 
@@ -423,6 +421,23 @@ namespace ExtraQL
       {
         MessageBox.Show(this, "An error occured while saving your settings:\n" + ex, "Saving settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
+    }
+    #endregion
+
+    #region Startup()
+    private void Startup()
+    {
+      if (this.startupCompleted)
+        return;
+
+      this.scriptRepository.RegisterScripts();
+      this.RestartHttpServer();
+      this.CheckIfStartedFromWorkshopFolder();
+      this.StartSteamClient();
+
+      if (this.cbAutostart.Checked)
+        this.Launch();
+      this.startupCompleted = true;
     }
     #endregion
 
