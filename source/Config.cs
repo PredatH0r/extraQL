@@ -41,6 +41,7 @@ namespace ExtraQL
       this.settings["startServerBrowser"] = "0";
       this.settings["closeServerBrowser"] = "0";
       this.settings["webpakWorkshopItem"] = "0";
+      this.settings["locale"] = "";
 
 
       var configFile = this.ConfigFile;

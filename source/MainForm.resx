@@ -286,7 +286,7 @@
     <value>5</value>
   </data>
   <data name="groupBox1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 16</value>
+    <value>12, 6</value>
   </data>
   <data name="groupBox1.Size" type="System.Drawing.Size, System.Drawing">
     <value>401, 89</value>
@@ -538,7 +538,7 @@
     <value>7</value>
   </data>
   <data name="grpWebPak.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 120</value>
+    <value>12, 110</value>
   </data>
   <data name="grpWebPak.Size" type="System.Drawing.Size, System.Drawing">
     <value>401, 157</value>
@@ -805,10 +805,10 @@
     <value>8</value>
   </data>
   <data name="grpOptions.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 292</value>
+    <value>12, 282</value>
   </data>
   <data name="grpOptions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>401, 227</value>
+    <value>401, 219</value>
   </data>
   <data name="grpOptions.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -832,10 +832,10 @@
     <value>Fill</value>
   </data>
   <data name="panelOptions.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 162</value>
+    <value>0, 180</value>
   </data>
   <data name="panelOptions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>429, 531</value>
+    <value>429, 513</value>
   </data>
   <data name="panelOptions.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -909,9 +909,6 @@
   <data name="linkOpenExtraQLWebsite.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Right</value>
   </data>
-  <data name="linkOpenExtraQLWebsite.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
   <data name="linkOpenExtraQLWebsite.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
     <value>0, 99</value>
   </data>
@@ -919,7 +916,7 @@
     <value>221, 139</value>
   </data>
   <data name="linkOpenExtraQLWebsite.Size" type="System.Drawing.Size, System.Drawing">
-    <value>115, 18</value>
+    <value>181, 38</value>
   </data>
   <data name="linkOpenExtraQLWebsite.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -952,7 +949,7 @@
     <value>22, 89</value>
   </data>
   <data name="btnStartQL.Size" type="System.Drawing.Size, System.Drawing">
-    <value>131, 37</value>
+    <value>175, 37</value>
   </data>
   <data name="btnStartQL.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -1078,7 +1075,7 @@
     <value>22, 139</value>
   </data>
   <data name="linkOpenConfigFolder.Size" type="System.Drawing.Size, System.Drawing">
-    <value>136, 20</value>
+    <value>193, 38</value>
   </data>
   <data name="linkOpenConfigFolder.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -1714,7 +1711,7 @@
     <value>0, 0</value>
   </data>
   <data name="panelTop.Size" type="System.Drawing.Size, System.Drawing">
-    <value>429, 162</value>
+    <value>429, 180</value>
   </data>
   <data name="panelTop.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>

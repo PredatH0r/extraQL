@@ -16,7 +16,9 @@ Changelog
 
 Version 2.10
 ---
-- added Chinese translation of QL UI
+- added Russian translation of extraQL UI (thanks to lmiol for the translation!)
+- added link to workshop item for Chinese translation of QL UI
+- added extraQL.ini setting "locale", which can be used to override the default extraQL UI language (en, de, ru)
 
 Version 2.9
 ---

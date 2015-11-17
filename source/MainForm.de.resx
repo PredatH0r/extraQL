@@ -4992,9 +4992,6 @@
   <data name="grpWebPak.Text" xml:space="preserve">
     <value>Alternative Quake Live Oberfläche</value>
   </data>
-  <data name="linkCroatian.Text" xml:space="preserve">
-    <value>Kroatisch</value>
-  </data>
   <data name="cbLog.Text" xml:space="preserve">
     <value>Protokoll</value>
   </data>
@@ -5040,9 +5037,6 @@
   <data name="cbOptions.Text" xml:space="preserve">
     <value>Einstellungen</value>
   </data>
-  <data name="linkRussian.Text" xml:space="preserve">
-    <value>Russisch</value>
-  </data>
   <data name="groupBox1.Text" xml:space="preserve">
     <value>Steam Nickname ändern wenn ...</value>
   </data>
@@ -5051,5 +5045,14 @@
   </data>
   <data name="linkGerman.Text" xml:space="preserve">
     <value>Deutsch</value>
+  </data>
+  <data name="linkCroatian.Text" xml:space="preserve">
+    <value>Kroatisch</value>
+  </data>
+  <data name="linkRussian.Text" xml:space="preserve">
+    <value>Russisch</value>
+  </data>
+  <data name="linkChinese.Text" xml:space="preserve">
+    <value>Chinesisch</value>
   </data>
 </root>

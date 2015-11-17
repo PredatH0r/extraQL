@@ -24,6 +24,10 @@ namespace ExtraQL
 
         Application.EnableVisualStyles();
 
+        var locale = config.GetString("locale");
+        if (!string.IsNullOrEmpty(locale))
+          System.Threading.Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo(locale);
+
         var mainForm = new MainForm(config);
         if (Environment.CommandLine.Contains(WinServiceSwitch))
           WinService.Start(mainForm);

@@ -45,6 +45,7 @@ namespace ExtraQL
       this.txtNickEnd = new System.Windows.Forms.TextBox();
       this.btnNickStart = new System.Windows.Forms.Button();
       this.grpWebPak = new System.Windows.Forms.GroupBox();
+      this.linkChinese = new System.Windows.Forms.LinkLabel();
       this.linkGerman = new System.Windows.Forms.LinkLabel();
       this.comboWebPak = new System.Windows.Forms.ComboBox();
       this.lblTranslations = new System.Windows.Forms.Label();
@@ -87,7 +88,6 @@ namespace ExtraQL
       this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.txtLog = new System.Windows.Forms.TextBox();
       this.autoQuitTimer = new System.Windows.Forms.Timer(this.components);
-      this.linkChinese = new System.Windows.Forms.LinkLabel();
       this.panelOptions.SuspendLayout();
       this.groupBox1.SuspendLayout();
       this.grpWebPak.SuspendLayout();
@@ -186,6 +186,15 @@ namespace ExtraQL
       this.grpWebPak.ForeColor = System.Drawing.Color.White;
       this.grpWebPak.Name = "grpWebPak";
       this.grpWebPak.TabStop = false;
+      // 
+      // linkChinese
+      // 
+      resources.ApplyResources(this.linkChinese, "linkChinese");
+      this.linkChinese.LinkColor = System.Drawing.Color.Gold;
+      this.linkChinese.Name = "linkChinese";
+      this.linkChinese.TabStop = true;
+      this.linkChinese.UseCompatibleTextRendering = true;
+      this.linkChinese.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkChinese_LinkClicked);
       // 
       // linkGerman
       // 
@@ -507,15 +516,6 @@ namespace ExtraQL
       this.autoQuitTimer.Enabled = true;
       this.autoQuitTimer.Interval = 2000;
       this.autoQuitTimer.Tick += new System.EventHandler(this.autoQuitTimer_Tick);
-      // 
-      // linkChinese
-      // 
-      resources.ApplyResources(this.linkChinese, "linkChinese");
-      this.linkChinese.LinkColor = System.Drawing.Color.Gold;
-      this.linkChinese.Name = "linkChinese";
-      this.linkChinese.TabStop = true;
-      this.linkChinese.UseCompatibleTextRendering = true;
-      this.linkChinese.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkChinese_LinkClicked);
       // 
       // MainForm
       // 
