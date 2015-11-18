@@ -25,21 +25,16 @@ Version 1.0
   var CVAR_DisableMsg = "cg_disableInstaBounceBindMsg";
 
   // internal variables
-  var checkFactory = false;
   var ignoreEvents = false;
+  var mainMenuTimer;
 
 
   function init() {
     restoreNormalConfig(); // in case someone used /quit and the normal config wasn't restored
-
     var postal = window.req("postal");
     var channel = postal.channel();
-    channel.subscribe("game.start", onGameStart);
-    channel.subscribe("cvar.cg_spectating", onSpectating); // fires after connecting and loading the map
-
-    // various ways trying to detect when a game has ended and settings need to be restored
-    channel.subscribe("game.end", onGameEnd);
-    channel.subscribe("cvar.ui_mainmenu", onUiMainMenu);
+    channel.subscribe("cvar.ui_mainmenu", onUiMainMenu); // used to detect in-game vs. menu-mode
+    channel.subscribe("cvar.cg_spectating", onSpectating); // wait for the player to join so he can see the "print" message
     echo("^2instaBounce.js installed");
   }
 
@@ -52,31 +47,29 @@ Version 1.0
     qz_instance.SendGameCommand("echo \"" + msg + "\"");
   }
 
-  function onGameStart() {
-    checkFactory = true;
-  }
+  function onUiMainMenu(data) {
+    if (ignoreEvents) return;
 
-  function onGameEnd() {
-    restoreNormalConfig();
+    // When changing maps, ui_mainMenu gets set to 1 and back to 0.
+    // To prevent unnecessary config resetting and console flooding, we use a timeout
+    if (data.value == "0") {
+      if (mainMenuTimer)
+        clearTimeout(mainMenuTimer);
+      checkFactoryForInstaBounce();
+    }
+    else {
+      mainMenuTimer = setTimeout(restoreNormalConfig, 1000);
+    }
   }
 
   function onSpectating(data) {
     if (ignoreEvents) return;
-    if (checkFactory) {
-      checkFactoryForInstaBounce();
-      checkFactory = false;
-    }
     if (parseInt(data.value) == 0 && qz_instance.GetCvar(CVAR_InstaBounce) == "1")
       showKeyBindMessage();
   }
 
-  function onUiMainMenu(data) {
-    if (ignoreEvents) return;
-    if (data.value == "1")
-      restoreNormalConfig();
-  }
-
   function restoreNormalConfig() {
+    mainMenuTimer = undefined;
     if (qz_instance.GetCvar(CVAR_InstaBounce) == "1") {
       ignoreEvents = true;
       qz_instance.SendGameCommand("exec ibounce_off.cfg");
@@ -91,12 +84,14 @@ Version 1.0
     qz_instance.SendGameCommand("serverinfo");
     qz_instance.SendGameCommand("condump extraql_condump.txt");
     //qz_instance.SendGameCommand("clear");
-    var xhttp = new XMLHttpRequest();
-    xhttp.timeout = 1000;
-    xhttp.onload = function () { extraQLCondumpOnLoad(xhttp); }
-    xhttp.onerror = function () { echo("^3extraQL.exe not running:^7 run extraQL.exe to auto-exec ibounce_on/off.cfg when connecting to (non-)InstaBounce servers."); }
-    xhttp.open("GET", "http://localhost:27963/condump", true);
-    xhttp.send();
+    setTimeout(function() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.timeout = 1000;
+      xhttp.onload = function() { extraQLCondumpOnLoad(xhttp); }
+      xhttp.onerror = function() { echo("^3extraQL.exe not running:^7 run extraQL.exe to auto-exec ibounce_on/off.cfg when connecting to (non-)InstaBounce servers."); }
+      xhttp.open("GET", "http://localhost:27963/condump", true);
+      xhttp.send();
+    }, 100);
   }
 
   function extraQLCondumpOnLoad(xhttp) {

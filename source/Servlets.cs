@@ -506,8 +506,25 @@ namespace ExtraQL
     #region GetCondump()
     private void GetCondump(Stream stream, Uri uri, string request)
     {
+      // wait for up to 1 sec to get a file that was updated within the last second
       var file = this.QuakeConfigFolder + "\\" + CondumpFile;
-      string content = File.Exists(file) ? File.ReadAllText(file) : "";
+      var content = "";
+      for (int i = 0; i < 10; i++)
+      {
+        if (File.Exists(file) && (DateTime.UtcNow - File.GetLastWriteTimeUtc(file)).Milliseconds < 1000)
+        {
+          try
+          {
+            content = File.ReadAllText(file);
+            break;
+          }
+          catch (IOException)
+          {
+            // file might still be locked by QL
+          }
+        }
+        Thread.Sleep(100);
+      }
       HttpOk(stream, content);
     }
     #endregion

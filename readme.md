@@ -14,6 +14,10 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.12.1
+---
+- fixed instaBounce config being reset after map change
+
 Version 2.12
 ---
 - fixed issues with instaBounce.js not restoring the original config and printing messages on non-InstaBounce servers.
