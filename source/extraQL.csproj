@@ -147,6 +147,7 @@
     <None Include="images\topright.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="scripts\instaBounce.js" />
     <Content Include="steam_api.dll" />
     <Content Include="scripts\attic\autoInvite.usr.js" />
     <Content Include="scripts\attic\demoBrowser.usr.js" />

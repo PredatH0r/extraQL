@@ -41,6 +41,7 @@ Version 2.0
   }
 
   function echo(msg) {
+    msg = msg.replace(/\"/g, "'").replace(/[\r\n]+/g, " ");
     qz_instance.SendGameCommand("echo \"" + msg + "\"");
   }
 

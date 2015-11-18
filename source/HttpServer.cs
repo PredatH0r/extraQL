@@ -308,7 +308,7 @@ namespace ExtraQL
     #region ExecuteServlet()
     private bool ExecuteServlet(Stream stream, string urlPath, Uri url, string data, Dictionary<string,string> header)
     {
-      var unprotectedServlets = new[] { "/", "/version", "/bringToFront", "/scripts", "/repository.json" };
+      var unprotectedServlets = new[] { "/", "/version", "/bringToFront", "/scripts", "/repository.json", "/condump" };
       // Check that the user agent is Awesomium and not a regular browser
       // This should prevent abuse of extraQL URLs embedded in regular web pages
       if (!bindToAllInterfaces && Array.IndexOf(unprotectedServlets, urlPath) < 0)

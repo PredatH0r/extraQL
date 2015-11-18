@@ -667,6 +667,22 @@ namespace ExtraQL
         file = baseq3Path + "gameend.cfg";
         if (!File.Exists(file))
           File.WriteAllText(file, "// this file will be executed by extraQL/autoExec.js every time a map is unloaded\n// you can use commands like /steamnick <nickname> to change your steam nickname when you enter a game.");
+
+        file = baseq3Path + "ibounce_on.cfg";
+        if (!File.Exists(file))
+          File.WriteAllText(file, @"// extraQL InstaBounce game type config
+alias +hook 'weapon 10; wait; wait; +attack'
+alias -hook '-attack; weapon 7'
+alias +rock 'weapon 5; wait; wait; +attack'
+alias -rock '-attack; weapon 7'
+
+// uncomment/edit the lines below
+
+//seta cg_disableInstaBounceBindMsg 1
+bind mouse2 +rock
+bind mouse4 +hook
+bind mouse5 +hook
+".Replace('\'', '"'));
       }
       catch (Exception ex)
       {

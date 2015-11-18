@@ -13,7 +13,14 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 
 Changelog
 =========
+
+Version 2.11
+---
+- added instaBounce.js script, which automatically sets up aliases and key binds for +hook and +rock.
+  extraQL.exe creates the assisting ibounce_on.cfg file in your QL config folder, which you should customize with your preferred binds.
+
 Version 2.10.1
+---
 - fixed Auto-start QL / ServerBrowser when extraQL was started minimized
 
 Version 2.10

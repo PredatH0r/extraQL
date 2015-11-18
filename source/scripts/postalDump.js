@@ -31,6 +31,7 @@ uncomment the last line of this script to get all "postal" notifications logged 
   }
 
   function echo(msg) {
+    msg = msg.replace(/\"/g, "'").replace(/[\r\n]+/g, " ");
     qz_instance.SendGameCommand("echo \"" + msg + "\"");
   }
 
