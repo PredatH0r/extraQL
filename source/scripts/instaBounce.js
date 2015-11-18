@@ -71,6 +71,7 @@ Version 1.0
           if (factory.indexOf("InstaBounce") >= 0) {
             echo("^3instBounce.js:^7 executing ibounce_on.cfg");
             qz_instance.SendGameCommand("exec ibounce_on.cfg");
+            ibounceActive = true;
           }
         } else {
           log("cound not detect g_factory");
