@@ -1,11 +1,14 @@
 ﻿// ==UserScript==
 // @name           instaBounce
-// @version        1.0
+// @version        1.1
 // @author         PredatH0r
 // @description    sets up the aliases needed for playing the InstaBounce game type
 // ==/UserScript==
 
 /*
+
+Version 1.1
+- fixed issues with restoring original config
 
 Version 1.0
 - initial release
@@ -16,15 +19,27 @@ Version 1.0
   // external global variables
   var qz_instance = window.qz_instance;
   var console = window.console;
-  var ibounceActive = false;
+
+  // constants
+  var CVAR_InstaBounce = "cg_instaBounce";
+  var CVAR_DisableMsg = "cg_disableInstaBounceBindMsg";
+
+  // internal variables
   var checkFactory = false;
+  var ignoreEvents = false;
+
 
   function init() {
+    restoreNormalConfig(); // in case someone used /quit and the normal config wasn't restored
+
     var postal = window.req("postal");
     var channel = postal.channel();
     channel.subscribe("game.start", onGameStart);
     channel.subscribe("cvar.cg_spectating", onSpectating); // fires after connecting and loading the map
+
+    // various ways trying to detect when a game has ended and settings need to be restored
     channel.subscribe("game.end", onGameEnd);
+    channel.subscribe("cvar.ui_mainmenu", onUiMainMenu);
     echo("^2instaBounce.js installed");
   }
 
@@ -41,55 +56,89 @@ Version 1.0
     checkFactory = true;
   }
 
-  function onSpectating() {
+  function onGameEnd() {
+    restoreNormalConfig();
+  }
+
+  function onSpectating(data) {
+    if (ignoreEvents) return;
     if (checkFactory) {
       checkFactoryForInstaBounce();
       checkFactory = false;
     }
-    else if (qz_instance.GetCvar("cg_disableInstaBounceBindMsg") != "1") {
-      var msg = "^7Edit ^3ibounce_on.cfg^7 to ^5bind^7 your preferred keys/buttons to ^5+hook^7 and ^5+rock^7 and disable this message.";
-      qz_instance.SendGameCommand("echo \"" + msg + "\"");
-      qz_instance.SendGameCommand("print \"" + msg + "\"");
-      msg = "^7When you disconnect, your original config will be restored automatically. You can also force it manually with ^5exec ibounce_off^7.";
-      qz_instance.SendGameCommand("echo \"" + msg + "\"");
+    if (parseInt(data.value) == 0 && qz_instance.GetCvar(CVAR_InstaBounce) == "1")
+      showKeyBindMessage();
+  }
+
+  function onUiMainMenu(data) {
+    if (ignoreEvents) return;
+    if (data.value == "1")
+      restoreNormalConfig();
+  }
+
+  function restoreNormalConfig() {
+    if (qz_instance.GetCvar(CVAR_InstaBounce) == "1") {
+      ignoreEvents = true;
+      qz_instance.SendGameCommand("exec ibounce_off.cfg");
+      ignoreEvents = false;
+      qz_instance.SetCvar(CVAR_InstaBounce, "0");
+      echo("^3instaBounce.js:^7 restored normal config (ibounce_off.cfg)");
     }
-    return;
   }
 
   function checkFactoryForInstaBounce() {
+    //qz_instance.SendGameCommand("clear");
     qz_instance.SendGameCommand("serverinfo");
     qz_instance.SendGameCommand("condump extraql_condump.txt");
+    //qz_instance.SendGameCommand("clear");
     var xhttp = new XMLHttpRequest();
     xhttp.timeout = 1000;
-    xhttp.onload = function () {
-      if (xhttp.status == 200) {
-        var condump = xhttp.responseText;
-        var idx, idx2;
-        if ((idx = condump.lastIndexOf("g_factoryTitle")) >= 0 && (idx2 = condump.indexOf("\n", idx)) >= 0) {
-          var factory = condump.substr(idx + 14, idx2 - idx - 14).trim();
-          qz_instance.SendGameCommand("writeconfig ibounce_off.cfg");
-          if (factory.indexOf("InstaBounce") >= 0) {
-            echo("^3instBounce.js:^7 executing ibounce_on.cfg");
-            qz_instance.SendGameCommand("exec ibounce_on.cfg");
-            ibounceActive = true;
-          }
-        } else {
-          log("cound not detect g_factory");
-        }
-      } else
-        log("instaBounce.js: failed to load serverinfo/condump through extraQL.exe: " + xhttp.responseText);
-    }
-    xhttp.onerror = function () { echo("^3extraQL.exe not running:^7 run extraQL.exe to allow auto-execing ibounce.cfg when connecting to InstaBounce servers."); }
+    xhttp.onload = function () { extraQLCondumpOnLoad(xhttp); }
+    xhttp.onerror = function () { echo("^3extraQL.exe not running:^7 run extraQL.exe to auto-exec ibounce_on/off.cfg when connecting to (non-)InstaBounce servers."); }
     xhttp.open("GET", "http://localhost:27963/condump", true);
     xhttp.send();
   }
 
-  function onGameEnd() {
-    if (ibounceActive) {
-      log("^3instaBounce.js:^7 restoring previous config");
-      qz_instance.SendGameCommand("exec ibounce_off.cfg");
-      ibounceActive = false;
+  function extraQLCondumpOnLoad(xhttp) {
+    var isInstaBounce = false;
+    if (xhttp.status == 200) {
+      var condump = xhttp.responseText;
+      var idx, idx2;
+      if ((idx = condump.lastIndexOf("g_factoryTitle")) >= 0 && (idx2 = condump.indexOf("\n", idx)) >= 0) {
+        var factory = condump.substr(idx + 14, idx2 - idx - 14).trim();
+        if (factory.indexOf("InstaBounce") >= 0)
+          isInstaBounce = true;
+      }
+      else {
+        log("cound not detect g_factory in condump");
+      }
     }
+    else
+      log("^1instaBounce.js:^7 failed to load serverinfo/condump through extraQL.exe: " + xhttp.responseText);
+
+    if (isInstaBounce) {
+      if (qz_instance.GetCvar(CVAR_InstaBounce) != "1") {
+        qz_instance.SendGameCommand("writeconfig ibounce_off.cfg"); // backup current config
+        // writeconfig doesn't write immediately, so we have to defer the config changes
+        setTimeout(function() {
+          qz_instance.SendGameCommand("exec ibounce_on.cfg");
+          qz_instance.SetCvar(CVAR_InstaBounce, "1");
+          echo("^3instaBounce.js:^7 activated InstaBounce config (ibounce_on.cfg)");
+        }, 1000);
+      }
+    }
+    else
+      restoreNormalConfig();
+  }
+
+  function showKeyBindMessage() {
+    if (qz_instance.GetCvar(CVAR_DisableMsg) == "1")
+      return;
+    var msg = "^3Edit^7 Quake Live/<steam-id>/baseq3/^3ibounce_on.cfg^7 to ^5bind +hook^7 and ^5+rock^7 to your preferred keys/buttons and disable this message.";
+    qz_instance.SendGameCommand("echo \"" + msg + "\"");
+    qz_instance.SendGameCommand("print \"" + msg + "\"");
+    msg = "^7Your original config will be restored automatically. You can also force it with ^5exec ibounce_off.cfg^7.";
+    qz_instance.SendGameCommand("echo \"" + msg + "\"");
   }
 
 

@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.11";
+    public const string Version = "2.12";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -668,6 +668,7 @@ namespace ExtraQL
         if (!File.Exists(file))
           File.WriteAllText(file, "// this file will be executed by extraQL/autoExec.js every time a map is unloaded\n// you can use commands like /steamnick <nickname> to change your steam nickname when you enter a game.");
 
+        // create ibounce_on.cfg for InstaBounce gametype
         file = baseq3Path + "ibounce_on.cfg";
         if (!File.Exists(file))
           File.WriteAllText(file, @"// extraQL InstaBounce game type config
@@ -815,6 +816,9 @@ var path = '" + webpak.Path.Replace("\\", "\\\\") + @"';
 if (qz_instance.GetCvar('fs_webpath') != path) {
   qz_instance.SetCvar('fs_webpath', path);
   qz_instance.SendGameCommand('web_reload');
+  setTimeout(function() {
+    qz_instance.SendGameCommand('echo ^3fs_webpath.js:^7 activating customized UI...^7');
+  }, 0);
 }
 })();
 ");
