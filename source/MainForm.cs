@@ -676,6 +676,7 @@ alias +hook 'weapon 10; wait; wait; +attack'
 alias -hook '-attack; weapon 7'
 alias +rock 'weapon 5; wait; wait; +attack'
 alias -rock '-attack; weapon 7'
+seta cl_preferredStartingWeapons '7'
 
 // uncomment/edit the lines below
 

@@ -80,6 +80,8 @@ Version 1.0
   }
 
   function checkFactoryForInstaBounce() {
+    if (qz_instance.GetCvar(CVAR_InstaBounce) == "-1")
+      return;
     //qz_instance.SendGameCommand("clear");
     qz_instance.SendGameCommand("serverinfo");
     qz_instance.SendGameCommand("condump extraql_condump.txt");
