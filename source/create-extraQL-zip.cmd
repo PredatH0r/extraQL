@@ -11,14 +11,16 @@ cd %abs%
 if errorlevel 1 goto error
 if exist extraQL.zip del extraQL.zip
 if errorlevel 1 goto error
-rmdir /s /q extraQL
+if exist extraQL\ rmdir /s /q extraQL
 mkdir extraQL
 mkdir extraQL\scripts
 mkdir extraQL\images
 mkdir extraQL\de
+mkdir extraQL\ru
 echo copying...
 xcopy "%abs%\bin\Debug\extraQL.exe" extraQL\
 xcopy "%abs%\bin\Debug\de\extraQL.resources.dll" extraQL\de\
+xcopy "%abs%\bin\Debug\ru\extraQL.resources.dll" extraQL\ru\
 xcopy "%abs%\bin\Debug\steam_api.dll" extraQL\
 xcopy "%abs%\bin\Debug\steam_appid.txt" extraQL\
 xcopy "%abs%\scripts" extraQL\scripts
@@ -37,7 +39,7 @@ rem -----------------------------
 set signtool="C:\Program Files\Microsoft SDKs\Windows\v6.0A\Bin\signtool.exe"
 set oldcd=%cd%
 cd %abs%\bin\Debug
-set files=extraQL.exe de\extraQL.resources.dll
+set files=extraQL.exe de\extraQL.resources.dll ru\extraQL.resources.dll
 %signtool% sign /a /t "http://timestamp.comodoca.com/authenticode" %files%
 goto :eof
 

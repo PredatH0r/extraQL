@@ -14,6 +14,11 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.12.2
+----
+- ability to disable instaBounce auto-detection with /seta cg_instaBounce -1
+- setting default weapon to railgun in InstaBounce
+
 Version 2.12.1
 ---
 - fixed instaBounce config being reset after map change
