@@ -82,8 +82,8 @@ Version 1.0
       printOrSetColors(val.substr(7));
     //else if (val.indexOf("profile=") == 0)
     //  showQlranksProfile(val.substr(8, val.length - 8));
-    //else if (val == "games")
-    //  games("1");
+    else if (val == "games")
+      showGameCount();
     else if (val.indexOf("shuffle!") == 0)
       shuffle(true, val.substr(8));
     else if (val.indexOf("shuffle") == 0)
@@ -176,82 +176,33 @@ Version 1.0
     }
   }
 
-  function requestEloInformation(callback) {
-    qz_instance.SendGameCommand("echo " + ConfigstringsMarker); // text marker required by extraQL servlet
-    qz_instance.SendGameCommand("configstrings");
-    setTimeout(function() {
-      qz_instance.SendGameCommand("condump extraql_condump.txt");
-      setTimeout(function() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.timeout = 1000;
-        xhttp.onload = function() { onExtraQLServerInfo(xhttp, callback); }
-        xhttp.onerror = function() {
-          echo("^3extraQL.exe not running:^7");
-          pendingEloRequest = null;
-        }
-        xhttp.open("GET", "http://localhost:27963/serverinfo", true);
-        xhttp.send();
-      }, 100);
-    }, 1000);
+  function showGameCount() {
+    var currentOut = PREFS.method;
 
+    // Refresh the current server's details
+    requestEloInformation(function(request, matchInfo) {
 
-    function onExtraQLServerInfo(xhttp, callback) {
-      if (xhttp.status != 200) {
-        pendingEloRequest = null;
-        return;
-      }
-
-      pendingEloRequest = {}
-
-      var json = JSON.parse(xhttp.responseText);
-      var matchInfo = { game_type: json.gameinfo.g_gametype, players: [] };
-      for (var i = 0; i < json.players.length; i++) {
-        var obj = json.players[i];
-        var player = { "steamid": obj.st, "name": obj.n.toLowerCase(), "team": obj.t, "clientid": obj.clientid };
-        matchInfo.players.push(player);
-        pendingEloRequest[player.steamid] = player;
-      }
-
-      var steamIds = Object.keys(pendingEloRequest);
-      if (steamIds.length == 0) {
-        pendingEloRequest = null;
-        return;
-      }
-      var url = "http://qlstats.net:8080/elo/" + steamIds.join("+");
-      var xhttp = new XMLHttpRequest();
-      xhttp.timeout = 5000;
-      xhttp.onload = function() { onQlstatsElo(xhttp, matchInfo, callback); }
-      xhttp.onerror = function() { echo("^1elo.js:^7 could not get data from qlstats.net"); }
-      xhttp.open("GET", url, true);
-      xhttp.send();
-    }
-
-    function onQlstatsElo(xhttp, matchInfo, callback) {
-      var request = pendingEloRequest;
-      pendingEloRequest = null;
-
-      if (xhttp.status != 200)
-        return;
-
-      var data = JSON.parse(xhttp.responseText);
-      var dataBySteamId = {}
-      for (var i = 0; i < data.players.length; i++)
-        dataBySteamId[data.players[i].steamid] = data.players[i];
-
-      var gametype = GametypeMap[matchInfo.game_type];
+      var games_played = [];
       for (var steamid in request) {
-        if (!request.hasOwnProperty(steamid)) continue;
-        var p = request[steamid];
-        var data = dataBySteamId[steamid] || {};
-        var gtData = data[gametype] || {};
-        p.elo = gtData.elo || 1000;
-        p.games = gtData.games || 0;
+        if (request.hasOwnProperty(steamid)) {
+          games_played.push(request[steamid]);
+        }
       }
+      games_played.sort(function(a, b) { return b.games - a.games; });
 
-      callback(request);
-    }
+      var step = currentOut == "echo" || currentOut == "print" ? 100 : 1000;
+
+      qz_instance.SendGameCommand(currentOut + " \"^5PLAYER_________   #" + GametypeMap[matchInfo.game_type].toUpperCase() + " games completed^7\"");
+      for (var i = 0; i < games_played.length; i++) {
+        (function(player, i) {
+          window.setTimeout(function() {
+            var color = player.games < 400 ? "^3" : player.games >= 10000 ? "^6" : "^2";
+            qz_instance.SendGameCommand(currentOut + " \"^7" + pad(player.name, 15) + " " + color + pad(player.games, -6) + "^7\"");
+          }, i * step);
+        })(games_played[i], i);
+      }
+    });
   }
-
   
   function shuffle(doit, args) {
     // Give the request some time to complete
@@ -434,6 +385,82 @@ Version 1.0
     });
   }
 
+  function requestEloInformation(callback) {
+    qz_instance.SendGameCommand("echo " + ConfigstringsMarker); // text marker required by extraQL servlet
+    qz_instance.SendGameCommand("configstrings");
+    setTimeout(function () {
+      qz_instance.SendGameCommand("condump extraql_condump.txt");
+      setTimeout(function () {
+        var xhttp = new XMLHttpRequest();
+        xhttp.timeout = 1000;
+        xhttp.onload = function () { onExtraQLServerInfo(xhttp, callback); }
+        xhttp.onerror = function () {
+          echo("^3extraQL.exe not running:^7");
+          pendingEloRequest = null;
+        }
+        xhttp.open("GET", "http://localhost:27963/serverinfo", true);
+        xhttp.send();
+      }, 100);
+    }, 1000);
+
+
+    function onExtraQLServerInfo(xhttp, callback) {
+      if (xhttp.status != 200) {
+        pendingEloRequest = null;
+        return;
+      }
+
+      pendingEloRequest = {}
+
+      var json = JSON.parse(xhttp.responseText);
+      var matchInfo = { game_type: json.gameinfo.g_gametype, players: [] };
+      for (var i = 0; i < json.players.length; i++) {
+        var obj = json.players[i];
+        var player = { "steamid": obj.st, "name": obj.n.toLowerCase(), "team": obj.t, "clientid": obj.clientid };
+        matchInfo.players.push(player);
+        pendingEloRequest[player.steamid] = player;
+      }
+
+      var steamIds = Object.keys(pendingEloRequest);
+      if (steamIds.length == 0) {
+        pendingEloRequest = null;
+        return;
+      }
+      var url = "http://qlstats.net:8080/elo/" + steamIds.join("+");
+      var xhttp = new XMLHttpRequest();
+      xhttp.timeout = 5000;
+      xhttp.onload = function () { onQlstatsElo(xhttp, matchInfo, callback); }
+      xhttp.onerror = function () { echo("^1elo.js:^7 could not get data from qlstats.net"); }
+      xhttp.open("GET", url, true);
+      xhttp.send();
+    }
+
+    function onQlstatsElo(xhttp, matchInfo, callback) {
+      var request = pendingEloRequest;
+      pendingEloRequest = null;
+
+      if (xhttp.status != 200)
+        return;
+
+      var data = JSON.parse(xhttp.responseText);
+      var dataBySteamId = {}
+      for (var i = 0; i < data.players.length; i++)
+        dataBySteamId[data.players[i].steamid] = data.players[i];
+
+      var gametype = GametypeMap[matchInfo.game_type];
+      for (var steamid in request) {
+        if (!request.hasOwnProperty(steamid)) continue;
+        var p = request[steamid];
+        var data = dataBySteamId[steamid] || {};
+        var gtData = data[gametype] || {};
+        p.elo = gtData.elo || 1000;
+        p.games = gtData.games || 0;
+      }
+
+      callback(request, matchInfo);
+    }
+  }
+
   /*
   function showQlranksProfile(playerString) {
     var server = quakelive.serverManager.GetServerInfo(quakelive.currentServerId);
@@ -594,21 +621,6 @@ Version 1.0
       return lines;
     }
 
-    function pad(text, minLength, paddingChar) {
-      if (text === undefined || text == null) text = "";
-      text = text.toString();
-      if (paddingChar === undefined || paddingChar == null || paddingChar == "") paddingChar = " ";
-      if (minLength === undefined) minLength = 0;
-      var padLeft = minLength < 0;
-      minLength = Math.abs(minLength);
-
-      var delta = 0;
-      for (var i = 0; i < text.length; i++)
-        if (text[i] == "^") delta++;
-      while (text.length - 2 * delta < minLength)
-        text = padLeft ? paddingChar + text : text + paddingChar;
-      return text;
-    }
   }
 
   function calcStats(players) {
@@ -657,6 +669,21 @@ Version 1.0
     return team == 0 ? "^5" : team == 1 ? "^1" : team == 2 ? "^4" : "^7";
   }
 
+  function pad(text, minLength, paddingChar) {
+    if (text === undefined || text == null) text = "";
+    text = text.toString();
+    if (paddingChar === undefined || paddingChar == null || paddingChar == "") paddingChar = " ";
+    if (minLength === undefined) minLength = 0;
+    var padLeft = minLength < 0;
+    minLength = Math.abs(minLength);
+
+    var delta = 0;
+    for (var i = 0; i < text.length; i++)
+      if (text[i] == "^") delta++;
+    while (text.length - 2 * delta < minLength)
+      text = padLeft ? paddingChar + text : text + paddingChar;
+    return text;
+  }
 
 
 
