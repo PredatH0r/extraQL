@@ -4,3 +4,6 @@ bin/
 source/.vs/config/applicationhost.config
 source/scripts/_cycle.js
 Thumbs.db
+source/.vs/extraQL/v14/.suo
+source/extraQL.csproj.user
+workshop/content/
