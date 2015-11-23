@@ -14,6 +14,12 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.13
+---
+- Added config screen to enable/disable individual scripts.
+- When extraQL cannot initialize steam_api.dll, there is now a fallback to AppID 1007, which in some scenarios can fix the problem.
+  If that happens, the "Steamworks SDK Redist" will show up in your Steam Client's "Recent" list.
+
 Version 2.12.2
 ----
 - ability to disable instaBounce auto-detection with /seta cg_instaBounce -1

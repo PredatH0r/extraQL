@@ -1,10 +1,12 @@
 ﻿// ==UserScript==
-// @id             steamNick
-// @name           steamNick
+// @name           SteamNick: Adds cvars to change your Steam nickname
 // @version        1.3
 // @author         PredatH0r
-// @description    add a /steamnick command to change steam nick name
-// @unwrap
+// @description    /steamnick <name> sets your Steam nickname to <name>
+// @description    /sn_clan + /sn_name + /sn_suffix are combined into /steamnick
+// @description    Only the sn_* variables will change your Steam Nick when QL is loaded.
+// @description    You can use /steamnick in combination with AutoExec's gamestart.cfg/gameend.cfg.
+// @enabled        1
 // ==/UserScript==
 
 /*

@@ -1,8 +1,13 @@
 ﻿// ==UserScript==
-// @name           instaBounce
+// @name           InstaBounce: Automate special config with key binds for InstaBounce gametype
 // @version        1.1
 // @author         PredatH0r
-// @description    sets up the aliases needed for playing the InstaBounce game type
+// @description    InstaBounce is InstaGib + 0-Damage-Bounce-Rockets + Grappling hook.
+// @description    This script automatically detects this game type and executes the config files
+// @description    ibounce_on.cfg and ibounce_off.cfg to setup aliases and key binds.
+// @description    The aliases +hook and +rock allow you to instantly switch and fire weapons.
+// @description    Your config is restored when you leave an InstaBounce server.
+// @enabled        1
 // ==/UserScript==
 
 /*
@@ -21,8 +26,11 @@ Version 1.0
   var console = window.console;
 
   // constants
-  var CVAR_InstaBounce = "cg_instaBounce";
   var CVAR_DisableMsg = "cg_disableInstaBounceBindMsg";
+  var CVAR_InstaBounce = "cg_instaBounce";
+  var IB_DISABLED = "-1";
+  var IB_AUTODETECT = "0";
+  var IB_ACTIVE = "1";
 
   // internal variables
   var ignoreEvents = false;
@@ -35,7 +43,9 @@ Version 1.0
     var channel = postal.channel();
     channel.subscribe("cvar.ui_mainmenu", onUiMainMenu); // used to detect in-game vs. menu-mode
     channel.subscribe("cvar.cg_spectating", onSpectating); // wait for the player to join so he can see the "print" message
-    echo("^2instaBounce.js installed");
+    var ib = qz_instance.GetCvar(CVAR_InstaBounce);
+    var status = ib == IB_AUTODETECT || ib == IB_ACTIVE ? "auto-detect" : "disabled";
+    echo("^2instaBounce.js installed^7 (" + CVAR_InstaBounce + "=" + ib + ": " + status + ")");
   }
 
   function log(msg) {
@@ -64,28 +74,26 @@ Version 1.0
 
   function onSpectating(data) {
     if (ignoreEvents) return;
-    if (parseInt(data.value) == 0 && qz_instance.GetCvar(CVAR_InstaBounce) == "1")
+    if (parseInt(data.value) == 0 && qz_instance.GetCvar(CVAR_InstaBounce) == IB_ACTIVE)
       showKeyBindMessage();
   }
 
   function restoreNormalConfig() {
     mainMenuTimer = undefined;
-    if (qz_instance.GetCvar(CVAR_InstaBounce) == "1") {
-      ignoreEvents = true;
-      qz_instance.SendGameCommand("exec ibounce_off.cfg");
-      ignoreEvents = false;
-      qz_instance.SetCvar(CVAR_InstaBounce, "0");
-      echo("^3instaBounce.js:^7 restored normal config (ibounce_off.cfg)");
-    }
+    if (qz_instance.GetCvar(CVAR_InstaBounce) != IB_ACTIVE)
+      return;
+    ignoreEvents = true;
+    qz_instance.SendGameCommand("exec ibounce_off.cfg");
+    ignoreEvents = false;
+    qz_instance.SetCvar(CVAR_InstaBounce, "1");
+    echo("^3instaBounce.js:^7 restored normal config (ibounce_off.cfg)");
   }
 
   function checkFactoryForInstaBounce() {
-    if (qz_instance.GetCvar(CVAR_InstaBounce) == "-1")
+    if (qz_instance.GetCvar(CVAR_InstaBounce) == IB_DISABLED)
       return;
-    //qz_instance.SendGameCommand("clear");
     qz_instance.SendGameCommand("serverinfo");
     qz_instance.SendGameCommand("condump extraql_condump.txt");
-    //qz_instance.SendGameCommand("clear");
     setTimeout(function() {
       var xhttp = new XMLHttpRequest();
       xhttp.timeout = 1000;
@@ -114,12 +122,12 @@ Version 1.0
       log("^1instaBounce.js:^7 failed to load serverinfo/condump through extraQL.exe: " + xhttp.responseText);
 
     if (isInstaBounce) {
-      if (qz_instance.GetCvar(CVAR_InstaBounce) != "1") {
+      if (qz_instance.GetCvar(CVAR_InstaBounce) == IB_AUTODETECT) {
         qz_instance.SendGameCommand("writeconfig ibounce_off.cfg"); // backup current config
         // writeconfig doesn't write immediately, so we have to defer the config changes
         setTimeout(function() {
           qz_instance.SendGameCommand("exec ibounce_on.cfg");
-          qz_instance.SetCvar(CVAR_InstaBounce, "1");
+          qz_instance.SetCvar(CVAR_InstaBounce, IB_ACTIVE);
           echo("^3instaBounce.js:^7 activated InstaBounce config (ibounce_on.cfg)");
         }, 1000);
       }

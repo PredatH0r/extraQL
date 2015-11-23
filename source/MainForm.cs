@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.12.2";
+    public const string Version = "2.13";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -164,13 +164,6 @@ namespace ExtraQL
     }
     #endregion
 
-    #region linkConfig_LinkClicked
-    private void linkConfig_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-    {
-      this.OpenConfigFolder();
-    }
-    #endregion
-
     #region cbAdvanced_CheckedChanged
     private void cbAdvanced_CheckedChanged(object sender, EventArgs e)
     {
@@ -185,6 +178,7 @@ namespace ExtraQL
         this.panelOptions.Visible = false;
         this.Height -= panelOptions.Height;
       }
+      this.panelScripts.Visible = this.cbOptions.Checked;
     }
     #endregion
 
@@ -192,12 +186,26 @@ namespace ExtraQL
     private void cbLog_CheckedChanged(object sender, EventArgs e)
     {
       this.SuspendLayout();
-      this.panelLog.Visible = this.cbLog.Checked;
+      this.panelRight.Visible = this.cbLog.Checked;
       if (!cbLog.Checked)
-        this.Width -= this.panelLog.Width;
+        this.Width -= this.panelRight.Width;
       else
-        this.Width += this.panelLog.Width;
+        this.Width += this.panelRight.Width;
       this.ResumeLayout();
+    }
+    #endregion
+
+    #region linkConfig_LinkClicked
+    private void linkConfig_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      this.OpenConfigFolder(false);
+    }
+    #endregion
+
+    #region linkExtraQlFolder_LinkClicked
+    private void linkExtraQlFolder_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      this.OpenConfigFolder(true);
     }
     #endregion
 
@@ -303,6 +311,16 @@ namespace ExtraQL
     private void btnClearLog_Click(object sender, EventArgs e)
     {
       this.txtLog.Clear();
+    }
+    #endregion
+
+    #region lbScripts_SelectedIndexChanged
+    private void lbScripts_SelectedIndexChanged(object sender, EventArgs e)
+    {
+      var script = (ScriptInfo) this.lbScripts.SelectedItem;
+      this.txtScriptDescription.Text = script?.Metadata.Get("description", "\r\n") ?? "";
+      this.txtScriptAuthor.Text = script?.Metadata.Get("author", ", ") ?? "";
+      this.txtScriptVersion.Text = script?.Metadata.Get("version") ?? "";
     }
     #endregion
 
@@ -415,6 +433,9 @@ namespace ExtraQL
         config.Set("startServerBrowser", this.cbStartServerBrowser.Checked ? "1" : "0");
         config.Set("closeServerBrowser", this.cbCloseServerBrowser.Checked ? "1" : "0");
         config.Set("webpakWorkshopItem", ((QuakeLiveWebPak) this.comboWebPak.SelectedItem)?.WorkshopId.ToString() ?? "0");
+
+        SaveScriptConfig();
+
         config.SaveSettings();
       }
       catch (Exception ex)
@@ -422,6 +443,16 @@ namespace ExtraQL
         MessageBox.Show(this, "An error occured while saving your settings:\n" + ex, "Saving settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
     }
+
+    private void SaveScriptConfig()
+    {
+      for (int i = 0; i < this.lbScripts.Items.Count; i++)
+      {
+        var script = (ScriptInfo) this.lbScripts.Items[i];
+        config.SetScriptState(script.Id, this.lbScripts.GetItemChecked(i));
+      }
+    }
+
     #endregion
 
     #region Startup()
@@ -433,6 +464,7 @@ namespace ExtraQL
       this.scriptRepository.RegisterScripts();
       this.RestartHttpServer();
       this.CheckIfStartedFromWorkshopFolder();
+      this.FillScriptList();
       this.StartSteamClient();
 
       if (this.cbAutostart.Checked)
@@ -520,9 +552,9 @@ namespace ExtraQL
     #endregion
 
     #region OpenConfigFolder()
-    private void OpenConfigFolder()
+    private void OpenConfigFolder(bool extraQlConfig)
     {
-      var dir = this.GetConfigFolder();
+      var dir = extraQlConfig ? this.GetSteamWorkshopPath() : this.GetConfigFolder();
       if (dir != null)
         Process.Start("explorer.exe", "/e," + dir);
     }
@@ -580,6 +612,20 @@ namespace ExtraQL
 
     #endregion
 
+    #region FillScriptList()
+    private void FillScriptList()
+    {
+      this.lbScripts.Items.Clear();
+      var list = new List<ScriptInfo>(this.scriptRepository.GetScripts());
+      list.Sort((a,b) => a.Name.CompareTo(b.Name));
+      foreach (var script in list)
+      {
+        bool enabled = config.GetScriptState(script.Id) ?? script.Metadata.Get("enabled") != "0";
+        this.lbScripts.Items.Add(script, enabled);
+      }
+    }
+    #endregion
+
     #region StartSteamClient()
     private void StartSteamClient()
     {
@@ -627,6 +673,8 @@ namespace ExtraQL
           "extraQL", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         return false;
       }
+
+      this.SaveScriptConfig();
 
       // modify files in <steam-user-id>\baseq3 directories
       var dirs = Directory.GetDirectories(path);
@@ -703,8 +751,9 @@ bind mouse5 +hook
         Directory.CreateDirectory(jsFolder);
         foreach (var script in scriptRepository.GetScripts())
         {
+          bool inst = install && (this.config.GetScriptState(script.Id) ?? true);
           var targetFile = Path.Combine(jsFolder, Path.GetFileName(script.Filepath) ?? "");
-          if (install)
+          if (inst)
             File.Copy(script.Filepath, targetFile, true);
           else
             File.Delete(targetFile);
@@ -779,7 +828,6 @@ bind mouse5 +hook
     private string GetSteamWorkshopPath()
     {
       var path = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(this.GetQuakeLivePath())) ?? "", @"workshop\content\" + QuakeLiveAppId + "\\" + WorkshopExtraQL);
-      //Log("Workshop folder: " + path);
       return path;
     }
     #endregion

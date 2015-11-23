@@ -1,10 +1,13 @@
 // ==UserScript==
-// @id             elo
-// @name           qlstats.net skill rating client
+// @name           QLStats: Adds an /elo command to show rating information from qlstats.net
 // @version        0.1
 // @author         PredatH0r
-// @description    Queries skill rating information from qlstats.net
-// @unwrap
+// @description    Use "/elo help" in the console to get a list of available commands.
+// @description    /elo score: display rating for all players on the server
+// @description    /elo games: display number of games played by each player
+// @description    /elo shuffle: suggest best possible balanced teams
+// @description    /elo shuffle!: arrange players into teams as suggested
+// @enabled        0
 // ==/UserScript==
 
 /*

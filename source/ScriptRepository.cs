@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ExtraQL
@@ -146,6 +147,14 @@ namespace ExtraQL
       }
       return value;
     }
+
+    public override string ToString()
+    {
+      string text = this.Name;
+      if (string.IsNullOrEmpty(text))
+        text = Path.GetFileName(this.Filepath) ?? "";
+      return text;
+    }
   }
 
   #endregion
@@ -175,6 +184,20 @@ namespace ExtraQL
         return null;
       List<string> values = data[key];
       return index < values.Count ? values[index] : null;
+    }
+
+    public string Get(string key, string separator)
+    {
+      if (!data.ContainsKey(key))
+        return "";
+      List<string> values = data[key];
+      var sb = new StringBuilder();
+      foreach (var value in values)
+      {
+        if (sb.Length > 0) sb.Append(separator);
+        sb.Append(value);
+      }
+      return sb.ToString();
     }
   }
 

@@ -69,14 +69,24 @@ namespace ExtraQL
         SteamAPI_Shutdown();
       }
 
-      return this.initialized = SteamAPI_Init();
+      string dllDir = Application.StartupPath + "\\";
+
+      // try the configured AppID
+      File.WriteAllText(dllDir + "steam_appid.txt", AppID.ToString());
+      this.initialized = SteamAPI_Init();
+
+      // fallback to Steamworks SDK Redist AppID
+      if (!this.initialized && AppID != 1007)
+      {
+        File.WriteAllText(dllDir + "steam_appid.txt", "1007");
+        this.initialized = SteamAPI_Init();
+      }
+
+      return this.initialized;
     }
 
     public bool SetName(string name)
     {
-      string dllDir = Application.StartupPath + "\\";
-      File.WriteAllText(dllDir + "steam_appid.txt", AppID.ToString());
-
       if (!EnsureInit())
         return false;
       

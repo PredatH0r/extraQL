@@ -1,10 +1,10 @@
 ﻿// ==UserScript==
-// @id             postalDump
-// @name           postalDump
+// @name           Postal Dump (for Developers): Print all javascript postal messages in the console.
 // @version        1.0
 // @author         PredatH0r
-// @description    logs all postal messages
-// @unwrap
+// @description    Enable developer console messages with /web_console 1 (restart may be required).
+// @description    After that you'll see all postal notification about cvar changes and other events.
+// @enabled        0
 // ==/UserScript==
 
 /*
@@ -53,6 +53,5 @@ uncomment the last line of this script to get all "postal" notifications logged 
       init();
     }
   }
-})
-//();
+})();
 

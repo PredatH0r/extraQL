@@ -9,6 +9,7 @@ namespace ExtraQL
   public class Config
   {
     private readonly Dictionary<string,string> settings = new Dictionary<string, string>();
+    private readonly Dictionary<string,bool> activeScripts = new Dictionary<string, bool>();
 
     public readonly string AppBaseDir;
 
@@ -42,6 +43,7 @@ namespace ExtraQL
       this.settings["closeServerBrowser"] = "0";
       this.settings["webpakWorkshopItem"] = "0";
       this.settings["locale"] = "";
+      this.settings["scripts"] = "";
 
 
       var configFile = this.ConfigFile;
@@ -58,7 +60,22 @@ namespace ExtraQL
             settings[key] = value;
         }
       }
+
+      try
+      {
+        foreach (var script in this.settings["scripts"].Split(','))
+        {
+          var parts = script.Split(':');
+          if (parts.Length == 2)
+            this.activeScripts[parts[0]] = int.Parse(parts[1].Trim()) != 0;
+        }
+      }
+      catch
+      {
+      }
     }
+
+
     #endregion
 
     #region GetString(), GetBool()
@@ -91,6 +108,14 @@ namespace ExtraQL
     #region SaveSettings()
     public void SaveSettings()
     {
+      var sb = new StringBuilder();
+      foreach (var script in this.activeScripts)
+      {
+        if (sb.Length > 0) sb.Append(',');
+        sb.Append(script.Key).Append(':').Append(script.Value ? "1" : "0");
+      }
+      this.settings["scripts"] = sb.ToString();
+
       StringBuilder config = new StringBuilder();
       config.AppendLine("[extraQL]");
       foreach (var entry in this.settings)
@@ -104,5 +129,17 @@ namespace ExtraQL
 
     #endregion
 
+    #region GetScriptState(), SetScriptState()
+    public bool? GetScriptState(string id)
+    {
+      bool val;
+      return this.activeScripts.TryGetValue(id, out val) ? (bool?)val : null;
+    }
+
+    public void SetScriptState(string id, bool active)
+    {
+      this.activeScripts[id] = active;
+    }
+    #endregion
   }
 }

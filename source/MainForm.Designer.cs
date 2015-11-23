@@ -37,7 +37,7 @@ namespace ExtraQL
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
       this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
       this.panelOptions = new System.Windows.Forms.Panel();
-      this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.grpSteamNick = new System.Windows.Forms.GroupBox();
       this.lblSteamNameStart = new System.Windows.Forms.Label();
       this.btnNickEnd = new System.Windows.Forms.Button();
       this.txtNickStart = new System.Windows.Forms.TextBox();
@@ -64,6 +64,7 @@ namespace ExtraQL
       this.cbStartMinimized = new System.Windows.Forms.CheckBox();
       this.cbSystemTray = new System.Windows.Forms.CheckBox();
       this.panelTop = new System.Windows.Forms.Panel();
+      this.linkExtraQlFolder = new System.Windows.Forms.LinkLabel();
       this.cbLog = new System.Windows.Forms.CheckBox();
       this.cbOptions = new System.Windows.Forms.CheckBox();
       this.linkOpenExtraQLWebsite = new System.Windows.Forms.LinkLabel();
@@ -81,15 +82,25 @@ namespace ExtraQL
       this.miStartServerBrowser = new System.Windows.Forms.ToolStripMenuItem();
       this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
       this.miQuit = new System.Windows.Forms.ToolStripMenuItem();
+      this.panelRight = new System.Windows.Forms.Panel();
       this.panelLog = new System.Windows.Forms.Panel();
       this.grpLog = new System.Windows.Forms.GroupBox();
       this.cbLogAllRequests = new System.Windows.Forms.CheckBox();
       this.btnClearLog = new System.Windows.Forms.Button();
       this.cbFollowLog = new System.Windows.Forms.CheckBox();
       this.txtLog = new System.Windows.Forms.TextBox();
+      this.grpScripts = new System.Windows.Forms.GroupBox();
+      this.txtScriptVersion = new System.Windows.Forms.TextBox();
+      this.txtScriptAuthor = new System.Windows.Forms.TextBox();
+      this.lblScriptVersion = new System.Windows.Forms.Label();
+      this.lblScriptAuthor = new System.Windows.Forms.Label();
+      this.txtScriptDescription = new System.Windows.Forms.TextBox();
+      this.lbScripts = new System.Windows.Forms.CheckedListBox();
+      this.lblScriptDescription = new System.Windows.Forms.Label();
+      this.panelScripts = new System.Windows.Forms.Panel();
       this.autoQuitTimer = new System.Windows.Forms.Timer(this.components);
       this.panelOptions.SuspendLayout();
-      this.groupBox1.SuspendLayout();
+      this.grpSteamNick.SuspendLayout();
       this.grpWebPak.SuspendLayout();
       this.grpOptions.SuspendLayout();
       this.panelTop.SuspendLayout();
@@ -97,8 +108,10 @@ namespace ExtraQL
       ((System.ComponentModel.ISupportInitialize)(this.picMinimize)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
       this.mnuTrayIcon.SuspendLayout();
+      this.panelRight.SuspendLayout();
       this.panelLog.SuspendLayout();
       this.grpLog.SuspendLayout();
+      this.grpScripts.SuspendLayout();
       this.SuspendLayout();
       // 
       // openFileDialog1
@@ -111,24 +124,24 @@ namespace ExtraQL
       // panelOptions
       // 
       this.panelOptions.BackColor = System.Drawing.Color.Transparent;
-      this.panelOptions.Controls.Add(this.groupBox1);
+      this.panelOptions.Controls.Add(this.grpSteamNick);
       this.panelOptions.Controls.Add(this.grpWebPak);
       this.panelOptions.Controls.Add(this.grpOptions);
       resources.ApplyResources(this.panelOptions, "panelOptions");
       this.panelOptions.Name = "panelOptions";
       // 
-      // groupBox1
+      // grpSteamNick
       // 
-      this.groupBox1.Controls.Add(this.lblSteamNameStart);
-      this.groupBox1.Controls.Add(this.btnNickEnd);
-      this.groupBox1.Controls.Add(this.txtNickStart);
-      this.groupBox1.Controls.Add(this.lblSteamNameEnd);
-      this.groupBox1.Controls.Add(this.txtNickEnd);
-      this.groupBox1.Controls.Add(this.btnNickStart);
-      this.groupBox1.ForeColor = System.Drawing.Color.White;
-      resources.ApplyResources(this.groupBox1, "groupBox1");
-      this.groupBox1.Name = "groupBox1";
-      this.groupBox1.TabStop = false;
+      this.grpSteamNick.Controls.Add(this.lblSteamNameStart);
+      this.grpSteamNick.Controls.Add(this.btnNickEnd);
+      this.grpSteamNick.Controls.Add(this.txtNickStart);
+      this.grpSteamNick.Controls.Add(this.lblSteamNameEnd);
+      this.grpSteamNick.Controls.Add(this.txtNickEnd);
+      this.grpSteamNick.Controls.Add(this.btnNickStart);
+      this.grpSteamNick.ForeColor = System.Drawing.Color.White;
+      resources.ApplyResources(this.grpSteamNick, "grpSteamNick");
+      this.grpSteamNick.Name = "grpSteamNick";
+      this.grpSteamNick.TabStop = false;
       // 
       // lblSteamNameStart
       // 
@@ -323,6 +336,7 @@ namespace ExtraQL
       // panelTop
       // 
       this.panelTop.BackColor = System.Drawing.Color.Transparent;
+      this.panelTop.Controls.Add(this.linkExtraQlFolder);
       this.panelTop.Controls.Add(this.cbLog);
       this.panelTop.Controls.Add(this.cbOptions);
       this.panelTop.Controls.Add(this.linkOpenExtraQLWebsite);
@@ -335,6 +349,15 @@ namespace ExtraQL
       this.panelTop.Controls.Add(this.picLogo);
       resources.ApplyResources(this.panelTop, "panelTop");
       this.panelTop.Name = "panelTop";
+      // 
+      // linkExtraQlFolder
+      // 
+      resources.ApplyResources(this.linkExtraQlFolder, "linkExtraQlFolder");
+      this.linkExtraQlFolder.LinkColor = System.Drawing.Color.Gold;
+      this.linkExtraQlFolder.Name = "linkExtraQlFolder";
+      this.linkExtraQlFolder.TabStop = true;
+      this.linkExtraQlFolder.UseCompatibleTextRendering = true;
+      this.linkExtraQlFolder.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkExtraQlFolder_LinkClicked);
       // 
       // cbLog
       // 
@@ -464,9 +487,17 @@ namespace ExtraQL
       resources.ApplyResources(this.miQuit, "miQuit");
       this.miQuit.Click += new System.EventHandler(this.miQuit_Click);
       // 
+      // panelRight
+      // 
+      this.panelRight.BackColor = System.Drawing.Color.Transparent;
+      this.panelRight.Controls.Add(this.panelLog);
+      this.panelRight.Controls.Add(this.grpScripts);
+      this.panelRight.Controls.Add(this.panelScripts);
+      resources.ApplyResources(this.panelRight, "panelRight");
+      this.panelRight.Name = "panelRight";
+      // 
       // panelLog
       // 
-      this.panelLog.BackColor = System.Drawing.Color.Transparent;
       this.panelLog.Controls.Add(this.grpLog);
       resources.ApplyResources(this.panelLog, "panelLog");
       this.panelLog.Name = "panelLog";
@@ -511,6 +542,63 @@ namespace ExtraQL
       this.txtLog.Name = "txtLog";
       this.txtLog.ReadOnly = true;
       // 
+      // grpScripts
+      // 
+      this.grpScripts.Controls.Add(this.txtScriptVersion);
+      this.grpScripts.Controls.Add(this.txtScriptAuthor);
+      this.grpScripts.Controls.Add(this.lblScriptVersion);
+      this.grpScripts.Controls.Add(this.lblScriptAuthor);
+      this.grpScripts.Controls.Add(this.txtScriptDescription);
+      this.grpScripts.Controls.Add(this.lbScripts);
+      this.grpScripts.Controls.Add(this.lblScriptDescription);
+      this.grpScripts.ForeColor = System.Drawing.Color.White;
+      resources.ApplyResources(this.grpScripts, "grpScripts");
+      this.grpScripts.Name = "grpScripts";
+      this.grpScripts.TabStop = false;
+      // 
+      // txtScriptVersion
+      // 
+      resources.ApplyResources(this.txtScriptVersion, "txtScriptVersion");
+      this.txtScriptVersion.Name = "txtScriptVersion";
+      // 
+      // txtScriptAuthor
+      // 
+      resources.ApplyResources(this.txtScriptAuthor, "txtScriptAuthor");
+      this.txtScriptAuthor.Name = "txtScriptAuthor";
+      // 
+      // lblScriptVersion
+      // 
+      resources.ApplyResources(this.lblScriptVersion, "lblScriptVersion");
+      this.lblScriptVersion.Name = "lblScriptVersion";
+      // 
+      // lblScriptAuthor
+      // 
+      resources.ApplyResources(this.lblScriptAuthor, "lblScriptAuthor");
+      this.lblScriptAuthor.Name = "lblScriptAuthor";
+      // 
+      // txtScriptDescription
+      // 
+      resources.ApplyResources(this.txtScriptDescription, "txtScriptDescription");
+      this.txtScriptDescription.Name = "txtScriptDescription";
+      this.txtScriptDescription.ReadOnly = true;
+      // 
+      // lbScripts
+      // 
+      this.lbScripts.FormattingEnabled = true;
+      resources.ApplyResources(this.lbScripts, "lbScripts");
+      this.lbScripts.Name = "lbScripts";
+      this.lbScripts.SelectedIndexChanged += new System.EventHandler(this.lbScripts_SelectedIndexChanged);
+      // 
+      // lblScriptDescription
+      // 
+      resources.ApplyResources(this.lblScriptDescription, "lblScriptDescription");
+      this.lblScriptDescription.Name = "lblScriptDescription";
+      // 
+      // panelScripts
+      // 
+      resources.ApplyResources(this.panelScripts, "panelScripts");
+      this.panelScripts.Name = "panelScripts";
+      // 
       // autoQuitTimer
       // 
       this.autoQuitTimer.Enabled = true;
@@ -524,15 +612,15 @@ namespace ExtraQL
       this.ControlBox = false;
       this.Controls.Add(this.panelOptions);
       this.Controls.Add(this.panelTop);
-      this.Controls.Add(this.panelLog);
+      this.Controls.Add(this.panelRight);
       this.DoubleBuffered = true;
       this.ForeColor = System.Drawing.Color.White;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
       this.MaximizeBox = false;
       this.Name = "MainForm";
       this.panelOptions.ResumeLayout(false);
-      this.groupBox1.ResumeLayout(false);
-      this.groupBox1.PerformLayout();
+      this.grpSteamNick.ResumeLayout(false);
+      this.grpSteamNick.PerformLayout();
       this.grpWebPak.ResumeLayout(false);
       this.grpWebPak.PerformLayout();
       this.grpOptions.ResumeLayout(false);
@@ -543,9 +631,12 @@ namespace ExtraQL
       ((System.ComponentModel.ISupportInitialize)(this.picMinimize)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
       this.mnuTrayIcon.ResumeLayout(false);
+      this.panelRight.ResumeLayout(false);
       this.panelLog.ResumeLayout(false);
       this.grpLog.ResumeLayout(false);
       this.grpLog.PerformLayout();
+      this.grpScripts.ResumeLayout(false);
+      this.grpScripts.PerformLayout();
       this.ResumeLayout(false);
 
     }
@@ -572,7 +663,7 @@ namespace ExtraQL
     private ToolStripMenuItem miQuit;
     private CheckBox cbAutostart;
     private CheckBox cbLog;
-    private Panel panelLog;
+    private Panel panelRight;
     private GroupBox grpLog;
     private TextBox txtLog;
     private Button btnClearLog;
@@ -600,10 +691,21 @@ namespace ExtraQL
     private LinkLabel linkRussian;
     private Label lblWebPak;
     private ComboBox comboWebPak;
-    private GroupBox groupBox1;
+    private GroupBox grpSteamNick;
     private Label lblSteamNameStart;
     private LinkLabel linkGerman;
     private LinkLabel linkChinese;
+    private LinkLabel linkExtraQlFolder;
+    private GroupBox grpScripts;
+    private TextBox txtScriptDescription;
+    private CheckedListBox lbScripts;
+    private Label lblScriptDescription;
+    private Panel panelScripts;
+    private Panel panelLog;
+    private TextBox txtScriptVersion;
+    private TextBox txtScriptAuthor;
+    private Label lblScriptVersion;
+    private Label lblScriptAuthor;
   }
 }
 

@@ -1,10 +1,12 @@
 ﻿// ==UserScript==
-// @id             autoExec
-// @name           autoExec
+// @name           AutoExec: Automate actions when you start/leave a match.
 // @version        2.1
 // @author         PredatH0r
-// @description    executes commands when you start/leave a game
-// @unwrap
+// @description    Toggles fullscreen and executes commands when you start/leave a game.
+// @description    /r_autoFullscreen: 1=fullscreen when playing, 2=windowed when not, 3=both. 
+// @description    gamestart.cfg and gameend.cfg are executed when joining/leaving a match.
+// @description    You can use /steamnick in these config files to add color to your name.
+// @enabled        1
 // ==/UserScript==
 
 /*
