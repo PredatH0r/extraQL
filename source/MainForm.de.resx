@@ -5037,9 +5037,6 @@
   <data name="cbOptions.Text" xml:space="preserve">
     <value>Einstellungen</value>
   </data>
-  <data name="groupBox1.Text" xml:space="preserve">
-    <value>Steam Nickname ändern wenn ...</value>
-  </data>
   <data name="lblSteamNameStart.Text" xml:space="preserve">
     <value>QL startet:</value>
   </data>
@@ -5054,5 +5051,20 @@
   </data>
   <data name="linkChinese.Text" xml:space="preserve">
     <value>Chinesisch</value>
+  </data>
+  <data name="grpScripts.Text" xml:space="preserve">
+    <value>Skripte</value>
+  </data>
+  <data name="lblScriptVersion.Text" xml:space="preserve">
+    <value>Version:</value>
+  </data>
+  <data name="lblScriptAuthor.Text" xml:space="preserve">
+    <value>Autor(en):</value>
+  </data>
+  <data name="lblScriptDescription.Text" xml:space="preserve">
+    <value>Skriptbeschreibung:</value>
+  </data>
+  <data name="grpSteamNick.Text" xml:space="preserve">
+    <value>Steam Nickname ändern wenn ...</value>
   </data>
 </root>

@@ -99,6 +99,7 @@ namespace ExtraQL
       this.lblScriptDescription = new System.Windows.Forms.Label();
       this.panelScripts = new System.Windows.Forms.Panel();
       this.autoQuitTimer = new System.Windows.Forms.Timer(this.components);
+      this.panelLeft = new System.Windows.Forms.Panel();
       this.panelOptions.SuspendLayout();
       this.grpSteamNick.SuspendLayout();
       this.grpWebPak.SuspendLayout();
@@ -112,6 +113,7 @@ namespace ExtraQL
       this.panelLog.SuspendLayout();
       this.grpLog.SuspendLayout();
       this.grpScripts.SuspendLayout();
+      this.panelLeft.SuspendLayout();
       this.SuspendLayout();
       // 
       // openFileDialog1
@@ -187,7 +189,6 @@ namespace ExtraQL
       // 
       // grpWebPak
       // 
-      resources.ApplyResources(this.grpWebPak, "grpWebPak");
       this.grpWebPak.Controls.Add(this.linkChinese);
       this.grpWebPak.Controls.Add(this.linkGerman);
       this.grpWebPak.Controls.Add(this.comboWebPak);
@@ -197,6 +198,7 @@ namespace ExtraQL
       this.grpWebPak.Controls.Add(this.lblWebPak);
       this.grpWebPak.Controls.Add(this.lblCustomizedVersions);
       this.grpWebPak.ForeColor = System.Drawing.Color.White;
+      resources.ApplyResources(this.grpWebPak, "grpWebPak");
       this.grpWebPak.Name = "grpWebPak";
       this.grpWebPak.TabStop = false;
       // 
@@ -388,9 +390,9 @@ namespace ExtraQL
       // 
       // btnStartQL
       // 
-      resources.ApplyResources(this.btnStartQL, "btnStartQL");
       this.btnStartQL.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
       this.btnStartQL.FlatAppearance.BorderSize = 2;
+      resources.ApplyResources(this.btnStartQL, "btnStartQL");
       this.btnStartQL.ForeColor = System.Drawing.Color.Gold;
       this.btnStartQL.Name = "btnStartQL";
       this.btnStartQL.UseVisualStyleBackColor = false;
@@ -522,9 +524,9 @@ namespace ExtraQL
       // 
       // btnClearLog
       // 
+      resources.ApplyResources(this.btnClearLog, "btnClearLog");
       this.btnClearLog.BackColor = System.Drawing.SystemColors.ButtonFace;
       this.btnClearLog.ForeColor = System.Drawing.Color.Black;
-      resources.ApplyResources(this.btnClearLog, "btnClearLog");
       this.btnClearLog.Name = "btnClearLog";
       this.btnClearLog.UseVisualStyleBackColor = false;
       this.btnClearLog.Click += new System.EventHandler(this.btnClearLog_Click);
@@ -544,6 +546,7 @@ namespace ExtraQL
       // 
       // grpScripts
       // 
+      resources.ApplyResources(this.grpScripts, "grpScripts");
       this.grpScripts.Controls.Add(this.txtScriptVersion);
       this.grpScripts.Controls.Add(this.txtScriptAuthor);
       this.grpScripts.Controls.Add(this.lblScriptVersion);
@@ -552,7 +555,6 @@ namespace ExtraQL
       this.grpScripts.Controls.Add(this.lbScripts);
       this.grpScripts.Controls.Add(this.lblScriptDescription);
       this.grpScripts.ForeColor = System.Drawing.Color.White;
-      resources.ApplyResources(this.grpScripts, "grpScripts");
       this.grpScripts.Name = "grpScripts";
       this.grpScripts.TabStop = false;
       // 
@@ -584,8 +586,8 @@ namespace ExtraQL
       // 
       // lbScripts
       // 
-      this.lbScripts.FormattingEnabled = true;
       resources.ApplyResources(this.lbScripts, "lbScripts");
+      this.lbScripts.FormattingEnabled = true;
       this.lbScripts.Name = "lbScripts";
       this.lbScripts.SelectedIndexChanged += new System.EventHandler(this.lbScripts_SelectedIndexChanged);
       // 
@@ -605,14 +607,21 @@ namespace ExtraQL
       this.autoQuitTimer.Interval = 2000;
       this.autoQuitTimer.Tick += new System.EventHandler(this.autoQuitTimer_Tick);
       // 
+      // panelLeft
+      // 
+      this.panelLeft.BackColor = System.Drawing.Color.Transparent;
+      this.panelLeft.Controls.Add(this.panelOptions);
+      this.panelLeft.Controls.Add(this.panelTop);
+      resources.ApplyResources(this.panelLeft, "panelLeft");
+      this.panelLeft.Name = "panelLeft";
+      // 
       // MainForm
       // 
       resources.ApplyResources(this, "$this");
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
       this.ControlBox = false;
-      this.Controls.Add(this.panelOptions);
-      this.Controls.Add(this.panelTop);
       this.Controls.Add(this.panelRight);
+      this.Controls.Add(this.panelLeft);
       this.DoubleBuffered = true;
       this.ForeColor = System.Drawing.Color.White;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -637,6 +646,7 @@ namespace ExtraQL
       this.grpLog.PerformLayout();
       this.grpScripts.ResumeLayout(false);
       this.grpScripts.PerformLayout();
+      this.panelLeft.ResumeLayout(false);
       this.ResumeLayout(false);
 
     }
@@ -706,6 +716,7 @@ namespace ExtraQL
     private TextBox txtScriptAuthor;
     private Label lblScriptVersion;
     private Label lblScriptAuthor;
+    private Panel panelLeft;
   }
 }
 

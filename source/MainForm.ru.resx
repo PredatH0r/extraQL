@@ -126,9 +126,6 @@
   <data name="lblSteamNameEnd.Text" xml:space="preserve">
     <value>Выходе из QL:</value>
   </data>
-  <data name="groupBox1.Text" xml:space="preserve">
-    <value>Замена ника в Steam при ...</value>
-  </data>
   <data name="lblTranslations.Text" xml:space="preserve">
     <value>Язык:</value>
   </data>
@@ -218,5 +215,8 @@
   </data>
   <data name="linkCroatian.Text" xml:space="preserve">
     <value>хорватский</value>
+  </data>
+  <data name="grpSteamNick.Text" xml:space="preserve">
+    <value>Замена ника в Steam при ...</value>
   </data>
 </root>

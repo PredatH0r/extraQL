@@ -123,20 +123,176 @@
   <data name="openFileDialog1.Filter" xml:space="preserve">
     <value>EXE Files|*.exe</value>
   </data>
+  <data name="&gt;&gt;grpSteamNick.Name" xml:space="preserve">
+    <value>grpSteamNick</value>
+  </data>
+  <data name="&gt;&gt;grpSteamNick.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grpSteamNick.Parent" xml:space="preserve">
+    <value>panelOptions</value>
+  </data>
+  <data name="&gt;&gt;grpSteamNick.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.Name" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.Parent" xml:space="preserve">
+    <value>panelOptions</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;grpOptions.Name" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;grpOptions.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grpOptions.Parent" xml:space="preserve">
+    <value>panelOptions</value>
+  </data>
+  <data name="&gt;&gt;grpOptions.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="panelOptions.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="panelOptions.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 186</value>
+  </data>
+  <data name="panelOptions.Size" type="System.Drawing.Size, System.Drawing">
+    <value>429, 517</value>
+  </data>
   <assembly alias="mscorlib" name="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="panelOptions.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;panelOptions.Name" xml:space="preserve">
+    <value>panelOptions</value>
+  </data>
+  <data name="&gt;&gt;panelOptions.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;panelOptions.Parent" xml:space="preserve">
+    <value>panelLeft</value>
+  </data>
+  <data name="&gt;&gt;panelOptions.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.Name" xml:space="preserve">
+    <value>lblSteamNameStart</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.Parent" xml:space="preserve">
+    <value>grpSteamNick</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameStart.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;btnNickEnd.Name" xml:space="preserve">
+    <value>btnNickEnd</value>
+  </data>
+  <data name="&gt;&gt;btnNickEnd.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnNickEnd.Parent" xml:space="preserve">
+    <value>grpSteamNick</value>
+  </data>
+  <data name="&gt;&gt;btnNickEnd.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.Name" xml:space="preserve">
+    <value>txtNickStart</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.Parent" xml:space="preserve">
+    <value>grpSteamNick</value>
+  </data>
+  <data name="&gt;&gt;txtNickStart.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.Name" xml:space="preserve">
+    <value>lblSteamNameEnd</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.Parent" xml:space="preserve">
+    <value>grpSteamNick</value>
+  </data>
+  <data name="&gt;&gt;lblSteamNameEnd.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.Name" xml:space="preserve">
+    <value>txtNickEnd</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.Parent" xml:space="preserve">
+    <value>grpSteamNick</value>
+  </data>
+  <data name="&gt;&gt;txtNickEnd.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.Name" xml:space="preserve">
+    <value>btnNickStart</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.Parent" xml:space="preserve">
+    <value>grpSteamNick</value>
+  </data>
+  <data name="&gt;&gt;btnNickStart.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="grpSteamNick.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 6</value>
+  </data>
+  <data name="grpSteamNick.Size" type="System.Drawing.Size, System.Drawing">
+    <value>401, 89</value>
+  </data>
+  <data name="grpSteamNick.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="grpSteamNick.Text" xml:space="preserve">
+    <value>Change Steam Nickname when ...</value>
+  </data>
+  <data name="&gt;&gt;grpSteamNick.Name" xml:space="preserve">
+    <value>grpSteamNick</value>
+  </data>
+  <data name="&gt;&gt;grpSteamNick.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grpSteamNick.Parent" xml:space="preserve">
+    <value>panelOptions</value>
+  </data>
+  <data name="&gt;&gt;grpSteamNick.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="lblSteamNameStart.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="lblSteamNameStart.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="lblSteamNameStart.Location" type="System.Drawing.Point, System.Drawing">
     <value>7, 27</value>
   </data>
   <data name="lblSteamNameStart.Size" type="System.Drawing.Size, System.Drawing">
-    <value>55, 13</value>
+    <value>60, 14</value>
   </data>
   <data name="lblSteamNameStart.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -190,7 +346,7 @@
     <value>142, 24</value>
   </data>
   <data name="txtNickStart.Size" type="System.Drawing.Size, System.Drawing">
-    <value>226, 21</value>
+    <value>226, 22</value>
   </data>
   <data name="txtNickStart.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -214,7 +370,7 @@
     <value>7, 59</value>
   </data>
   <data name="lblSteamNameEnd.Size" type="System.Drawing.Size, System.Drawing">
-    <value>50, 13</value>
+    <value>55, 14</value>
   </data>
   <data name="lblSteamNameEnd.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -241,7 +397,7 @@
     <value>142, 56</value>
   </data>
   <data name="txtNickEnd.Size" type="System.Drawing.Size, System.Drawing">
-    <value>226, 21</value>
+    <value>226, 22</value>
   </data>
   <data name="txtNickEnd.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -285,32 +441,125 @@
   <data name="&gt;&gt;btnNickStart.ZOrder" xml:space="preserve">
     <value>5</value>
   </data>
-  <data name="grpSteamNick.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 6</value>
+  <data name="&gt;&gt;linkChinese.Name" xml:space="preserve">
+    <value>linkChinese</value>
   </data>
-  <data name="grpSteamNick.Size" type="System.Drawing.Size, System.Drawing">
-    <value>401, 89</value>
+  <data name="&gt;&gt;linkChinese.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="grpSteamNick.TabIndex" type="System.Int32, mscorlib">
+  <data name="&gt;&gt;linkChinese.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;linkChinese.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
-  <data name="grpSteamNick.Text" xml:space="preserve">
-    <value>Change Steam Nickname when ...</value>
+  <data name="&gt;&gt;linkGerman.Name" xml:space="preserve">
+    <value>linkGerman</value>
   </data>
-  <data name="&gt;&gt;grpSteamNick.Name" xml:space="preserve">
-    <value>grpSteamNick</value>
+  <data name="&gt;&gt;linkGerman.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;grpSteamNick.Type" xml:space="preserve">
+  <data name="&gt;&gt;linkGerman.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;linkGerman.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;comboWebPak.Name" xml:space="preserve">
+    <value>comboWebPak</value>
+  </data>
+  <data name="&gt;&gt;comboWebPak.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ComboBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;comboWebPak.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;comboWebPak.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;lblTranslations.Name" xml:space="preserve">
+    <value>lblTranslations</value>
+  </data>
+  <data name="&gt;&gt;lblTranslations.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblTranslations.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;lblTranslations.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;linkCroatian.Name" xml:space="preserve">
+    <value>linkCroatian</value>
+  </data>
+  <data name="&gt;&gt;linkCroatian.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;linkCroatian.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;linkCroatian.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;linkRussian.Name" xml:space="preserve">
+    <value>linkRussian</value>
+  </data>
+  <data name="&gt;&gt;linkRussian.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;linkRussian.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;linkRussian.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="&gt;&gt;lblWebPak.Name" xml:space="preserve">
+    <value>lblWebPak</value>
+  </data>
+  <data name="&gt;&gt;lblWebPak.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblWebPak.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;lblWebPak.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;lblCustomizedVersions.Name" xml:space="preserve">
+    <value>lblCustomizedVersions</value>
+  </data>
+  <data name="&gt;&gt;lblCustomizedVersions.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblCustomizedVersions.Parent" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;lblCustomizedVersions.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="grpWebPak.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 110</value>
+  </data>
+  <data name="grpWebPak.Size" type="System.Drawing.Size, System.Drawing">
+    <value>401, 157</value>
+  </data>
+  <data name="grpWebPak.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="grpWebPak.Text" xml:space="preserve">
+    <value>Alternative Quake Live UI</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.Name" xml:space="preserve">
+    <value>grpWebPak</value>
+  </data>
+  <data name="&gt;&gt;grpWebPak.Type" xml:space="preserve">
     <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;grpSteamNick.Parent" xml:space="preserve">
+  <data name="&gt;&gt;grpWebPak.Parent" xml:space="preserve">
     <value>panelOptions</value>
   </data>
-  <data name="&gt;&gt;grpSteamNick.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="grpWebPak.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Left, Right</value>
+  <data name="&gt;&gt;grpWebPak.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <data name="linkChinese.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -325,7 +574,7 @@
     <value>123, 82</value>
   </data>
   <data name="linkChinese.Size" type="System.Drawing.Size, System.Drawing">
-    <value>43, 18</value>
+    <value>47, 19</value>
   </data>
   <data name="linkChinese.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -358,7 +607,7 @@
     <value>208, 64</value>
   </data>
   <data name="linkGerman.Size" type="System.Drawing.Size, System.Drawing">
-    <value>44, 18</value>
+    <value>47, 19</value>
   </data>
   <data name="linkGerman.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -382,7 +631,7 @@
     <value>10, 123</value>
   </data>
   <data name="comboWebPak.Size" type="System.Drawing.Size, System.Drawing">
-    <value>380, 21</value>
+    <value>380, 22</value>
   </data>
   <data name="comboWebPak.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -406,7 +655,7 @@
     <value>7, 64</value>
   </data>
   <data name="lblTranslations.Size" type="System.Drawing.Size, System.Drawing">
-    <value>69, 13</value>
+    <value>75, 14</value>
   </data>
   <data name="lblTranslations.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -433,10 +682,10 @@
     <value>0, 99</value>
   </data>
   <data name="linkCroatian.Location" type="System.Drawing.Point, System.Drawing">
-    <value>278, 64</value>
+    <value>292, 64</value>
   </data>
   <data name="linkCroatian.Size" type="System.Drawing.Size, System.Drawing">
-    <value>46, 18</value>
+    <value>50, 19</value>
   </data>
   <data name="linkCroatian.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -466,7 +715,7 @@
     <value>123, 64</value>
   </data>
   <data name="linkRussian.Size" type="System.Drawing.Size, System.Drawing">
-    <value>42, 18</value>
+    <value>46, 19</value>
   </data>
   <data name="linkRussian.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -493,7 +742,7 @@
     <value>7, 105</value>
   </data>
   <data name="lblWebPak.Size" type="System.Drawing.Size, System.Drawing">
-    <value>230, 13</value>
+    <value>264, 14</value>
   </data>
   <data name="lblWebPak.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -537,32 +786,140 @@
   <data name="&gt;&gt;lblCustomizedVersions.ZOrder" xml:space="preserve">
     <value>7</value>
   </data>
-  <data name="grpWebPak.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 110</value>
+  <data name="grpOptions.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left</value>
   </data>
-  <data name="grpWebPak.Size" type="System.Drawing.Size, System.Drawing">
-    <value>401, 157</value>
+  <data name="&gt;&gt;cbCloseServerBrowser.Name" xml:space="preserve">
+    <value>cbCloseServerBrowser</value>
   </data>
-  <data name="grpWebPak.TabIndex" type="System.Int32, mscorlib">
+  <data name="&gt;&gt;cbCloseServerBrowser.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cbCloseServerBrowser.Parent" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;cbCloseServerBrowser.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;cbStartServerBrowser.Name" xml:space="preserve">
+    <value>cbStartServerBrowser</value>
+  </data>
+  <data name="&gt;&gt;cbStartServerBrowser.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cbStartServerBrowser.Parent" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;cbStartServerBrowser.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="grpWebPak.Text" xml:space="preserve">
-    <value>Alternative Quake Live UI</value>
+  <data name="&gt;&gt;txtSteamExe.Name" xml:space="preserve">
+    <value>txtSteamExe</value>
   </data>
-  <data name="&gt;&gt;grpWebPak.Name" xml:space="preserve">
-    <value>grpWebPak</value>
+  <data name="&gt;&gt;txtSteamExe.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;grpWebPak.Type" xml:space="preserve">
+  <data name="&gt;&gt;txtSteamExe.Parent" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;txtSteamExe.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;lblSteamExe.Name" xml:space="preserve">
+    <value>lblSteamExe</value>
+  </data>
+  <data name="&gt;&gt;lblSteamExe.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblSteamExe.Parent" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;lblSteamExe.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;btnSteamExe.Name" xml:space="preserve">
+    <value>btnSteamExe</value>
+  </data>
+  <data name="&gt;&gt;btnSteamExe.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnSteamExe.Parent" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;btnSteamExe.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;cbAutoQuit.Name" xml:space="preserve">
+    <value>cbAutoQuit</value>
+  </data>
+  <data name="&gt;&gt;cbAutoQuit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cbAutoQuit.Parent" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;cbAutoQuit.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="&gt;&gt;cbAutostart.Name" xml:space="preserve">
+    <value>cbAutostart</value>
+  </data>
+  <data name="&gt;&gt;cbAutostart.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cbAutostart.Parent" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;cbAutostart.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;cbStartMinimized.Name" xml:space="preserve">
+    <value>cbStartMinimized</value>
+  </data>
+  <data name="&gt;&gt;cbStartMinimized.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cbStartMinimized.Parent" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;cbStartMinimized.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;cbSystemTray.Name" xml:space="preserve">
+    <value>cbSystemTray</value>
+  </data>
+  <data name="&gt;&gt;cbSystemTray.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cbSystemTray.Parent" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;cbSystemTray.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="grpOptions.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 282</value>
+  </data>
+  <data name="grpOptions.Size" type="System.Drawing.Size, System.Drawing">
+    <value>401, 223</value>
+  </data>
+  <data name="grpOptions.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="grpOptions.Text" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="&gt;&gt;grpOptions.Name" xml:space="preserve">
+    <value>grpOptions</value>
+  </data>
+  <data name="&gt;&gt;grpOptions.Type" xml:space="preserve">
     <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;grpWebPak.Parent" xml:space="preserve">
+  <data name="&gt;&gt;grpOptions.Parent" xml:space="preserve">
     <value>panelOptions</value>
   </data>
-  <data name="&gt;&gt;grpWebPak.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="grpOptions.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
+  <data name="&gt;&gt;grpOptions.ZOrder" xml:space="preserve">
+    <value>2</value>
   </data>
   <data name="cbCloseServerBrowser.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -571,7 +928,7 @@
     <value>10, 193</value>
   </data>
   <data name="cbCloseServerBrowser.Size" type="System.Drawing.Size, System.Drawing">
-    <value>175, 17</value>
+    <value>196, 18</value>
   </data>
   <data name="cbCloseServerBrowser.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -598,7 +955,7 @@
     <value>10, 170</value>
   </data>
   <data name="cbStartServerBrowser.Size" type="System.Drawing.Size, System.Drawing">
-    <value>176, 17</value>
+    <value>196, 18</value>
   </data>
   <data name="cbStartServerBrowser.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -625,7 +982,7 @@
     <value>10, 37</value>
   </data>
   <data name="txtSteamExe.Size" type="System.Drawing.Size, System.Drawing">
-    <value>358, 21</value>
+    <value>358, 22</value>
   </data>
   <data name="txtSteamExe.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -649,7 +1006,7 @@
     <value>7, 21</value>
   </data>
   <data name="lblSteamExe.Size" type="System.Drawing.Size, System.Drawing">
-    <value>317, 13</value>
+    <value>361, 14</value>
   </data>
   <data name="lblSteamExe.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -703,7 +1060,7 @@
     <value>10, 147</value>
   </data>
   <data name="cbAutoQuit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>159, 17</value>
+    <value>180, 18</value>
   </data>
   <data name="cbAutoQuit.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -730,7 +1087,7 @@
     <value>10, 124</value>
   </data>
   <data name="cbAutostart.Size" type="System.Drawing.Size, System.Drawing">
-    <value>128, 17</value>
+    <value>142, 18</value>
   </data>
   <data name="cbAutostart.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -757,7 +1114,7 @@
     <value>10, 78</value>
   </data>
   <data name="cbStartMinimized.Size" type="System.Drawing.Size, System.Drawing">
-    <value>98, 17</value>
+    <value>108, 18</value>
   </data>
   <data name="cbStartMinimized.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -784,7 +1141,7 @@
     <value>10, 101</value>
   </data>
   <data name="cbSystemTray.Size" type="System.Drawing.Size, System.Drawing">
-    <value>126, 17</value>
+    <value>142, 18</value>
   </data>
   <data name="cbSystemTray.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -804,56 +1161,161 @@
   <data name="&gt;&gt;cbSystemTray.ZOrder" xml:space="preserve">
     <value>8</value>
   </data>
-  <data name="grpOptions.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 282</value>
+  <data name="&gt;&gt;linkExtraQlFolder.Name" xml:space="preserve">
+    <value>linkExtraQlFolder</value>
   </data>
-  <data name="grpOptions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>401, 223</value>
+  <data name="&gt;&gt;linkExtraQlFolder.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="grpOptions.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
+  <data name="&gt;&gt;linkExtraQlFolder.Parent" xml:space="preserve">
+    <value>panelTop</value>
   </data>
-  <data name="grpOptions.Text" xml:space="preserve">
-    <value>Options</value>
+  <data name="&gt;&gt;linkExtraQlFolder.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
-  <data name="&gt;&gt;grpOptions.Name" xml:space="preserve">
-    <value>grpOptions</value>
+  <data name="&gt;&gt;cbLog.Name" xml:space="preserve">
+    <value>cbLog</value>
   </data>
-  <data name="&gt;&gt;grpOptions.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;cbLog.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;grpOptions.Parent" xml:space="preserve">
-    <value>panelOptions</value>
+  <data name="&gt;&gt;cbLog.Parent" xml:space="preserve">
+    <value>panelTop</value>
   </data>
-  <data name="&gt;&gt;grpOptions.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="panelOptions.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="panelOptions.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 186</value>
-  </data>
-  <data name="panelOptions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>429, 517</value>
-  </data>
-  <data name="panelOptions.TabIndex" type="System.Int32, mscorlib">
+  <data name="&gt;&gt;cbLog.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="&gt;&gt;panelOptions.Name" xml:space="preserve">
-    <value>panelOptions</value>
+  <data name="&gt;&gt;cbOptions.Name" xml:space="preserve">
+    <value>cbOptions</value>
   </data>
-  <data name="&gt;&gt;panelOptions.Type" xml:space="preserve">
+  <data name="&gt;&gt;cbOptions.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;cbOptions.Parent" xml:space="preserve">
+    <value>panelTop</value>
+  </data>
+  <data name="&gt;&gt;cbOptions.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;linkOpenExtraQLWebsite.Name" xml:space="preserve">
+    <value>linkOpenExtraQLWebsite</value>
+  </data>
+  <data name="&gt;&gt;linkOpenExtraQLWebsite.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;linkOpenExtraQLWebsite.Parent" xml:space="preserve">
+    <value>panelTop</value>
+  </data>
+  <data name="&gt;&gt;linkOpenExtraQLWebsite.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;btnStartQL.Name" xml:space="preserve">
+    <value>btnStartQL</value>
+  </data>
+  <data name="&gt;&gt;btnStartQL.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnStartQL.Parent" xml:space="preserve">
+    <value>panelTop</value>
+  </data>
+  <data name="&gt;&gt;btnStartQL.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;picClose.Name" xml:space="preserve">
+    <value>picClose</value>
+  </data>
+  <data name="&gt;&gt;picClose.Type" xml:space="preserve">
+    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;picClose.Parent" xml:space="preserve">
+    <value>panelTop</value>
+  </data>
+  <data name="&gt;&gt;picClose.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="&gt;&gt;picMinimize.Name" xml:space="preserve">
+    <value>picMinimize</value>
+  </data>
+  <data name="&gt;&gt;picMinimize.Type" xml:space="preserve">
+    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;picMinimize.Parent" xml:space="preserve">
+    <value>panelTop</value>
+  </data>
+  <data name="&gt;&gt;picMinimize.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;lblVersion.Name" xml:space="preserve">
+    <value>lblVersion</value>
+  </data>
+  <data name="&gt;&gt;lblVersion.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblVersion.Parent" xml:space="preserve">
+    <value>panelTop</value>
+  </data>
+  <data name="&gt;&gt;lblVersion.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;linkOpenConfigFolder.Name" xml:space="preserve">
+    <value>linkOpenConfigFolder</value>
+  </data>
+  <data name="&gt;&gt;linkOpenConfigFolder.Type" xml:space="preserve">
+    <value>System.Windows.Forms.LinkLabel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;linkOpenConfigFolder.Parent" xml:space="preserve">
+    <value>panelTop</value>
+  </data>
+  <data name="&gt;&gt;linkOpenConfigFolder.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="&gt;&gt;lblExtra.Name" xml:space="preserve">
+    <value>lblExtra</value>
+  </data>
+  <data name="&gt;&gt;lblExtra.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblExtra.Parent" xml:space="preserve">
+    <value>panelTop</value>
+  </data>
+  <data name="&gt;&gt;lblExtra.ZOrder" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <data name="&gt;&gt;picLogo.Name" xml:space="preserve">
+    <value>picLogo</value>
+  </data>
+  <data name="&gt;&gt;picLogo.Type" xml:space="preserve">
+    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;picLogo.Parent" xml:space="preserve">
+    <value>panelTop</value>
+  </data>
+  <data name="&gt;&gt;picLogo.ZOrder" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="panelTop.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Top</value>
+  </data>
+  <data name="panelTop.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="panelTop.Size" type="System.Drawing.Size, System.Drawing">
+    <value>429, 186</value>
+  </data>
+  <data name="panelTop.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;panelTop.Name" xml:space="preserve">
+    <value>panelTop</value>
+  </data>
+  <data name="&gt;&gt;panelTop.Type" xml:space="preserve">
     <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;panelOptions.Parent" xml:space="preserve">
-    <value>$this</value>
+  <data name="&gt;&gt;panelTop.Parent" xml:space="preserve">
+    <value>panelLeft</value>
   </data>
-  <data name="&gt;&gt;panelOptions.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;panelTop.ZOrder" xml:space="preserve">
     <value>1</value>
-  </data>
-  <data name="linkExtraQlFolder.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
   </data>
   <data name="linkExtraQlFolder.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -892,7 +1354,7 @@
     <value>221, 112</value>
   </data>
   <data name="cbLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>43, 17</value>
+    <value>46, 18</value>
   </data>
   <data name="cbLog.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -919,7 +1381,7 @@
     <value>221, 89</value>
   </data>
   <data name="cbOptions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>63, 17</value>
+    <value>68, 18</value>
   </data>
   <data name="cbOptions.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -938,9 +1400,6 @@
   </data>
   <data name="&gt;&gt;cbOptions.ZOrder" xml:space="preserve">
     <value>2</value>
-  </data>
-  <data name="linkOpenExtraQLWebsite.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
   </data>
   <data name="linkOpenExtraQLWebsite.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
     <value>0, 99</value>
@@ -969,14 +1428,11 @@
   <data name="&gt;&gt;linkOpenExtraQLWebsite.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
-  <data name="btnStartQL.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Left, Right</value>
-  </data>
   <data name="btnStartQL.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
     <value>Flat</value>
   </data>
   <data name="btnStartQL.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Tahoma, 8.25pt, style=Bold</value>
+    <value>Tahoma, 9pt, style=Bold</value>
   </data>
   <data name="btnStartQL.Location" type="System.Drawing.Point, System.Drawing">
     <value>22, 89</value>
@@ -1097,9 +1553,6 @@
   </data>
   <data name="&gt;&gt;lblVersion.ZOrder" xml:space="preserve">
     <value>7</value>
-  </data>
-  <data name="linkOpenConfigFolder.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
   </data>
   <data name="linkOpenConfigFolder.LinkArea" type="System.Windows.Forms.LinkArea, System.Windows.Forms">
     <value>0, 99</value>
@@ -1737,30 +2190,6 @@
   <data name="&gt;&gt;picLogo.ZOrder" xml:space="preserve">
     <value>10</value>
   </data>
-  <data name="panelTop.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Top</value>
-  </data>
-  <data name="panelTop.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="panelTop.Size" type="System.Drawing.Size, System.Drawing">
-    <value>429, 186</value>
-  </data>
-  <data name="panelTop.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;panelTop.Name" xml:space="preserve">
-    <value>panelTop</value>
-  </data>
-  <data name="&gt;&gt;panelTop.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;panelTop.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;panelTop.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
   <metadata name="trayIcon.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>339, 17</value>
   </metadata>
@@ -1773,6 +2202,18 @@
   <metadata name="mnuTrayIcon.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>434, 17</value>
   </metadata>
+  <data name="mnuTrayIcon.Size" type="System.Drawing.Size, System.Drawing">
+    <value>154, 98</value>
+  </data>
+  <data name="&gt;&gt;mnuTrayIcon.Name" xml:space="preserve">
+    <value>mnuTrayIcon</value>
+  </data>
+  <data name="&gt;&gt;mnuTrayIcon.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="trayIcon.Text" xml:space="preserve">
+    <value>extraQL</value>
+  </data>
   <data name="miOpenExtraQl.Size" type="System.Drawing.Size, System.Drawing">
     <value>153, 22</value>
   </data>
@@ -1800,18 +2241,6 @@
   <data name="miQuit.Text" xml:space="preserve">
     <value>Quit extraQL</value>
   </data>
-  <data name="mnuTrayIcon.Size" type="System.Drawing.Size, System.Drawing">
-    <value>154, 98</value>
-  </data>
-  <data name="&gt;&gt;mnuTrayIcon.Name" xml:space="preserve">
-    <value>mnuTrayIcon</value>
-  </data>
-  <data name="&gt;&gt;mnuTrayIcon.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="trayIcon.Text" xml:space="preserve">
-    <value>extraQL</value>
-  </data>
   <data name="grpLog.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
   </data>
@@ -1822,7 +2251,7 @@
     <value>10, 37</value>
   </data>
   <data name="cbLogAllRequests.Size" type="System.Drawing.Size, System.Drawing">
-    <value>104, 17</value>
+    <value>114, 18</value>
   </data>
   <data name="cbLogAllRequests.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -1842,11 +2271,14 @@
   <data name="&gt;&gt;cbLogAllRequests.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="btnClearLog.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
   <data name="btnClearLog.Location" type="System.Drawing.Point, System.Drawing">
-    <value>367, 20</value>
+    <value>457, 20</value>
   </data>
   <data name="btnClearLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>96, 23</value>
+    <value>101, 23</value>
   </data>
   <data name="btnClearLog.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -1873,7 +2305,7 @@
     <value>10, 20</value>
   </data>
   <data name="cbFollowLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>122, 17</value>
+    <value>136, 18</value>
   </data>
   <data name="cbFollowLog.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -1906,7 +2338,7 @@
     <value>Vertical</value>
   </data>
   <data name="txtLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>453, 206</value>
+    <value>548, 206</value>
   </data>
   <data name="txtLog.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -1927,7 +2359,7 @@
     <value>12, 3</value>
   </data>
   <data name="grpLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>471, 278</value>
+    <value>566, 278</value>
   </data>
   <data name="grpLog.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -1954,7 +2386,7 @@
     <value>0, 0</value>
   </data>
   <data name="panelLog.Size" type="System.Drawing.Size, System.Drawing">
-    <value>495, 296</value>
+    <value>590, 287</value>
   </data>
   <data name="panelLog.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -1971,11 +2403,173 @@
   <data name="&gt;&gt;panelLog.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="grpScripts.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <data name="&gt;&gt;txtScriptVersion.Name" xml:space="preserve">
+    <value>txtScriptVersion</value>
+  </data>
+  <data name="&gt;&gt;txtScriptVersion.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtScriptVersion.Parent" xml:space="preserve">
+    <value>grpScripts</value>
+  </data>
+  <data name="&gt;&gt;txtScriptVersion.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;txtScriptAuthor.Name" xml:space="preserve">
+    <value>txtScriptAuthor</value>
+  </data>
+  <data name="&gt;&gt;txtScriptAuthor.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtScriptAuthor.Parent" xml:space="preserve">
+    <value>grpScripts</value>
+  </data>
+  <data name="&gt;&gt;txtScriptAuthor.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;lblScriptVersion.Name" xml:space="preserve">
+    <value>lblScriptVersion</value>
+  </data>
+  <data name="&gt;&gt;lblScriptVersion.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblScriptVersion.Parent" xml:space="preserve">
+    <value>grpScripts</value>
+  </data>
+  <data name="&gt;&gt;lblScriptVersion.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;lblScriptAuthor.Name" xml:space="preserve">
+    <value>lblScriptAuthor</value>
+  </data>
+  <data name="&gt;&gt;lblScriptAuthor.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblScriptAuthor.Parent" xml:space="preserve">
+    <value>grpScripts</value>
+  </data>
+  <data name="&gt;&gt;lblScriptAuthor.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;txtScriptDescription.Name" xml:space="preserve">
+    <value>txtScriptDescription</value>
+  </data>
+  <data name="&gt;&gt;txtScriptDescription.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtScriptDescription.Parent" xml:space="preserve">
+    <value>grpScripts</value>
+  </data>
+  <data name="&gt;&gt;txtScriptDescription.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;lbScripts.Name" xml:space="preserve">
+    <value>lbScripts</value>
+  </data>
+  <data name="&gt;&gt;lbScripts.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckedListBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbScripts.Parent" xml:space="preserve">
+    <value>grpScripts</value>
+  </data>
+  <data name="&gt;&gt;lbScripts.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="&gt;&gt;lblScriptDescription.Name" xml:space="preserve">
+    <value>lblScriptDescription</value>
+  </data>
+  <data name="&gt;&gt;lblScriptDescription.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lblScriptDescription.Parent" xml:space="preserve">
+    <value>grpScripts</value>
+  </data>
+  <data name="&gt;&gt;lblScriptDescription.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="grpScripts.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 296</value>
+  </data>
+  <data name="grpScripts.Size" type="System.Drawing.Size, System.Drawing">
+    <value>566, 395</value>
+  </data>
+  <data name="grpScripts.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="grpScripts.Text" xml:space="preserve">
+    <value>Scripts</value>
+  </data>
+  <data name="&gt;&gt;grpScripts.Name" xml:space="preserve">
+    <value>grpScripts</value>
+  </data>
+  <data name="&gt;&gt;grpScripts.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;grpScripts.Parent" xml:space="preserve">
+    <value>panelRight</value>
+  </data>
+  <data name="&gt;&gt;grpScripts.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="panelScripts.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Bottom</value>
+  </data>
+  <data name="panelScripts.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 287</value>
+  </data>
+  <data name="panelScripts.Size" type="System.Drawing.Size, System.Drawing">
+    <value>590, 416</value>
+  </data>
+  <data name="panelScripts.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;panelScripts.Name" xml:space="preserve">
+    <value>panelScripts</value>
+  </data>
+  <data name="&gt;&gt;panelScripts.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;panelScripts.Parent" xml:space="preserve">
+    <value>panelRight</value>
+  </data>
+  <data name="&gt;&gt;panelScripts.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="panelRight.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="panelRight.Location" type="System.Drawing.Point, System.Drawing">
+    <value>429, 0</value>
+  </data>
+  <data name="panelRight.Size" type="System.Drawing.Size, System.Drawing">
+    <value>590, 703</value>
+  </data>
+  <data name="panelRight.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;panelRight.Name" xml:space="preserve">
+    <value>panelRight</value>
+  </data>
+  <data name="&gt;&gt;panelRight.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;panelRight.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;panelRight.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="txtScriptVersion.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
   <data name="txtScriptVersion.Location" type="System.Drawing.Point, System.Drawing">
-    <value>362, 363</value>
+    <value>457, 363</value>
   </data>
   <data name="txtScriptVersion.Size" type="System.Drawing.Size, System.Drawing">
-    <value>97, 21</value>
+    <value>97, 22</value>
   </data>
   <data name="txtScriptVersion.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -1992,11 +2586,14 @@
   <data name="&gt;&gt;txtScriptVersion.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="txtScriptAuthor.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left, Right</value>
+  </data>
   <data name="txtScriptAuthor.Location" type="System.Drawing.Point, System.Drawing">
     <value>10, 363</value>
   </data>
   <data name="txtScriptAuthor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>334, 21</value>
+    <value>429, 22</value>
   </data>
   <data name="txtScriptAuthor.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -2013,11 +2610,14 @@
   <data name="&gt;&gt;txtScriptAuthor.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="lblScriptVersion.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Right</value>
+  </data>
   <data name="lblScriptVersion.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="lblScriptVersion.Location" type="System.Drawing.Point, System.Drawing">
-    <value>359, 343</value>
+    <value>454, 343</value>
   </data>
   <data name="lblScriptVersion.Size" type="System.Drawing.Size, System.Drawing">
     <value>100, 16</value>
@@ -2040,6 +2640,9 @@
   <data name="&gt;&gt;lblScriptVersion.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
+  <data name="lblScriptAuthor.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left, Right</value>
+  </data>
   <data name="lblScriptAuthor.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
@@ -2047,7 +2650,7 @@
     <value>11, 343</value>
   </data>
   <data name="lblScriptAuthor.Size" type="System.Drawing.Size, System.Drawing">
-    <value>294, 16</value>
+    <value>389, 16</value>
   </data>
   <data name="lblScriptAuthor.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -2067,6 +2670,9 @@
   <data name="&gt;&gt;lblScriptAuthor.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
+  <data name="txtScriptDescription.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
   <data name="txtScriptDescription.Location" type="System.Drawing.Point, System.Drawing">
     <value>10, 243</value>
   </data>
@@ -2074,7 +2680,7 @@
     <value>True</value>
   </data>
   <data name="txtScriptDescription.Size" type="System.Drawing.Size, System.Drawing">
-    <value>449, 91</value>
+    <value>544, 91</value>
   </data>
   <data name="txtScriptDescription.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -2091,11 +2697,14 @@
   <data name="&gt;&gt;txtScriptDescription.ZOrder" xml:space="preserve">
     <value>4</value>
   </data>
+  <data name="lbScripts.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
   <data name="lbScripts.Location" type="System.Drawing.Point, System.Drawing">
     <value>10, 20</value>
   </data>
   <data name="lbScripts.Size" type="System.Drawing.Size, System.Drawing">
-    <value>453, 180</value>
+    <value>548, 180</value>
   </data>
   <data name="lbScripts.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -2139,81 +2748,33 @@
   <data name="&gt;&gt;lblScriptDescription.ZOrder" xml:space="preserve">
     <value>6</value>
   </data>
-  <data name="grpScripts.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 296</value>
-  </data>
-  <data name="grpScripts.Size" type="System.Drawing.Size, System.Drawing">
-    <value>471, 395</value>
-  </data>
-  <data name="grpScripts.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="grpScripts.Text" xml:space="preserve">
-    <value>Scripts</value>
-  </data>
-  <data name="&gt;&gt;grpScripts.Name" xml:space="preserve">
-    <value>grpScripts</value>
-  </data>
-  <data name="&gt;&gt;grpScripts.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;grpScripts.Parent" xml:space="preserve">
-    <value>panelRight</value>
-  </data>
-  <data name="&gt;&gt;grpScripts.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="panelScripts.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Bottom</value>
-  </data>
-  <data name="panelScripts.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 296</value>
-  </data>
-  <data name="panelScripts.Size" type="System.Drawing.Size, System.Drawing">
-    <value>495, 407</value>
-  </data>
-  <data name="panelScripts.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;panelScripts.Name" xml:space="preserve">
-    <value>panelScripts</value>
-  </data>
-  <data name="&gt;&gt;panelScripts.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;panelScripts.Parent" xml:space="preserve">
-    <value>panelRight</value>
-  </data>
-  <data name="&gt;&gt;panelScripts.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="panelRight.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Right</value>
-  </data>
-  <data name="panelRight.Location" type="System.Drawing.Point, System.Drawing">
-    <value>429, 0</value>
-  </data>
-  <data name="panelRight.Size" type="System.Drawing.Size, System.Drawing">
-    <value>495, 703</value>
-  </data>
-  <data name="panelRight.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;panelRight.Name" xml:space="preserve">
-    <value>panelRight</value>
-  </data>
-  <data name="&gt;&gt;panelRight.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;panelRight.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="&gt;&gt;panelRight.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
   <metadata name="autoQuitTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>861, 17</value>
   </metadata>
+  <data name="panelLeft.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Left</value>
+  </data>
+  <data name="panelLeft.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="panelLeft.Size" type="System.Drawing.Size, System.Drawing">
+    <value>429, 703</value>
+  </data>
+  <data name="panelLeft.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;panelLeft.Name" xml:space="preserve">
+    <value>panelLeft</value>
+  </data>
+  <data name="&gt;&gt;panelLeft.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;panelLeft.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;panelLeft.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -2231,10 +2792,10 @@
 </value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>924, 703</value>
+    <value>1019, 703</value>
   </data>
   <data name="$this.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Tahoma, 8.25pt</value>
+    <value>Tahoma, 9pt</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

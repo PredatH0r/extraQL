@@ -17,6 +17,7 @@ Changelog
 Version 2.13
 ---
 - Added config screen to enable/disable individual scripts.
+- Increased font size
 - When extraQL cannot initialize steam_api.dll, there is now a fallback to AppID 1007, which in some scenarios can fix the problem.
   If that happens, the "Steamworks SDK Redist" will show up in your Steam Client's "Recent" list.
 

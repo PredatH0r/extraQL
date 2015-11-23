@@ -103,6 +103,7 @@
     <EmbeddedResource Include="UpdateForm.resx">
       <DependentUpon>UpdateForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="extraQL.ini" />
     <None Include="scripts\attic\autoExec.usr.js" />
     <None Include="scripts\attic\openChat.usr.js" />
     <None Include="scripts\attic\startpage.usr.js" />
