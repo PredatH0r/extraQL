@@ -57,6 +57,8 @@ namespace ExtraQL
 
     public int SteamAppId { get { return steamworks.AppID; } set { steamworks.AppID = value; } }
 
+    public ThreadStart BringToFrontHandler { get; set; } 
+
     #region RegisterServlets()
 
     /// <summary>
@@ -438,13 +440,9 @@ namespace ExtraQL
         return;
       }
 
-      form.BeginInvoke((ThreadStart)(() =>
-      {
-        this.form.Visible = true;
-        this.form.WindowState = FormWindowState.Normal;
-        this.form.BringToFront();
-        this.form.Activate();
-      }));
+      var handler = this.BringToFrontHandler;
+      if (handler != null)
+        form.BeginInvoke(handler);
       this.HttpOk(stream, "ok");
     }
     #endregion

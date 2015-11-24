@@ -14,6 +14,13 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.14
+---
+- When option "Auto-Start QL" is active and you try to start a 2nd extraQL, extraQL will now bring the QL window to the foreground 
+  or start QL instead of bringing the extraQL GUI to the foreground. You can now always use the extraQL desktop shortcut to start QL.
+- When option "Auto-Start QL" is active and the Steam Client wasn't running, extraQL no longer tries to start Steam and QL at the same
+  time to avoid the misleading Steam popup about 2 Steam Clients running under different user accounts.
+
 Version 2.13
 ---
 - Added config screen to enable/disable individual scripts.

@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.13";
+    public const string Version = "2.14";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -475,6 +475,16 @@ namespace ExtraQL
     }
     #endregion
 
+    #region OnSecondInstanceStarted()
+    private void OnSecondInstanceStarted()
+    {
+      if (this.cbAutostart.Checked)
+        this.Launch();
+      else
+        this.SetFormVisibility(true);
+    }
+    #endregion
+
     #region CheckIfStartedFromWorkshopFolder()
     private void CheckIfStartedFromWorkshopFolder()
     {
@@ -534,6 +544,7 @@ namespace ExtraQL
         this.servlets.QuakeSteamFolder = this.GetQuakeLivePath();
         if (this.steamAppId != 0)
           this.servlets.SteamAppId = this.steamAppId;
+        this.servlets.BringToFrontHandler = this.OnSecondInstanceStarted;
       }
     }
     #endregion
@@ -837,12 +848,20 @@ bind mouse5 +hook
     #region StartQuakeLive()
     private void StartQuakeLive()
     {
-      this.Log("Starting Quake Live...");
-
-      var args = "";
-      PrepareAlternativeQuakeLiveUI(ref args);
-
-      Process.Start("steam://rungameid/" + QuakeLiveAppId + args);
+      var procList = Process.GetProcessesByName("quakelive_steam");
+      if (procList.Length > 0)
+      {
+        // bring existing QL window to front and activate it
+        Win32.SetWindowPos(procList[0].MainWindowHandle, Win32.HWND_TOPMOST, 0, 0, 0, 0, Win32.SWP_SHOWWINDOW | Win32.SWP_NOSIZE | Win32.SWP_NOMOVE);
+        Win32.SetWindowPos(procList[0].MainWindowHandle, Win32.HWND_NOTOPMOST, 0, 0, 0, 0, Win32.SWP_SHOWWINDOW | Win32.SWP_NOSIZE | Win32.SWP_NOMOVE);
+      }
+      else
+      {
+        this.Log("Starting Quake Live...");
+        var args = "";
+        PrepareAlternativeQuakeLiveUI(ref args);
+        Process.Start("steam://rungameid/" + QuakeLiveAppId + args);
+      }
       this.SetFormVisibility(false);
     }
     #endregion
@@ -889,7 +908,9 @@ if (qz_instance.GetCvar('fs_webpath') != path) {
       if (visible)
       {
         this.WindowState = FormWindowState.Normal;
+        this.BringToFront();
         this.Show();
+        this.Activate();
       }
       else
       {
