@@ -465,10 +465,12 @@ namespace ExtraQL
       this.RestartHttpServer();
       this.CheckIfStartedFromWorkshopFolder();
       this.FillScriptList();
-      this.StartSteamClient();
 
       if (this.cbAutostart.Checked)
         this.Launch();
+      else
+        this.StartSteamClient();
+
       this.startupCompleted = true;
     }
     #endregion
