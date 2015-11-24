@@ -43,7 +43,13 @@ namespace ExtraQL
     [DllImport("user32.dll")]
     public static extern bool ShowWindow(IntPtr handle, int flags);
 
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr handle);
+
     public delegate bool EnumWindowProc(IntPtr hWnd, IntPtr lParam);
+
+    public static int HWND_TOPMOST = -1;
+    public static int HWND_NOTOPMOST = -2;
 
     public const int WM_ACTIVATE = 0x0006;
     public const int WM_SETREDRAW = 0x000B;
