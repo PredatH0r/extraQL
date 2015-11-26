@@ -44,7 +44,19 @@ namespace ExtraQL
     public static extern bool ShowWindow(IntPtr handle, int flags);
 
     [DllImport("user32.dll")]
+    public static extern bool SetActiveWindow(IntPtr handle);
+
+    [DllImport("user32.dll")]
     public static extern bool SetForegroundWindow(IntPtr handle);
+
+    [DllImport("user32.dll")]
+    public static extern bool SetFocus(IntPtr handle);
+
+    [DllImport("user32.dll")]
+    public static extern bool SetCapture(IntPtr handle);
+
+    [DllImport("user32.dll")]
+    public static extern bool EnableWindow(IntPtr handle, bool enable);
 
     public delegate bool EnumWindowProc(IntPtr hWnd, IntPtr lParam);
 
@@ -52,6 +64,7 @@ namespace ExtraQL
     public static int HWND_NOTOPMOST = -2;
 
     public const int WM_ACTIVATE = 0x0006;
+    public const int WM_NCACTIVATE = 0x0086;
     public const int WM_SETREDRAW = 0x000B;
     public const int WM_CLOSE = 0x0010;
     public const int WM_SHOWWINDOW = 0x0018;
@@ -68,6 +81,11 @@ namespace ExtraQL
     public const int WM_EXITSIZEMOVE = 0x0232;
     public const int WM_SYSKEYDOWN = 0x0104;
     public const int WM_SYSKEYUP = 0x0105;
+
+    public const int SW_SHOWNORMAL = 1;
+
+    public const int WA_ACTIVE = 1;
+    public const int WA_CLICKACTIVE = 2;
 
     public const int SWP_NOSIZE = 0x0001;
     public const int SWP_NOMOVE = 0x0002;

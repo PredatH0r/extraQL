@@ -14,6 +14,10 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.15
+---
+- improved forwarding focus to an already running QL window when re-starting extraQL with enabled option to auto-start QL
+
 Version 2.14
 ---
 - When option "Auto-Start QL" is active and you try to start a 2nd extraQL, extraQL will now bring the QL window to the foreground 
