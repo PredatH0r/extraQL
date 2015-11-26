@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.14";
+    public const string Version = "2.15";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -852,8 +852,12 @@ bind mouse5 +hook
       if (procList.Length > 0)
       {
         // bring existing QL window to front and activate it
-        Win32.SetWindowPos(procList[0].MainWindowHandle, Win32.HWND_TOPMOST, 0, 0, 0, 0, Win32.SWP_SHOWWINDOW | Win32.SWP_NOSIZE | Win32.SWP_NOMOVE);
-        Win32.SetWindowPos(procList[0].MainWindowHandle, Win32.HWND_NOTOPMOST, 0, 0, 0, 0, Win32.SWP_SHOWWINDOW | Win32.SWP_NOSIZE | Win32.SWP_NOMOVE);
+        var hWnd = procList[0].MainWindowHandle;
+        Win32.ShowWindow(hWnd, Win32.SW_SHOWNORMAL);
+        Win32.SetForegroundWindow(hWnd);
+        Win32.SetCapture(hWnd);
+        Win32.SetFocus(hWnd);
+        Win32.SetActiveWindow(hWnd);
       }
       else
       {
