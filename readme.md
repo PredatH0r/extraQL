@@ -14,6 +14,11 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.16
+---
+- improved detection of Quake Live directory when it's installed outside the standard steam folder. 
+  (Only works when extraQL is started from the workshop item folder.)
+
 Version 2.15
 ---
 - improved forwarding focus to an already running QL window when re-starting extraQL with enabled option to auto-start QL
