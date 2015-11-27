@@ -12,7 +12,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.15";
+    public const string Version = "2.16";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -781,36 +781,59 @@ bind mouse5 +hook
     #endregion
 
     #region GetQuakeLivePath()
+
+    private delegate string StrFunc();
+
     private string GetQuakeLivePath()
     {
-      string path;
-      if (this.txtSteamExe.Text != "")
+      var methods = new StrFunc[] {GetQuakeLivePathFromTextField, GetQuakeLivePathFromExtraQlPath, GetQuakeLivePathFromRegisty };
+
+      foreach (var method in methods)
       {
         try
         {
-          path = this.txtSteamExe.Text;
-          if (Directory.Exists(path))
+          var path = method();
+          if (File.Exists(path))
           {
-            if (!path.EndsWith("/") && !path.EndsWith("\\"))
-              path += "quakelive_steam.exe";
+            path = Path.GetDirectoryName(path);
+            return path;
           }
         }
         catch
         {
-          return null;
         }
       }
-      else
-      {
-        path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
-        if (path != null)
-          path = path.Replace("/", "\\") + @"\SteamApps\Common\Quake Live\quakelive_steam.exe";
-      }
+      return null;
+    }
 
-      if (!File.Exists(path))
-        return null;
-      path = Path.GetDirectoryName(path);
-      //Log("Quake Live folder: " + path);
+    private string GetQuakeLivePathFromTextField()
+    {
+      if (this.txtSteamExe.Text != "")
+      {
+        var path = this.txtSteamExe.Text;
+        if (Directory.Exists(path))
+        {
+          if (!path.EndsWith("/") && !path.EndsWith("\\"))
+            path += "quakelive_steam.exe";
+        }
+        return path;
+      }
+      return null;
+    }
+
+    private string GetQuakeLivePathFromExtraQlPath()
+    {
+      var path = this.GetType().Assembly.Location;
+      for (int i = 0; i < 5; i++)
+        path = Path.GetDirectoryName(path) ?? "";
+      return Path.Combine(path, @"common\Quake Live\quakelive_steam.exe");
+    }
+
+    private string GetQuakeLivePathFromRegisty()
+    {
+      var path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
+      if (path != null)
+        path = path.Replace("/", "\\") + @"\SteamApps\Common\Quake Live\quakelive_steam.exe";
       return path;
     }
 
@@ -829,7 +852,6 @@ bind mouse5 +hook
         if (Regex.IsMatch(Path.GetFileName(dir) ?? "", "\\d{5,}"))
         {
           var path = Path.Combine(dir, "baseq3");
-          //Log("Config folder: " + path);
           return path;
         }
       }
@@ -840,7 +862,10 @@ bind mouse5 +hook
     #region GetSteamWorkshopPath()
     private string GetSteamWorkshopPath()
     {
-      var path = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(this.GetQuakeLivePath())) ?? "", @"workshop\content\" + QuakeLiveAppId + "\\" + WorkshopExtraQL);
+      var qlPath = this.GetQuakeLivePath();
+      if (qlPath == null)
+        return null;
+      var path = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(qlPath)) ?? "", @"workshop\content\" + QuakeLiveAppId + "\\" + WorkshopExtraQL);
       return path;
     }
     #endregion
@@ -911,9 +936,9 @@ if (qz_instance.GetCvar('fs_webpath') != path) {
     {
       if (visible)
       {
+        this.Show();
         this.WindowState = FormWindowState.Normal;
         this.BringToFront();
-        this.Show();
         this.Activate();
       }
       else
