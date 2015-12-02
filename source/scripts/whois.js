@@ -65,8 +65,11 @@ Version 1.0
 
  
   function showHelp() {
-    qz_instance.SendGameCommand("echo Usage: ^5/" + CVAR_whois + "^7 <^3nickname^7 or ^3player-id^7> (use /players to list player-ids)");
-    qz_instance.SendGameCommand("echo ^5/" + CVAR_whois + "^3 update^7: force update of /player information");
+    echo("Usage:");
+    echo("^5/" + CVAR_whois + "^7 ^3*^7 (to get all players' aliases)");
+    echo("^5/" + CVAR_whois + "^7 <^3part-of-nickname^7>");
+    echo("^5/" + CVAR_whois + "^7 <^3player-id^7> (use /players to list player-ids)");
+    echo("^5/" + CVAR_whois + "^3 update^7: force update of cached /player information");
   }
 
 
@@ -85,16 +88,22 @@ Version 1.0
         var req = pendingAjaxRequest[steamid];
         var player = aliases[steamid];
 
-        var nicks = [ /*req.name*/ ];
+        var regex = /\^./g;
+        var nicks = [ req.name ];
         if (player) {
           for (var strippedNick in player) {
             if (!player.hasOwnProperty(strippedNick)) continue;
             var alias = player[strippedNick];
-            //if (alias.nick != req.name)
-              nicks.push(alias.nick);
+
+            if (alias.nick.replace(regex, "") == req.name)
+              nicks[0] = alias.nick; // current in-game nick (with maybe different colors)
+            else
+              nicks.push(alias.nick); // additional nick
           }
         }
-        lines.push(("0" + req.clientid).substr(-2) + " " + nicks.join("^3 aka ^7"));
+
+        if (method == "echo" || nicks.length > 1)
+          lines.push(("0" + req.clientid).substr(-2) + " " + nicks.join("^3 aka ^7"));
       }
 
       if (lines.length == 0)
@@ -160,7 +169,7 @@ Version 1.0
       pendingAjaxRequest = {};
       for (var i = 0; i < players.length; i++) {
         var obj = players[i];
-        var player = { "steamid": obj.st, "name": obj.n.toLowerCase(), "clientid": obj.clientid };
+        var player = { "steamid": obj.st, "name": obj.n, "clientid": obj.clientid };
         if (arg == "*" || player.name.indexOf(arg) >= 0 || player.clientid.toString() == arg) {
           steamIds.push(player.steamid);
           pendingAjaxRequest[player.steamid] = player;
