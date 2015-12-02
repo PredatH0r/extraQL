@@ -14,6 +14,11 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.17
+---
+- show warning when the offical UI in web.pak is newer than the currently selected alternative UI
+- added /whois userscript to show alias nicknames
+
 Version 2.16
 ---
 - improved detection of Quake Live directory when it's installed outside the standard steam folder. 
