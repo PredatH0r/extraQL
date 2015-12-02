@@ -6,13 +6,14 @@ using System.Drawing.Text;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using ExtraQL.Properties;
 using Microsoft.Win32;
 
 namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.16";
+    public const string Version = "2.17";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -886,9 +887,10 @@ bind mouse5 +hook
       }
       else
       {
-        this.Log("Starting Quake Live...");
         var args = "";
-        PrepareAlternativeQuakeLiveUI(ref args);
+        if (!PrepareAlternativeQuakeLiveUI(ref args))
+          return;
+        this.Log("Starting Quake Live...");
         Process.Start("steam://rungameid/" + QuakeLiveAppId + args);
       }
       this.SetFormVisibility(false);
@@ -896,7 +898,7 @@ bind mouse5 +hook
     #endregion
 
     #region PrepareAlternativeQuakeLiveUI()
-    private void PrepareAlternativeQuakeLiveUI(ref string args)
+    private bool PrepareAlternativeQuakeLiveUI(ref string args)
     {
       try
       {
@@ -905,6 +907,26 @@ bind mouse5 +hook
         File.Delete(js);
         if (webpak.WorkshopId != 0)
         {
+          if (!this.config.GetBool("ignoreStaleWebPak"))
+          {
+            var fiDir = new FileInfo(Path.Combine(webpak.Path, "bundle.js"));
+            var fiPak = new FileInfo(Path.Combine(this.GetQuakeLivePath(), "web.pak"));
+            if (fiPak.LastWriteTimeUtc > fiDir.LastWriteTimeUtc)
+            {
+              var choice = MessageBox.Show(this,
+                Resources.MainForm_StaleWebPak, 
+                "extraQL", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+              if (choice == DialogResult.Cancel)
+                return false;
+              if (choice == DialogResult.Yes)
+              {
+                this.comboWebPak.SelectedIndex = 0;
+                return true;
+              }
+              if ((Control.ModifierKeys & (Keys.Shift | Keys.Control | Keys.Alt)) != 0)
+                this.config.Set("ignoreStaleWebPak", true);
+            }
+          }
           // adding command line args works, but steam shows a popup in that case. So instead we use a JS file to change fs_webpath
           //args = System.Web.HttpUtility.UrlPathEncode("//+set fs_webpath \"" + webpak.Path + "\"");
 
@@ -927,6 +949,7 @@ if (qz_instance.GetCvar('fs_webpath') != path) {
       {
         Log("Failed to set alternative Quake Live UI: " + ex.Message);
       }
+      return true;
     }
 
     #endregion
