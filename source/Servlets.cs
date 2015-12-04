@@ -582,9 +582,15 @@ namespace ExtraQL
       int index = -1;
       string value = "";
       var info = new Dictionary<int, string>();
+      var regexTimestamp = new Regex(@"^\[\d+:\d\d.\d+\] (.*)");
       for (; i < lines.Length; i++)
       {
         string line = lines[i];
+
+        var match = regexTimestamp.Match(line);
+        if (match.Success)
+          line = match.Groups[1].Value;
+
         if (line.Length >= 4 && line[0] == ' ' && line[4] == ':')
         {
           if (index == 0 || index >= 529 && index < 529 + 32)

@@ -1,12 +1,15 @@
 // ==UserScript==
 // @name           Whois: Adds a /whois command to show alias nicknames stored on qlstats.net
-// @version        1.0
+// @version        1.1
 // @author         PredatH0r
 // @description    Use "/whois nickname -or- client-id (from /players)"
 // @enabled        1
 // ==/UserScript==
 
 /*
+
+Version 1.1
+- using /players instead of /configstrings to get list of players
 
 Version 1.0
 - first release
@@ -21,7 +24,7 @@ Version 1.0
   // constants
   var CVAR_whois = "whois";
   var HelpText = "a user script command. Use ^3" + CVAR_whois +" help^7 to get some help.";
-  var ConfigstringsMarker = "]\\configstrings";
+  var CondumpMarker = "]\\players";
 
   // state variables
   var pendingAjaxRequest = null;
@@ -36,6 +39,7 @@ Version 1.0
     var postal = window.req("postal");
     var channel = postal.channel();
     channel.subscribe("cvar." + CVAR_whois, onCommand);
+    channel.subscribe("cvar.ui_mainmenu", function() { playerCache.timestamp = 0; }); // happens on connect and map change
 
     echo("^2whois.js installed");
   }
@@ -57,8 +61,10 @@ Version 1.0
 
     if (val == "help")
       showHelp();
-    else if (val == "update")
+    else if (val == "update") {
       playerCache.timestamp = 0;
+      showAliases("*");
+    }
     else
       showAliases(val);
   }
@@ -125,51 +131,61 @@ Version 1.0
       return;
     }
 
-    qz_instance.SendGameCommand("echo " + ConfigstringsMarker); // text marker required by extraQL servlet
-    qz_instance.SendGameCommand("configstrings");
+    qz_instance.SendGameCommand("echo " + CondumpMarker); // text marker required by extraQL servlet
+    qz_instance.SendGameCommand("players");
     setTimeout(function () {
       qz_instance.SendGameCommand("condump extraql_condump.txt");
       setTimeout(function () {
         var xhttp = new XMLHttpRequest();
         xhttp.timeout = 1000;
-        xhttp.onload = function () { onExtraQLServerInfo(arg, xhttp, callback); }
+        xhttp.onload = function () { onExtraQLCondump(arg, xhttp, callback); }
         xhttp.onerror = function () {
           echo("^3extraQL.exe not running:^7");
           pendingAjaxRequest = null;
         }
-        xhttp.open("GET", "http://localhost:27963/serverinfo", true);
+        xhttp.open("GET", "http://localhost:27963/condump", true);
         xhttp.send();
       }, 100);
     }, 1000);
 
 
-    function onExtraQLServerInfo(arg, xhttp, callback) {
+    function onExtraQLCondump(arg, xhttp, callback) {
       if (xhttp.status != 200) {
         pendingAjaxRequest = null;
         return;
       }
 
-      var json = null;
-      try {
-        json = JSON.parse(xhttp.responseText);
-      } catch (err) {
-      }
-      if (!json || !json.players) {
+      var players = getPlayersFromCondump(xhttp.responseText);     
+      if (!players || players.length == 0) {
         pendingAjaxRequest = null;
         return;
       }
 
-      playerCache.players = json.players;
+      playerCache.players = players;
       playerCache.timestamp = Date.now();
-      requestAliasInformation(arg, json.players, callback);
+      requestAliasInformation(arg, players, callback);
+    }
+
+    function getPlayersFromCondump(condump) {
+      var idx = condump.lastIndexOf(CondumpMarker);
+      if (idx < 0) {
+        return null;
+      }
+      var players = [];
+      var lines = condump.substring(idx).split('\n');
+      lines.forEach(function (line) {
+        var match = /^(?:\[\d+:\d\d\.\d+\] )?([ \d]\d) (.) (.+) steam:(\d+)$/.exec(line);
+        if (match)
+          players.push({ clientid: parseInt(match[1].trim()), opflag: match[2], name: match[3], steamid: match[4] });
+      });
+      return players;
     }
 
     function requestAliasInformation(arg, players, callback) {
       var steamIds = [];
       pendingAjaxRequest = {};
       for (var i = 0; i < players.length; i++) {
-        var obj = players[i];
-        var player = { "steamid": obj.st, "name": obj.n, "clientid": obj.clientid };
+        var player = players[i];
         if (arg == "*" || player.name.indexOf(arg) >= 0 || player.clientid.toString() == arg) {
           steamIds.push(player.steamid);
           pendingAjaxRequest[player.steamid] = player;

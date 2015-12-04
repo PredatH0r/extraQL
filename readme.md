@@ -14,6 +14,10 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.18
+---
+- fixed /whois when console dump includes timestamps (also using the less spammy /players command now to get player info)
+
 Version 2.17
 ---
 - show warning when the offical UI in web.pak is newer than the currently selected alternative UI
