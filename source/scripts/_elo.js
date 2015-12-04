@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           QLStats: Adds an /elo command to show rating information from qlstats.net
-// @version        0.1
+// @version        1.1
 // @author         PredatH0r
 // @description    Use "/elo help" in the console to get a list of available commands.
 // @description    /elo score: display rating for all players on the server
@@ -11,6 +11,9 @@
 // ==/UserScript==
 
 /*
+
+Version 1.1
+- fixed help text
 
 Version 1.0
 - rewrite to work with Steam exclusive version of Quake Live
@@ -99,7 +102,6 @@ Version 1.0
   function showHelp() {
     qz_instance.SendGameCommand("echo Usage: ^5/" + CVAR_elo + "^7 <^3command^7>");
     qz_instance.SendGameCommand("echo \"^3say^7       shows the QLRanks score to all players\"");
-    /*
     qz_instance.SendGameCommand("echo \"^3table^7|^3list^7|^3simple^7           ^^^7... formatted in your console\"");
     qz_instance.SendGameCommand("echo \"^3method^7=x  show/set output method\"");
     qz_instance.SendGameCommand("echo \"^3format^7=x  show/set output format used by method=echo\"");
@@ -109,13 +111,12 @@ Version 1.0
     qz_instance.SendGameCommand("echo \"^3games^7     shows the number of completed games for each player\"");
     qz_instance.SendGameCommand("echo \"^3shuffle^7!  suggest/arrange teams based on QLRanks score\"");
     qz_instance.SendGameCommand("echo \"          append ^3,+all,+player1,-player2^7 to add/remove players\"");
-    qz_instance.SendGameCommand("echo \"^3profile=^7x opens QLranks.com player profile in your browser\"");
+    //qz_instance.SendGameCommand("echo \"^3profile=^7x opens QLranks.com player profile in your browser\"");
     qz_instance.SendGameCommand("echo \"          ^3x^7 is a comma separated list of game types and players\"");
-    */
     qz_instance.SendGameCommand("echo \"^3update^7    clears cached Elo scores\"");
-    qz_instance.SendGameCommand("echo \"\"");
-    qz_instance.SendGameCommand("echo \"Badge letters after Elo score indicate number of games completed\"");
-    qz_instance.SendGameCommand("echo ^3A-J^7:  <100...<1000, ^3K-Y^7: <2000...<16000, ^3Z^7: >=16000");
+    //qz_instance.SendGameCommand("echo \"\"");
+    //qz_instance.SendGameCommand("echo \"Badge letters after Elo score indicate number of games completed\"");
+    //qz_instance.SendGameCommand("echo ^3A-J^7:  <100...<1000, ^3K-Y^7: <2000...<16000, ^3Z^7: >=16000");
   }
 
   function clearEloCache() {
