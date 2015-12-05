@@ -1,12 +1,15 @@
 // ==UserScript==
 // @name           Whois: Adds a /whois command to show alias nicknames stored on qlstats.net
-// @version        1.1
+// @version        1.2
 // @author         PredatH0r
 // @description    Use "/whois nickname -or- client-id (from /players)"
 // @enabled        1
 // ==/UserScript==
 
 /*
+
+Version 1.2
+- switched back to /configstrings as long as /players is bugged and returns duplicate steam ids (when speccing or when on the same team)
 
 Version 1.1
 - using /players instead of /configstrings to get list of players
@@ -24,13 +27,13 @@ Version 1.0
   // constants
   var CVAR_whois = "whois";
   var HelpText = "a user script command. Use ^3" + CVAR_whois +" help^7 to get some help.";
-  var CondumpMarker = "]\\players";
 
   // state variables
   var pendingAjaxRequest = null;
   var playerCache = { timestamp: 0, players: {} }
   var PREFS = { method: "echo" }
   PREFS.set = function (setting, value) { PREFS[setting] = value; }
+  var playerInfoProvider = { condumpMarker: "", qlCommand: "", extraQlServlet: "", dataHandler: function() {} }
 
   function init() {
     // create cvar
@@ -39,10 +42,15 @@ Version 1.0
     var postal = window.req("postal");
     var channel = postal.channel();
     channel.subscribe("cvar." + CVAR_whois, onCommand);
-    channel.subscribe("cvar.ui_mainmenu", function() { playerCache.timestamp = 0; }); // happens on connect and map change
+    channel.subscribe("cvar.ui_mainmenu", function () { playerCache.timestamp = 0; }); // happens on connect and map change
+
+    // "/players" would be better, but is currently bugged and shows duplicate steam-ids, so we have to stick with "/configstrings" for now
+    playerInfoProvider = { condumpMarker: "]\\configstrings", qlCommand: "configstrings", extraQlServlet: "serverinfo", dataHandler: onExtraQLServerInfo };
+    //playerInfoProvider = { condumpMarker: "]\\players", qlCommand: "players", extraQlServlet: "condump", dataHandler: onExtraQLCondump };
 
     echo("^2whois.js installed");
   }
+
 
   function log(msg) {
     console.log(msg);
@@ -124,86 +132,114 @@ Version 1.0
     }
   }
 
- 
+
   function requestPlayerInformation(arg, callback) {
     if (Date.now() - playerCache.timestamp < 60000) {
       requestAliasInformation(arg, playerCache.players, callback);
       return;
     }
 
-    qz_instance.SendGameCommand("echo " + CondumpMarker); // text marker required by extraQL servlet
-    qz_instance.SendGameCommand("players");
-    setTimeout(function () {
+    qz_instance.SendGameCommand("echo " + playerInfoProvider.condumpMarker); // text marker required by extraQL servlet
+    qz_instance.SendGameCommand(playerInfoProvider.qlCommand);
+    setTimeout(function() {
       qz_instance.SendGameCommand("condump extraql_condump.txt");
-      setTimeout(function () {
+      setTimeout(function() {
         var xhttp = new XMLHttpRequest();
         xhttp.timeout = 1000;
-        xhttp.onload = function () { onExtraQLCondump(arg, xhttp, callback); }
-        xhttp.onerror = function () {
+        xhttp.onload = function() { playerInfoProvider.dataHandler(arg, xhttp, callback); }
+        xhttp.onerror = function() {
           echo("^3extraQL.exe not running:^7");
           pendingAjaxRequest = null;
         }
-        xhttp.open("GET", "http://localhost:27963/condump", true);
+        xhttp.open("GET", "http://localhost:27963/" + playerInfoProvider.extraQlServlet, true);
         xhttp.send();
       }, 100);
     }, 1000);
+  }
 
-
-    function onExtraQLCondump(arg, xhttp, callback) {
-      if (xhttp.status != 200) {
-        pendingAjaxRequest = null;
-        return;
-      }
-
-      var players = getPlayersFromCondump(xhttp.responseText);     
-      if (!players || players.length == 0) {
-        pendingAjaxRequest = null;
-        return;
-      }
-
-      playerCache.players = players;
-      playerCache.timestamp = Date.now();
-      requestAliasInformation(arg, players, callback);
+  function onExtraQLServerInfo(arg, xhttp, callback) {
+    if (xhttp.status != 200) {
+      pendingAjaxRequest = null;
+      return;
     }
 
+    var json = null;
+    try {
+      json = JSON.parse(xhttp.responseText);
+    } catch (err) {
+    }
+    if (!json || !json.players) {
+      pendingAjaxRequest = null;
+      return;
+    }
+
+    var players = [];
+    pendingAjaxRequest = {};
+    for (var i = 0; i < json.players.length; i++) {
+      var obj = json.players[i];
+      players.push({ "steamid": obj.st, "name": obj.n, "clientid": obj.clientid });
+    }
+    playerCache.players = players;
+    playerCache.timestamp = Date.now();
+    requestAliasInformation(arg, players, callback);
+  }
+
+  function onExtraQLCondump(arg, xhttp, callback) {
+    if (xhttp.status != 200) {
+      pendingAjaxRequest = null;
+      return;
+    }
+
+    var players = getPlayersFromCondump(xhttp.responseText);
+    if (!players || players.length == 0) {
+      pendingAjaxRequest = null;
+      return;
+    }
+
+    playerCache.players = players;
+    playerCache.timestamp = Date.now();
+    requestAliasInformation(arg, players, callback);
+
+
     function getPlayersFromCondump(condump) {
-      var idx = condump.lastIndexOf(CondumpMarker);
+      var idx = condump.lastIndexOf(playerInfoProvider.condumpMarker);
       if (idx < 0) {
         return null;
       }
       var players = [];
       var lines = condump.substring(idx).split('\n');
-      lines.forEach(function (line) {
+      lines.forEach(function(line) {
         var match = /^(?:\[\d+:\d\d\.\d+\] )?([ \d]\d) (.) (.+) steam:(\d+)$/.exec(line);
         if (match)
           players.push({ clientid: parseInt(match[1].trim()), opflag: match[2], name: match[3], steamid: match[4] });
       });
       return players;
     }
+  }
 
-    function requestAliasInformation(arg, players, callback) {
-      var steamIds = [];
-      pendingAjaxRequest = {};
-      for (var i = 0; i < players.length; i++) {
-        var player = players[i];
-        if (arg == "*" || player.name.indexOf(arg) >= 0 || player.clientid.toString() == arg) {
-          steamIds.push(player.steamid);
-          pendingAjaxRequest[player.steamid] = player;
-        }
+  function requestAliasInformation(arg, players, callback) {
+    var steamIds = [];
+    pendingAjaxRequest = {};
+    for (var i = 0; i < players.length; i++) {
+      var player = players[i];
+      if (arg == "*" || player.name.indexOf(arg) >= 0 || player.clientid.toString() == arg) {
+        steamIds.push(player.steamid);
+        pendingAjaxRequest[player.steamid] = player;
       }
-
-      if (steamIds.length == 0) {
-        pendingAjaxRequest = null;
-        return;
-      }
-      var url = "http://qlstats.net:8080/aliases/" + steamIds.join("+") + ".json";
-      var xhttp = new XMLHttpRequest();
-      xhttp.timeout = 5000;
-      xhttp.onload = function () { onQlstatsAliases(xhttp, callback); }
-      xhttp.onerror = function () { echo("^1elo.js:^7 could not get data from qlstats.net"); }
-      xhttp.open("GET", url, true);
-      xhttp.send();
     }
+
+    if (steamIds.length == 0) {
+      pendingAjaxRequest = null;
+      return;
+    }
+    var url = "http://qlstats.net:8080/aliases/" + steamIds.join("+") + ".json";
+    var xhttp = new XMLHttpRequest();
+    xhttp.timeout = 5000;
+    xhttp.onload = function () { onQlstatsAliases(xhttp, callback); }
+    xhttp.onerror = function () { echo("^1elo.js:^7 could not get data from qlstats.net"); }
+    xhttp.open("GET", url, true);
+    xhttp.send();
+
 
     function onQlstatsAliases(xhttp, callback) {
       if (xhttp.status == 200)
@@ -212,7 +248,6 @@ Version 1.0
     }
   }
 
-  
 
 
   // there is a race condition between QL's bundle.js and the userscripts.
