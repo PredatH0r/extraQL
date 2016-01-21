@@ -151,6 +151,7 @@
     <Content Include="scripts\instaBounce.js" />
     <None Include="scripts\_elo.js" />
     <None Include="scripts\whois.js" />
+    <Content Include="scripts\quakeTv.js" />
     <Content Include="steam_api.dll" />
     <Content Include="scripts\attic\autoInvite.usr.js" />
     <Content Include="scripts\attic\demoBrowser.usr.js" />

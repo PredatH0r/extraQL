@@ -84,6 +84,7 @@ namespace ExtraQL
       RegisterServlet("/join", JoinGame);
       RegisterServlet("/demos", ListDemos);
       RegisterServlet("/steamnick", SetSteamNick);
+      RegisterServlet("/restartOBS", RestartObs);
     }
 
     #endregion
@@ -762,6 +763,24 @@ namespace ExtraQL
 
     #endregion
 
+    #region BringToFront()
+    private void RestartObs(Stream stream, Uri uri, string request)
+    {
+      if (!this.EnablePrivateServlets)
+      {
+        HttpForbidden(stream);
+        return;
+      }
+
+      var script = Path.Combine(this.baseDir, "restartOBS.cmd");
+      if (File.Exists(script))
+        Process.Start(script);
+      else
+        Log("Restart OBS: Please create the script " + script + " with commands to restart OBS.");
+
+      this.HttpOk(stream, "ok");
+    }
+    #endregion
     // internal methods
 
     #region EnableScripts
