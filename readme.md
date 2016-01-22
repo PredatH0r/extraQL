@@ -14,6 +14,11 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.20
+---
+- added quakeTV prototype script (can't handle full or password protected servers yet)
+- /whois: switched back to /players now that QL no longer returns duplicate steam IDs
+
 Version 2.19
 ---
 - /whois: switched back to /configstrings to work around the bugged duplicate steamids in /players output
