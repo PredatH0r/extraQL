@@ -45,8 +45,8 @@ Version 1.0
     channel.subscribe("cvar.ui_mainmenu", function () { playerCache.timestamp = 0; }); // happens on connect and map change
 
     // "/players" would be better, but is currently bugged and shows duplicate steam-ids, so we have to stick with "/configstrings" for now
-    playerInfoProvider = { condumpMarker: "]\\configstrings", qlCommand: "configstrings", extraQlServlet: "serverinfo", dataHandler: onExtraQLServerInfo };
-    //playerInfoProvider = { condumpMarker: "]\\players", qlCommand: "players", extraQlServlet: "condump", dataHandler: onExtraQLCondump };
+    //playerInfoProvider = { condumpMarker: "]\\configstrings", qlCommand: "configstrings", extraQlServlet: "serverinfo", dataHandler: onExtraQLServerInfo };
+    playerInfoProvider = { condumpMarker: "]\\players", qlCommand: "players", extraQlServlet: "condump", dataHandler: onExtraQLCondump };
 
     echo("^2whois.js installed");
   }
@@ -209,9 +209,9 @@ Version 1.0
       var players = [];
       var lines = condump.substring(idx).split('\n');
       lines.forEach(function(line) {
-        var match = /^(?:\[\d+:\d\d\.\d+\] )?([ \d]\d) (.) (.+) steam:(\d+)$/.exec(line);
+        var match = /^(?:\[\d+:\d\d\.\d+\] )?([ \d]\d) (\d+) (.) (.+)$/.exec(line);
         if (match)
-          players.push({ clientid: parseInt(match[1].trim()), opflag: match[2], name: match[3], steamid: match[4] });
+          players.push({ clientid: parseInt(match[1].trim()), opflag: match[3], name: match[4], steamid: match[2] });
       });
       return players;
     }

@@ -127,10 +127,6 @@ var $;
       setTimeout(function() {
         $.get("http://localhost:27963/condump", function(condump) {
           var players = getPlayersFromCondump(condump);
-
-          log("players on server: " + JSON.stringify(players));
-          log("best players: " + JSON.stringify(bestPlayers));
-
           var playersById = players.reduce(function(agg, p) {
             agg[p.steamid] = p;
             return agg;
