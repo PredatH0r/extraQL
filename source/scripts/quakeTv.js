@@ -157,8 +157,8 @@ var $;
   function onUiMainMenu(data) {
     // when changing maps, ui_mainMenu gets set to 1 and back to 0.
     if (data.value == "0") {
-      qz_instance.SendGameCommand("team s");
       if (active) {
+        qz_instance.SendGameCommand("team s");
         following = null;
         followBestPlayerOnCurrentServer();
       }
