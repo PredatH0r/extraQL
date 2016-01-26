@@ -1,16 +1,18 @@
 ﻿// ==UserScript==
 // @name           QuakeTV: prototype for automated connect + spec of high rated matches
-// @version        0.2
+// @version        0.3
 // @author         PredatH0r
 // @description    Use "/qtv help" to get a list of supported commands
-// @description    Use "/qtv 0" to stop auto connecting + following
-// @description    Use "/set qtv_autoConnect 1" to automatically connect and spec when you start QL
+// @description    Use "/qtv 0" to stop connecting + following
+// @description    Use "/qtv 1..10" to connect + follow the n-th best match
+// @description    Use "/qtv follow" to follow the best player on the current server only
+// @description    Commands can be combined like: /qtv duel,all,1
 // @enabled        0
 // ==/UserScript==
 
 /*
 
-Version 0.2
+Version 0.3
 - combined various commands and cvars into "/qtv".
 - added support to follow the n-th best match and connect to the next best match if a connection can't be established within 10sec
 
@@ -28,6 +30,9 @@ var $;
   var bestMatchRank = 0;
   var active = false;
   var following = null;
+  var connectTime = 0;
+  var mapStartTime = 0;
+  var autoReconnect;
 
   var HELP_MSG = "use ^2\\qtv help^7 to get a list of qtv commands";
 
@@ -47,25 +52,28 @@ var $;
     qz_instance.SetCvar("qtv", HELP_MSG);
 
     val.split(",").forEach(function(val) {
+      var idx;
       val = val.trim();
       if (val == "help")
         showHelp();
-      else if ("all,eu,na,sa,eu,as,af".indexOf(val) >= 0)
-        qz_instance.SetCvar("qtv_region", val);
-      else if ("duel,ffa,ca,tdm,ctf,ft".indexOf(val) >= 0) {
+      else if ((idx = ["all","eu","af","as","au","na","sa"].indexOf(val)) >= 0)
+        qz_instance.SetCvar("qtv_region", idx);
+      else if ("duel,ffa,ca,tdm,ctf,ft".indexOf(val) >= 0)
         qz_instance.SetCvar("qtv_gameType", val);
-        connect();
-      }
       else if (val == "0") {
         active = false;
         clearTimeout(connectTimer);
         clearTimeout(followTimer);
         qz_instance.SendGameCommand("team s");
       }
-      else if (parseInt(val) > 0)
+      else if (parseInt(val) > 0) {
+        autoReconnect = true;
         connect(val - 1);
+      }
       else if (val == "follow") {
+        autoReconnect = false;
         following = null;
+        active = true;
         followBestPlayerOnCurrentServer();
       }
     });
@@ -73,13 +81,13 @@ var $;
 
   function showHelp() {
     echo("Use ^5qtv^7 ^3command^7(s) with these commands:");
-    echo("^3duel^7,^3ffa^7,...   set gametype and connect to the best match");
-    echo("^3all^7,^3eu^7,...     set region to all,eu,na,sa,au,as,af");
-    echo("^3connect^7        connect to the best match with the current gametype");
     echo("^3follow^7         switches POV to the highest rated player on the current server");
+    echo("^3duel^7,^3ffa^7,...   set gametype for auto-connect");
+    echo("^3all^7,^3eu^7,...     set region to all,eu,na,sa,au,as,af");
     echo("^31^7..^310^7          connect+follow the n-th best match");
     echo("^30^7              stop automatic connecting and following");
     echo("Multiple commands can be separated with comma, spaces are NOT allowed");
+    echo("e.g.: \\qtv duel,all,1");
   }
 
   function connect(matchRank) {
@@ -88,6 +96,7 @@ var $;
     bestMatchRank = matchRank || 0;
     active = true;
     following = null;
+    mapStartTime = 0;
 
     if (connectTimer)
       clearTimeout(connectTimer);
@@ -96,6 +105,7 @@ var $;
 
     $.getJSON("http://api.qlstats.net/api/nowplaying", { region: region }, function(data) {
         if (!data[gametype] || !data[gametype][0]) {
+          log("couldn't get match data from qlstats.net. retrying in 60sec");
           connectTimer = setTimeout(connect, 60 * 1000);
           return;
         }
@@ -114,9 +124,9 @@ var $;
         }
 
         if (!bestAddr) {
-          // can't find a good match, so stay on the current server and check again in 10sec
+          // can't find a good match, so stay on the current server and check again in 30sec
           bestAddr = curAddr;
-          connectTimer = setTimeout(connect, 10 * 1000);
+          connectTimer = setTimeout(connect, 30 * 1000);
         }
 
         if (curAddr == bestAddr && qz_instance.GetCvar("ui_mainmenu") == "0") {
@@ -125,6 +135,7 @@ var $;
           return;
         }
 
+        following = null;
         qz_instance.SendGameCommand("connect " + bestAddr);
         $.getJSON("http://localhost:27963/restartOBS", function() {
           echo("^2quakeTv:^7 notified extraQL to restart OBS");
@@ -133,22 +144,14 @@ var $;
       })
       .fail(function(err) {
         echo("^1quakeTv:^7 failed to get list of top matches from qlstats.net: " + err);
-        connectTimer = setTimeout(connect, 5 * 1000);
-      });   
-  }
-
-  function connectionTimedOut() {
-    // happens when server is down or passworded
-    connect(bestMatchRank + 1);
-  }
-
-  function onGameStart() {
+        connectTimer = setTimeout(connect, 20 * 1000);
+      });  
     
-  }
-
-  function onGameEnd() {
-    clearTimeout(connectTimer);
-    connectTimer = setTimeout(connect, 7 * 1000);
+    function connectionTimedOut() {
+      // happens when server is down or passworded
+      if (autoReconnect)
+        connect(bestMatchRank + 1);
+    }
   }
 
   function onUiMainMenu(data) {
@@ -163,8 +166,11 @@ var $;
       // stop connection timeout
       clearTimeout(connectTimer);
       connectTimer = null;
+      connectTime = new Date().getTime();
+      mapStartTime = 0;
     }
   }
+
 
   function followBestPlayerOnCurrentServer() {
     if (followTimer)
@@ -179,7 +185,20 @@ var $;
             agg.push(p);
           return agg;
         }, []);
-        if (serverBrowserData.length < 2) {
+
+        if (!mapStartTime)
+          mapStartTime = data.serverinfo.mapstart;
+
+        if (data.serverinfo.mapstart != mapStartTime) {
+          // map_restart: speccing POV is lost
+          following = null;
+          mapStartTime = data.serverinfo.mapstart;
+          if (autoReconnect)
+            connect();
+          else
+            switchPov();
+        }
+        else if (serverBrowserData.length < 2 && autoReconnect && new Date().getTime() > connectTime + 30 * 1000) {
           // connect to a new server when there are fewer than 2 players on the current server
           connect();
         }
@@ -188,7 +207,12 @@ var $;
           switchPov();
         }
       }
+      else {
+        console.log("quakeTV: can't get ratings for current server: " + data.msg);
+      }
     });
+
+    followTimer = setTimeout(followBestPlayerOnCurrentServer, 10 * 1000);
 
 
     function switchPov() {
@@ -216,7 +240,8 @@ var $;
 
             if (!p) {
               // connect to a different server when nobody was found to spec
-              connect(bestMatchRank == 0 ? 1 : 0);
+              if (new Date().getTime() > connectTime + 30*1000)
+                connect();
               return;
             }
 
@@ -226,8 +251,6 @@ var $;
           });
         }, 100);
       }, 1000);
-
-      followTimer = setTimeout(followBestPlayerOnCurrentServer, 10 * 1000);
     }
   }
 
@@ -264,14 +287,9 @@ var $;
     // install QL event listeners
     var postal = window.req("postal");
     var channel = postal.channel();
-    channel.subscribe("game.start", onGameStart);
-    channel.subscribe("game.end", onGameEnd);
     channel.subscribe("cvar.ui_mainmenu", onUiMainMenu);
     channel.subscribe("cvar.qtv", onQtvCommand);
     echo("^2quakeTv.js installed");
-
-    if (qz_instance.GetCvar("qtv_autoConnect") == "1")
-      setTimeout(connect, 3000);
   }
 
   // there is a race condition between QL's bundle.js and the userscripts.
