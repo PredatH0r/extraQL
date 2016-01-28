@@ -1,5 +1,5 @@
 ﻿// ==UserScript==
-// @name           QuakeTV: prototype for automated connect + spec of high rated matches
+// @name           QuakeTV: automated connect + spec of high rated matches (based on qlstats.net)
 // @version        1.0
 // @author         PredatH0r
 // @description    Use "/qtv help" to get a list of supported commands
