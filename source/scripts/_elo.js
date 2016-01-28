@@ -457,7 +457,7 @@ Version 1.0
         var p = request[steamid];
         var data = dataBySteamId[steamid] || {};
         var gtData = data[gametype] || {};
-        p.elo = gtData.elo || 1000;
+        p.elo = gtData.elo || 1500;
         p.games = gtData.games || 0;
       }
 

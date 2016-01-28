@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name           QuakeTV: automated connect + spec of high rated matches (based on qlstats.net)
-// @version        1.0
+// @version        1.0.1
 // @author         PredatH0r
 // @description    Use "/qtv help" to get a list of supported commands
 // @description    Use "/qtv 0" to stop connecting + following
@@ -11,6 +11,11 @@
 // ==/UserScript==
 
 /*
+
+Version 1.0.1
+- fixed: could not connect to same server again after disconnecting
+- fixed: ignore "dead player" information for non-round-based games and always follow the top rated player
+- fixed: no longer connecting to the best server after the match on a 2nd-best server started
 
 Version 1.0
 - using ZMQ relay stream from qlstats.net to get notified about player deaths/joins so POV can be updated instantly
@@ -100,20 +105,19 @@ var $;
     echo("^3all^7,^3eu^7,^3na^7...   set region to all,eu,na,sa,au,as,af");
     echo("^31^7..^310^7          connect to + follow the n-th best match");
     echo("^30^7              stop automatic connecting and following");
-    echo("^5qtv_announce ^30^7|^31^7  to turn announcements off/on when switching POV")
+    echo("^5qtv_announce ^30^7|^31^7  to turn announcements off/on when switching POV");
     echo("Multiple commands can be separated with comma, spaces are NOT allowed");
     echo("e.g.: ^2\\qtv duel,all,1^7");
   }
 
   function connect(matchRank) {
+    log("connect(" + matchRank + ")");
     var region = qz_instance.GetCvar("qtv_region") || 0;
     gametype = qz_instance.GetCvar("qtv_gameType") || "duel";
     bestMatchRank = matchRank || 0;
 
-    if (connectTimer)
-      clearTimeout(connectTimer);
-    if (followTimer)
-      clearTimeout(followTimer);
+    clearTimeout(connectTimer);
+    clearTimeout(followTimer);
 
     $.getJSON("http://api.qlstats.net/api/nowplaying", { region: region }, function(data) {
         if (!data[gametype] || !data[gametype][0]) {
@@ -124,6 +128,8 @@ var $;
 
         var bestMatches = data[gametype];
         var curAddr = qz_instance.GetCvar("cl_currentServerAddress") || "";
+        if (qz_instance.GetCvar("ui_mainmenu") == "1")
+          curAddr = "";
 
         // find a match with at least 2 players
         var bestAddr = null;
@@ -209,7 +215,11 @@ var $;
         });
       }
     }
-    else if (event.TYPE == "PLAYER_DEATH" && !event.WARMUP || event.TYPE == "PLAYER_SWITCHTEAM" && event.TEAM == "SPECTATOR") {
+    else if (event.TYPE == "MATCH_STARTED") {
+      // QLDS resets the g_levelStartTime time when the match starts. We need to reset mapStartTime so there won't be a reconnect attempt
+      mapStartTime = 0; 
+    }
+    else if (event.TYPE == "PLAYER_DEATH" && !event.WARMUP && "ca,ft,ad".indexOf(gametype) >= 0 || event.TYPE == "PLAYER_SWITCHTEAM" && event.TEAM == "SPECTATOR") {
       deadPlayers.push(event.STEAM_ID);
       if (event.STEAM_ID == following) {
         following = null;
@@ -267,11 +277,11 @@ var $;
     $.getJSON("http://api.qlstats.net/api/server/" + qz_instance.GetCvar("cl_currentServerAddress") + "/players", function(data) {
       if (data.ok) {
         log("/players");
-        gametype = data.serverinfo.gt || gametype;
+        //gametype = data.serverinfo.gt || gametype;
         serverBrowserData = data.players;
         serverBrowserData.sort(function(a, b) { return (b.rating || 0) - (a.rating || 0); });
         serverBrowserData = serverBrowserData.reduce(function(agg, p) {
-          if (p.team >= 0 && p.team <= 2 && !p.quit && deadPlayers.indexOf(p.steamid) < 0)
+          if (p.team >= 0 && p.team <= 2 && !p.quit && ("ca,ft,ad".indexOf(gametype) < 0 || deadPlayers.indexOf(p.steamid) < 0))
             agg.push(p);
           return agg;
         }, []);
@@ -297,9 +307,9 @@ var $;
           log("emptyServer");
           connect();
         }
-        else if (serverBrowserData.length >= 1 && serverBrowserData[0].steamid != following) {
+        else { //if (serverBrowserData.length >= 1 && serverBrowserData[0].steamid != following) {
           // either a higher rated player joined, or the highest rated player left or moved to spec
-          log("notFollowingBestPlayer");
+          log("restoreBestPov");
           switchPov();
         }
       }
@@ -359,10 +369,12 @@ var $;
         }
 
         log("following clientid " + p.clientid);
-        var cmd = qz_instance.GetCvar("qtv_announce") == "1" ? "say" : "echo";
-        qz_instance.SendGameCommand(cmd + ' "^6QTV^7 is now following ' + (name || p.name).replace(/"/g, "'") + '"');
         qz_instance.SendGameCommand("follow " + p.clientid);
-        following = p.steamid;
+        if (p.steamid != following) {         
+          var cmd = qz_instance.GetCvar("qtv_announce") == "1" ? "say" : "echo";
+          qz_instance.SendGameCommand(cmd + ' "^6QTV^7 is now following ' + (name || p.name).replace(/"/g, "'") + '"');
+          following = p.steamid;
+        }
       };
     }
   }
