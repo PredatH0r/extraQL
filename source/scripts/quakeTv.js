@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name           QuakeTV: prototype for automated connect + spec of high rated matches
-// @version        0.3
+// @version        1.0
 // @author         PredatH0r
 // @description    Use "/qtv help" to get a list of supported commands
 // @description    Use "/qtv 0" to stop connecting + following
@@ -11,6 +11,11 @@
 // ==/UserScript==
 
 /*
+
+Version 1.0
+- using ZMQ relay stream from qlstats.net to get notified about player deaths/joins so POV can be updated instantly
+- reduced console spam to a minimum
+
 
 Version 0.3
 - combined various commands and cvars into "/qtv".
@@ -36,7 +41,7 @@ var $;
   var autoReconnect;
   var eventSource = null;
   var deadPlayers = [];
-  var clientIdCache = null; // dictionary with steam-id => client-id
+  var clientIdCache = null;
 
   var HELP_MSG = "use ^2\\qtv help^7 to get a list of qtv commands";
 
@@ -95,8 +100,9 @@ var $;
     echo("^3all^7,^3eu^7,^3na^7...   set region to all,eu,na,sa,au,as,af");
     echo("^31^7..^310^7          connect to + follow the n-th best match");
     echo("^30^7              stop automatic connecting and following");
+    echo("^5qtv_announce ^30^7|^31^7  to turn announcements off/on when switching POV")
     echo("Multiple commands can be separated with comma, spaces are NOT allowed");
-    echo("e.g.: \\qtv duel,all,1");
+    echo("e.g.: ^2\\qtv duel,all,1^7");
   }
 
   function connect(matchRank) {
@@ -213,17 +219,16 @@ var $;
     }
     else if (event.TYPE == "PLAYER_SWITCHTEAM")
       clientIdCache = null;
-    else if (event.TYPE == "ROUND_OVER")
+    else if (event.TYPE == "ROUND_OVER") {
       deadPlayers = [];
+      clearTimeout(followTimer);
+      followTimer = setTimeout(followBestPlayerOnCurrentServer, 5000);
+    }
     else if (event.TYPE == "MATCH_REPORT") {
       deadPlayers = [];
       if (autoReconnect) {
         clearTimeout(connectTimer);
         connectTimer = setTimeout(connect, 10 * 1000);
-      }
-      else {
-        clearTimeout(followTimer);
-        followTimer = setTimeout(followBestPlayerOnCurrentServer, 3000);
       }
     }
   }
@@ -292,9 +297,9 @@ var $;
           log("emptyServer");
           connect();
         }
-        else if (serverBrowserData[0].steamid != following) {
+        else if (serverBrowserData.length >= 1 && serverBrowserData[0].steamid != following) {
           // either a higher rated player joined, or the highest rated player left or moved to spec
-          log("povNotAvailable");
+          log("notFollowingBestPlayer");
           switchPov();
         }
       }
@@ -303,8 +308,8 @@ var $;
       }
     });
 
+    // safeguard timer to make sure we don't accidentally end up in free-float cam
     followTimer = setTimeout(followBestPlayerOnCurrentServer, 10 * 1000);
-
 
     function switchPov() {
       log("switchPov()");
