@@ -24,6 +24,7 @@ Version 0.1
 var $;
 
 (function() {
+  var gametype = "ca";
   var serverBrowserData = [];
   var connectTimer = null;
   var followTimer = null;
@@ -33,11 +34,14 @@ var $;
   var connectTime = 0;
   var mapStartTime = 0;
   var autoReconnect;
+  var eventSource = null;
+  var deadPlayers = [];
+  var clientIdCache = null; // dictionary with steam-id => client-id
 
   var HELP_MSG = "use ^2\\qtv help^7 to get a list of qtv commands";
 
   function log(msg) {
-    console.log(msg);
+    //console.log(msg);
   }
 
   function echo(msg) {
@@ -51,6 +55,7 @@ var $;
       return;
     qz_instance.SetCvar("qtv", HELP_MSG);
 
+    // multiple instructions can be specified, separated with a comma
     val.split(",").forEach(function(val) {
       var idx;
       val = val.trim();
@@ -62,18 +67,22 @@ var $;
         qz_instance.SetCvar("qtv_gameType", val);
       else if (val == "0") {
         active = false;
+        autoReconnect = false;
+        unregisterZmqEventSource();
         clearTimeout(connectTimer);
         clearTimeout(followTimer);
         qz_instance.SendGameCommand("team s");
       }
       else if (parseInt(val) > 0) {
+        active = true;
         autoReconnect = true;
         connect(val - 1);
       }
       else if (val == "follow") {
-        autoReconnect = false;
-        following = null;
         active = true;
+        autoReconnect = false;
+        registerZmqEventSource();
+        following = null;
         followBestPlayerOnCurrentServer();
       }
     });
@@ -83,8 +92,8 @@ var $;
     echo("Use ^5qtv^7 ^3command^7(s) with these commands:");
     echo("^3follow^7         switches POV to the highest rated player on the current server");
     echo("^3duel^7,^3ffa^7,...   set gametype for auto-connect");
-    echo("^3all^7,^3eu^7,...     set region to all,eu,na,sa,au,as,af");
-    echo("^31^7..^310^7          connect+follow the n-th best match");
+    echo("^3all^7,^3eu^7,^3na^7...   set region to all,eu,na,sa,au,as,af");
+    echo("^31^7..^310^7          connect to + follow the n-th best match");
     echo("^30^7              stop automatic connecting and following");
     echo("Multiple commands can be separated with comma, spaces are NOT allowed");
     echo("e.g.: \\qtv duel,all,1");
@@ -92,11 +101,8 @@ var $;
 
   function connect(matchRank) {
     var region = qz_instance.GetCvar("qtv_region") || 0;
-    var gametype = qz_instance.GetCvar("qtv_gametype") || "duel";
+    gametype = qz_instance.GetCvar("qtv_gameType") || "duel";
     bestMatchRank = matchRank || 0;
-    active = true;
-    following = null;
-    mapStartTime = 0;
 
     if (connectTimer)
       clearTimeout(connectTimer);
@@ -105,13 +111,15 @@ var $;
 
     $.getJSON("http://api.qlstats.net/api/nowplaying", { region: region }, function(data) {
         if (!data[gametype] || !data[gametype][0]) {
-          log("couldn't get match data from qlstats.net. retrying in 60sec");
-          connectTimer = setTimeout(connect, 60 * 1000);
+          echo("^1quakeTV:^7 couldn't get match data from qlstats.net. retrying in 30sec...");
+          connectTimer = setTimeout(connect, 30 * 1000);
           return;
         }
 
         var bestMatches = data[gametype];
         var curAddr = qz_instance.GetCvar("cl_currentServerAddress") || "";
+
+        // find a match with at least 2 players
         var bestAddr = null;
         if (bestMatchRank >= bestMatches.length)
           bestMatchRank = 0;
@@ -129,22 +137,31 @@ var $;
           connectTimer = setTimeout(connect, 30 * 1000);
         }
 
-        if (curAddr == bestAddr && qz_instance.GetCvar("ui_mainmenu") == "0") {
+        if (curAddr == bestAddr) {
           // if already connected to the best match, just ensure we follow the best player
-          followBestPlayerOnCurrentServer();
+          if (qz_instance.GetCvar("ui_mainmenu") == "0")
+            followBestPlayerOnCurrentServer();
           return;
         }
 
+        // connect to the new server
         following = null;
+        connectTime = 0;
+        mapStartTime = 0;
+        clientIdCache = null;
+        unregisterZmqEventSource();
         qz_instance.SendGameCommand("connect " + bestAddr);
         $.getJSON("http://localhost:27963/restartOBS", function() {
-          echo("^2quakeTv:^7 notified extraQL to restart OBS");
+          log("^2quakeTv:^7 notified extraQL to restart OBS");
         });
+
+        // give QL 15sec to connect to the server and raise the cvar.ui_mainmenu notification when the map was loaded
+        clearTimeout(connectTimer);
         connectTimer = setTimeout(connectionTimedOut, 15 * 1000);
       })
       .fail(function(err) {
         echo("^1quakeTv:^7 failed to get list of top matches from qlstats.net: " + err);
-        connectTimer = setTimeout(connect, 20 * 1000);
+        connectTimer = setTimeout(connect, 30 * 1000);
       });  
     
     function connectionTimedOut() {
@@ -154,34 +171,102 @@ var $;
     }
   }
 
+  function unregisterZmqEventSource() {
+    if (!eventSource)
+      return;
+    eventSource.removeEventListener('message', onZmqMessage);
+    eventSource.close();
+    eventSource = null;
+  }
+
+  function registerZmqEventSource() {
+    if (eventSource)
+      unregisterZmqEventSource();
+
+    $.getJSON("http://api.qlstats.net/api/qtv/" + qz_instance.GetCvar("cl_currentServerAddress") + "/url", function(data) {
+      if (data.ok && data.streamUrl) {
+        eventSource = new window.EventSource(data.streamUrl);
+        eventSource.addEventListener('message', onZmqMessage);
+      }
+    });
+  }
+
+  function onZmqMessage(e) {
+    log(e.data);
+    var event = JSON.parse(e.data);
+    if (event.TYPE == "INIT") {
+      gametype = event.GAME_TYPE || gametype || "ca";
+      if ("ca,ft,ad".indexOf(gametype) >= 0) {
+        event.PLAYERS.forEach(function(p) {
+          if (p.DEAD)
+            deadPlayers.push(p.STEAM_ID);
+        });
+      }
+    }
+    else if (event.TYPE == "PLAYER_DEATH" && !event.WARMUP || event.TYPE == "PLAYER_SWITCHTEAM" && event.TEAM == "SPECTATOR") {
+      deadPlayers.push(event.STEAM_ID);
+      if (event.STEAM_ID == following) {
+        following = null;
+        clearTimeout(followTimer);
+        followTimer = setTimeout(followBestPlayerOnCurrentServer, 1000);
+      }
+    }
+    else if (event.TYPE == "PLAYER_SWITCHTEAM")
+      clientIdCache = null;
+    else if (event.TYPE == "ROUND_OVER")
+      deadPlayers = [];
+    else if (event.TYPE == "MATCH_REPORT") {
+      deadPlayers = [];
+      if (autoReconnect) {
+        clearTimeout(connectTimer);
+        connectTimer = setTimeout(connect, 10 * 1000);
+      }
+      else {
+        clearTimeout(followTimer);
+        followTimer = setTimeout(followBestPlayerOnCurrentServer, 3000);
+      }
+    }
+  }
+
   function onUiMainMenu(data) {
-    // when changing maps, ui_mainMenu gets set to 1 and back to 0.
+    // When changing/reloading maps, ui_mainMenu gets set to 1 and back to 0.
+    // This is our confirmation that a /connect attempt succeeded
     if (data.value == "0") {
+      log("onUiMainMenu(0)");
+      // stop connection timeout
+      clearTimeout(connectTimer);
+      connectTimer = null;
+      connectTime = Date.now();
+      mapStartTime = 0;
+
       if (active) {
         qz_instance.SendGameCommand("team s");
         following = null;
         followBestPlayerOnCurrentServer();
-      }
 
-      // stop connection timeout
-      clearTimeout(connectTimer);
-      connectTimer = null;
-      connectTime = new Date().getTime();
-      mapStartTime = 0;
+        if (!eventSource)
+          registerZmqEventSource();
+      }
     }
   }
 
 
   function followBestPlayerOnCurrentServer() {
+    log("followBestPlayerOnCurrentServer(), ct=" + connectTime);
+    if (!connectTime) // not connected -> can't follow
+      return;
+
     if (followTimer)
-      clearTimeout(followTimer);
+      clearTimeout(followTimer);   
 
     $.getJSON("http://api.qlstats.net/api/server/" + qz_instance.GetCvar("cl_currentServerAddress") + "/players", function(data) {
       if (data.ok) {
+        log("/players");
+        gametype = data.serverinfo.gt || gametype;
         serverBrowserData = data.players;
         serverBrowserData.sort(function(a, b) { return (b.rating || 0) - (a.rating || 0); });
         serverBrowserData = serverBrowserData.reduce(function(agg, p) {
-          if (p.team >= 0 && p.team <= 2 && !p.quit)
+          if (p.team >= 0 && p.team <= 2 && !p.quit && deadPlayers.indexOf(p.steamid) < 0)
             agg.push(p);
           return agg;
         }, []);
@@ -193,22 +278,28 @@ var $;
           // map_restart: speccing POV is lost
           following = null;
           mapStartTime = data.serverinfo.mapstart;
-          if (autoReconnect)
+          if (autoReconnect) {
+            log("autoReconnect");
             connect();
-          else
+          }
+          else {
+            log("mapRestart");
             switchPov();
+          }
         }
         else if (serverBrowserData.length < 2 && autoReconnect && new Date().getTime() > connectTime + 30 * 1000) {
           // connect to a new server when there are fewer than 2 players on the current server
+          log("emptyServer");
           connect();
         }
         else if (serverBrowserData[0].steamid != following) {
           // either a higher rated player joined, or the highest rated player left or moved to spec
+          log("povNotAvailable");
           switchPov();
         }
       }
       else {
-        console.log("quakeTV: can't get ratings for current server: " + data.msg);
+        log("quakeTV: can't get ratings for current server: " + data.msg);
       }
     });
 
@@ -216,41 +307,58 @@ var $;
 
 
     function switchPov() {
-      // execute "/players" to print a mapping from steam-id to client-id in the console, 
-      // dump the console log to a file, call extraQL to read the log file content, ...
-      echo("]\\players");
-      qz_instance.SendGameCommand("players");
-      setTimeout(function() {
-        qz_instance.SendGameCommand("condump extraql_condump.txt");
+      log("switchPov()");
+      if (!clientIdCache)
+        refreshClientIdCache(setNewPov);
+      else
+        setNewPov();
+
+      function refreshClientIdCache(cb) {
+        // execute "/players" to print a mapping from steam-id to client-id in the console, 
+        // dump the console log to a file, call extraQL to read the log file content, ...
+        echo("]\\players");
+        qz_instance.SendGameCommand("players");
         setTimeout(function() {
-          $.get("http://localhost:27963/condump", function(condump) {
-            var players = getPlayersFromCondump(condump);
-            var playersById = players.reduce(function(agg, p) {
-              agg[p.steamid] = p;
-              return agg;
-            }, {});
+          qz_instance.SendGameCommand("condump extraql_condump.txt");
+          setTimeout(function() {
+            $.get("http://localhost:27963/condump", function(condump) {
+              var players = getPlayersFromCondump(condump);
+              var playersById = players.reduce(function(agg, p) {
+                agg[p.steamid] = p;
+                return agg;
+              }, {});
+              clientIdCache = playersById;
+              cb();
+            });
+          }, 100);
+        }, 1000);
+      }
 
-            var p = null;
-            for (var i = 0, c = serverBrowserData.length; i < c; i++) {
-              p = playersById[serverBrowserData[i].steamid];
-              if (p)
-                break;
-              p = null;
-            }
+      function setNewPov() {
+        var p = null;
+        var name = null;
+        for (var i = 0, c = serverBrowserData.length; i < c; i++) {
+          p = clientIdCache[serverBrowserData[i].steamid];
+          name = serverBrowserData[i].name;
+          if (p && ("ca,ft,ad".indexOf(gametype) < 0 || deadPlayers.indexOf(p.steamid) < 0))
+            break;
+          p = null;
+        }
 
-            if (!p) {
-              // connect to a different server when nobody was found to spec
-              if (new Date().getTime() > connectTime + 30*1000)
-                connect();
-              return;
-            }
+        if (!p) {
+          log("nobody to follow");
+          // connect to a different server when nobody was found to spec
+          if (autoReconnect && new Date().getTime() > connectTime + 30*1000)
+            connect();
+          return;
+        }
 
-            echo("following client id " + p.clientid + ": " + p.name);
-            qz_instance.SendGameCommand("follow " + p.clientid);
-            following = p.steamid;
-          });
-        }, 100);
-      }, 1000);
+        log("following clientid " + p.clientid);
+        var cmd = qz_instance.GetCvar("qtv_announce") == "1" ? "say" : "echo";
+        qz_instance.SendGameCommand(cmd + ' "^6QTV^7 is now following ' + (name || p.name).replace(/"/g, "'") + '"');
+        qz_instance.SendGameCommand("follow " + p.clientid);
+        following = p.steamid;
+      };
     }
   }
 
@@ -282,7 +390,18 @@ var $;
       return;
     }
 
-    qz_instance.SetCvar("qtv", HELP_MSG);
+    if (qz_instance.GetCvar("qtv_region") == "")
+      qz_instance.SetCvar("qtv_region", "0");
+    if (qz_instance.GetCvar("qtv_gameType") == "")
+      qz_instance.SetCvar("qtv_gameType", "duel");
+    if (qz_instance.GetCvar("qtv_announce") == "")
+      qz_instance.SetCvar("qtv_announce", "0");
+
+    var qtv = qz_instance.GetCvar("qtv");
+    if (qtv == "")
+      qz_instance.SetCvar("qtv", HELP_MSG);
+    else if (qtv != HELP_MSG)
+      onQtvCommand({ value: qtv });
 
     // install QL event listeners
     var postal = window.req("postal");
