@@ -14,6 +14,10 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.22
+---
+- quakeTV 1.1: fixed couple issues with auto-following
+
 Version 2.21
 ---
 - quakeTV 1.0 now capable to track CA matches and switch POV when a player dies
