@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.22";
+    public const string Version = "2.23";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -24,6 +24,7 @@ namespace ExtraQL
     private int steamAppId;
     private bool suppressInitialShow;
     private bool startupCompleted;
+    private ulong steamClientId;
 
     private const int QuakeLiveAppId = 282440;
     private const int WorkshopExtraQL = 539252269;
@@ -650,6 +651,7 @@ namespace ExtraQL
           Log("starting Steam Client...");
           Process.Start("steam://preload/" + QuakeLiveAppId);
         }
+        this.steamClientId = steam.GetUserID();
       }
     }
     #endregion
@@ -847,6 +849,11 @@ bind mouse5 +hook
       if (baseq3 == null)
         return null;
 
+      // use SteamID from steamworks API when possible
+      if (this.steamClientId != 0 && Directory.Exists(Path.Combine(baseq3, this.steamClientId.ToString())))
+        return Path.Combine(Path.Combine(baseq3, this.steamClientId.ToString()), "baseq3");
+
+      // pick the first directory that looks like a SteamID
       var dirs = Directory.GetDirectories(baseq3);
       foreach (var dir in dirs)
       {
@@ -923,7 +930,7 @@ bind mouse5 +hook
                 this.comboWebPak.SelectedIndex = 0;
                 return true;
               }
-              if ((Control.ModifierKeys & (Keys.Shift | Keys.Control | Keys.Alt)) != 0)
+              if ((ModifierKeys & (Keys.Shift | Keys.Control | Keys.Alt)) != 0)
                 this.config.Set("ignoreStaleWebPak", true);
             }
           }

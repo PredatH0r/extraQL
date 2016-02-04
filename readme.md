@@ -14,6 +14,10 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.23
+---
+- use Steamworks API to determine current user's Steam-ID. Use that Steam-ID for QL's user config folder (\<steamid\>\baseq3)
+
 Version 2.22
 ---
 - quakeTV 1.1: fixed couple issues with auto-following

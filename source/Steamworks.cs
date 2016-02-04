@@ -17,13 +17,23 @@ namespace ExtraQL
     private extern static bool SteamAPI_IsSteamRunning();
 
     [DllImport("steam_api.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    private extern static bool SteamAPI_Shutdown();
+
+
+
+    [DllImport("steam_api.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    private extern static IntPtr SteamUser();
+
+    [DllImport("steam_api.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    private static extern ulong SteamAPI_ISteamUser_GetSteamID(IntPtr instancePtr);
+
+
+
+    [DllImport("steam_api.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     private extern static IntPtr SteamFriends();
 
     [DllImport("steam_api.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     private extern static void SteamAPI_ISteamFriends_SetPersonaName(IntPtr handle, byte[] utf8name);
-
-    [DllImport("steam_api.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    private extern static bool SteamAPI_Shutdown();
 
     #endregion
 
@@ -97,5 +107,15 @@ namespace ExtraQL
       SteamAPI_ISteamFriends_SetPersonaName(handle, cName);
       return true;
     }
+
+    public ulong GetUserID()
+    {
+      if (!EnsureInit())
+        return 0;
+
+      var handle = SteamUser();
+      return handle == IntPtr.Zero ? 0 : SteamAPI_ISteamUser_GetSteamID(handle);
+    }
+
   }
 }
