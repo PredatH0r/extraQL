@@ -1,12 +1,15 @@
 // ==UserScript==
 // @name           Whois: Adds a /whois command to show alias nicknames stored on qlstats.net
-// @version        1.2
+// @version        1.3
 // @author         PredatH0r
 // @description    Use "/whois nickname -or- client-id (from /players)"
 // @enabled        1
 // ==/UserScript==
 
 /*
+
+Version 1.3
+- added flag to indicate players deactivated on qlstats.net (cheaters and other special people)
 
 Version 1.2
 - switched back to /configstrings as long as /players is bugged and returns duplicate steam ids (when speccing or when on the same team)
@@ -116,8 +119,9 @@ Version 1.0
           }
         }
 
+        var flag = aliases.deactivated && aliases.deactivated.indexOf(steamid) >= 0 ? "^1\u203c^7" : " ";
         if (method == "echo" || nicks.length > 1)
-          lines.push(("0" + req.clientid).substr(-2) + " " + nicks.join("^3 aka ^7"));
+          lines.push(("0" + req.clientid).substr(-2) + " " + flag + " " + nicks.join("^3 aka ^7"));
       }
 
       if (lines.length == 0)

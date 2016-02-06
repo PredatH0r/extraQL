@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           QLStats: Adds an /elo command to show rating information from qlstats.net
-// @version        1.1
+// @version        1.2
 // @author         PredatH0r
 // @description    Use "/elo help" in the console to get a list of available commands.
 // @description    /elo score: display rating for all players on the server
@@ -11,6 +11,10 @@
 // ==/UserScript==
 
 /*
+
+Version 1.2
+- show info if server is tracked by qlstats.net when joining / starting a map
+- show flag after the rating for players which are deactivated on qlstats.net (cheaters and other special people)
 
 Version 1.1
 - fixed help text
@@ -26,6 +30,7 @@ Version 1.0
   var console = window.console;
 
   // constants
+  var SCRIPT = "qlstats";
   var CVAR_elo = "elo";
   var HelpText = "a user script command. Use ^3elo help^7 to get some help.";
   var ConfigstringsMarker = "]\\configstrings";
@@ -49,8 +54,9 @@ Version 1.0
     var postal = window.req("postal");
     var channel = postal.channel();
     channel.subscribe("cvar.elo", onEloCommand);
+    channel.subscribe("cvar.ui_mainmenu", onUiMainMenu);
 
-    echo("^2elo.js installed");
+    echo("^2qlstats.js installed");
   }
 
   function log(msg) {
@@ -60,6 +66,30 @@ Version 1.0
   function echo(msg) {
     msg = msg.replace(/\"/g, "'").replace(/[\r\n]+/g, " ");
     qz_instance.SendGameCommand("echo \"" + msg + "\"");
+  }
+
+  function onUiMainMenu(arg) {
+    if (arg.value != "0")
+      return;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.timeout = 1000;
+    xhttp.onload = function () { onServerInfo(xhttp); }
+    xhttp.onerror = function () { echo("^1" + SCRIPT + "^7: couldn't get server information from qlstats.net"); }
+    xhttp.open("GET", "http://api.qlstats.net/api/server/" + qz_instance.GetCvar("cl_currentServerAddress") + "/players", true);
+    xhttp.send();
+
+    function onServerInfo(xhttp) {
+      if (xhttp.status != 200) {
+        echo("^1" + SCRIPT + "^7: couldn't get server information from qlstats.net");
+        return;
+      }
+
+      var info = JSON.parse(xhttp.responseText);
+      var msg = "this server " + (info.ok ? "^2is rated " + info.serverinfo.rating + "^7" : " ^1is not rated^7") + " by qlstats.net";
+      qz_instance.SendGameCommand("print ^2" + SCRIPT + "^7: " + msg);
+      qz_instance.SendGameCommand("echo ^2" + SCRIPT + "^7: " + msg);
+    }
   }
 
   function onEloCommand(data) {
@@ -169,8 +199,9 @@ Version 1.0
           "name": p.name,
           "team": p.team,
           "elo": p.elo,
-          "badge": isNaN(p.games) ? "" : p.games >= 16000 ? "Z" : p.games < 1000 ? String.fromCharCode(65 + Math.floor(p.games / 100)) : String.fromCharCode(74 + Math.floor(p.games / 1000))
-        });
+          "badge": isNaN(p.games) ? "" : p.games >= 16000 ? "Z" : p.games < 1000 ? String.fromCharCode(65 + Math.floor(p.games / 100)) : String.fromCharCode(74 + Math.floor(p.games / 1000)),
+          "active": p.active
+      });
       }
 
       // Sort players by either Elo or team
@@ -459,6 +490,7 @@ Version 1.0
         var gtData = data[gametype] || {};
         p.elo = gtData.elo || 1500;
         p.games = gtData.games || 0;
+        p.active = gtData.active === false ? false : true;
       }
 
       callback(request, matchInfo);
@@ -569,6 +601,7 @@ Version 1.0
         var nameColor = colors[0] == "0" ? getTeamColor(curTeam) : "^" + colors[0];
         var scoreColor = colors[1] == "0" ? getTeamColor(curTeam) : "^" + colors[1];
         var badge = colors[2].toUpperCase() != "X" && players[i].badge ? "^" + colors[2] + players[i].badge : "";
+        badge += players[i].active ? " " : "^1\u203c^7";
         if (format == "list")
           out.push(nameColor + pad(players[i].name, 10).substr(0, 10) + " " + scoreColor + pad(players[i].elo, -4) + badge);
         else
@@ -612,9 +645,10 @@ Version 1.0
             line += nameColor + pad(p.name, nameWidth).substr(0, nameWidth) + scoreColor + pad(p.elo, -4);
             if (showBadge)
               line += badgeColor + (p.badge || " ");
+            line += p.active ? " " : "^1\u203c^7";
             line += separator;
           } else
-            line += pad("", nameWidth + 4 + showBadge) + separator;
+            line += pad("", nameWidth + 4 + showBadge + 1) + separator;
         }
 
         if (hasInfo)

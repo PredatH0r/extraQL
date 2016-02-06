@@ -14,6 +14,11 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.24
+---
+- added qlstats userscript (formerly the inofficial _elo userscript)
+- added indicator for deactivated accounts to /whois (cheaters or otherwise special people)
+
 Version 2.23
 ---
 - use Steamworks API to determine current user's Steam-ID. Use that Steam-ID for QL's user config folder (\<steamid\>\baseq3)
