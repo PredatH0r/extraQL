@@ -51,7 +51,7 @@ namespace ExtraQL
 
     public string QuakeSteamFolder { get; set; }
 
-    public int SteamAppId { get { return steamworks.AppID; } set { steamworks.AppID = value; } }
+    public ulong SteamAppId { get { return steamworks.AppID; } set { steamworks.AppID = value; } }
 
     public ThreadStart BringToFrontHandler { get; set; } 
 

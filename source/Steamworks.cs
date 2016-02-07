@@ -38,7 +38,7 @@ namespace ExtraQL
     #endregion
 
     // using the QL Dedicated Linux Server app-id so it won't block the QL client (282440) from starting
-    public int AppID { get; set; } = 349090;
+    public ulong AppID { get; set; } = 349090;
 
     private bool initialized;
 

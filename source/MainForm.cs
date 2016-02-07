@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.24";
+    public const string Version = "2.25";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -22,7 +22,7 @@ namespace ExtraQL
     private readonly Steamworks steam = new Steamworks();
     private bool qlStarted;
     private bool skipWorkshopNotice;
-    private int steamAppId;
+    private ulong steamAppId;
     private bool suppressInitialShow;
     private bool startupCompleted;
     private ulong steamClientId;
@@ -63,7 +63,7 @@ namespace ExtraQL
       this.ActiveControl = this.btnStartQL;
 
       // set current dir to .exe directory. Maybe that helps that steam_api.dll finds the steam_appid.txt file
-      Environment.CurrentDirectory = Path.GetDirectoryName(this.GetType().Assembly.Location) ?? "";
+      Environment.CurrentDirectory = config.AppBaseDir;
 
       this.suppressInitialShow = Environment.CommandLine.Contains(Program.BackgroundSwitch) || this.cbStartMinimized.Checked;
       if (this.suppressInitialShow)
@@ -408,10 +408,21 @@ namespace ExtraQL
       this.cbLogAllRequests.Checked = config.GetBool("logAllRequests");
       this.cbAutoQuit.Checked = config.GetBool("autoquit");
       this.skipWorkshopNotice = config.GetBool("skipWorkshopNotice");
-      int.TryParse(config.GetString("steamAppId"), out this.steamAppId);
-      ulong.TryParse(config.GetString("steamId"), out this.steamClientId);
       this.cbStartServerBrowser.Checked = config.GetBool("startServerBrowser");
       this.cbCloseServerBrowser.Checked = config.GetBool("closeServerBrowser");
+      
+      // these settings are not written back to the .ini
+      ulong.TryParse(config.GetString("steamAppId"), out this.steamAppId);
+      var regex = new Regex(@"(?:^|\s|/|-)steamappid=(\d+)(?:\s|$)", RegexOptions.IgnoreCase);
+      var match = regex.Match(Environment.CommandLine);
+      if (match.Success)
+        ulong.TryParse(match.Groups[1].Value, out this.steamAppId);
+
+      ulong.TryParse(config.GetString("steamId"), out this.steamClientId);
+      regex = new Regex(@"(?:^|\s|/|-)steamid=(\d+)(?:\s|$)", RegexOptions.IgnoreCase);
+      match = regex.Match(Environment.CommandLine);
+      if (match.Success)
+        ulong.TryParse(match.Groups[1].Value, out this.steamClientId);
     }
 
     #endregion
@@ -675,7 +686,9 @@ namespace ExtraQL
       }
       else
       {
-        this.Log("Unable to auto-detect your steam ID (needed for the QL config folder). You can manually set steamId=... in extraQL.ini");
+        if (Environment.GetEnvironmentVariable("SteamAppId") != null)
+          this.Log("WARNING: extraQL was started as a Steam Library item.\r\nThis prevents it from using the Steam API, which is required to detect your Steam-ID or change your nickname. Please use a regular Windows shortcut to start extraQL.exe.");
+        this.Log("Unable to auto-detect your steam ID (needed for the QL config folder). You can manually set steamId=... in extraQL.ini or as a command line argument.");
       }
     }
     #endregion

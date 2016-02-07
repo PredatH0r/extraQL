@@ -14,6 +14,11 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.25
+---
+- improved log output when steam initialisation failes due to starting extraQL directly from the steam library
+- added latest version of qlstats.js
+
 Version 2.24
 ---
 - improved auto-detection of steam ID and allow manual override in extraQL.ini

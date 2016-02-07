@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           QLStats: Adds an /elo command to show rating information from qlstats.net
-// @version        1.2
+// @version        1.2.1
 // @author         PredatH0r
 // @description    Use "/elo help" in the console to get a list of available commands.
 // @description    /elo score: display rating for all players on the server
@@ -11,6 +11,9 @@
 // ==/UserScript==
 
 /*
+
+Version 1.2.1
+- adjusted to changed qlstats.net API to detect deactivated accounts
 
 Version 1.2
 - show info if server is tracked by qlstats.net when joining / starting a map
@@ -478,7 +481,8 @@ Version 1.0
         return;
 
       var data = JSON.parse(xhttp.responseText);
-      var dataBySteamId = {}
+      var dataBySteamId = {};
+      var deactivated = data.deactivated || [];
       for (var i = 0; i < data.players.length; i++)
         dataBySteamId[data.players[i].steamid] = data.players[i];
 
@@ -490,7 +494,7 @@ Version 1.0
         var gtData = data[gametype] || {};
         p.elo = gtData.elo || 1500;
         p.games = gtData.games || 0;
-        p.active = gtData.active === false ? false : true;
+        p.active = deactivated.indexOf(steamid) < 0;;
       }
 
       callback(request, matchInfo);
