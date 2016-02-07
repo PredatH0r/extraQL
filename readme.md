@@ -16,12 +16,13 @@ Changelog
 
 Version 2.24
 ---
-- added qlstats userscript (formerly the inofficial _elo userscript)
-- added indicator for deactivated accounts to /whois (cheaters or otherwise special people)
+- improved auto-detection of steam ID and allow manual override in extraQL.ini
 
 Version 2.23
 ---
 - use Steamworks API to determine current user's Steam-ID. Use that Steam-ID for QL's user config folder (\<steamid\>\baseq3)
+- added qlstats userscript (formerly the inofficial _elo userscript)
+- added indicator for deactivated accounts to /whois (cheaters or otherwise special people)
 
 Version 2.22
 ---

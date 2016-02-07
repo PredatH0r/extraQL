@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace ExtraQL
 {
-  internal class Servlets : IDisposable
+  internal class Servlets
   {
     private static readonly string[] DomainsAllowedForProxy = { "esreality.com", "quakelive.com", "github.com" };
     private const string AddScriptRoute = "/addScript";
@@ -21,7 +21,7 @@ namespace ExtraQL
     private readonly StringBuilder indexBuilder = new StringBuilder();
     private readonly string baseDir;
     private readonly ScriptRepository scriptRepository;
-    private readonly Steamworks steamworks = new Steamworks();
+    private readonly Steamworks steamworks;
     private readonly Form form;
     private string joinServer, joinPass;
 
@@ -29,11 +29,12 @@ namespace ExtraQL
     
     #region ctor()
 
-    public Servlets(HttpServer server, ScriptRepository scriptRepository, Action<string> logger, Form form, string baseDir)
+    public Servlets(HttpServer server, ScriptRepository scriptRepository, Action<string> logger, Form form, string baseDir, Steamworks steam)
     {
       this.server = server;
       this.scriptRepository = scriptRepository;
       this.form = form;
+      this.steamworks = steam;
       this.EnableScripts = true;
       this.EnablePrivateServlets = true;
       server.Log = logger;
@@ -43,11 +44,6 @@ namespace ExtraQL
     }
 
     #endregion
-
-    public void Dispose()
-    {
-      this.steamworks.Dispose();
-    }
 
     public bool EnablePrivateServlets { get; set; }
 

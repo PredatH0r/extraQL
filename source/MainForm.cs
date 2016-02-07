@@ -13,12 +13,13 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.23";
+    public const string Version = "2.24";
 
     private readonly Config config;
     private readonly HttpServer server;
     private readonly Servlets servlets;
     private readonly ScriptRepository scriptRepository;
+    private readonly Steamworks steam = new Steamworks();
     private bool qlStarted;
     private bool skipWorkshopNotice;
     private int steamAppId;
@@ -53,7 +54,7 @@ namespace ExtraQL
       this.scriptRepository = new ScriptRepository(config.AppBaseDir);
       this.scriptRepository.Log = this.Log;
 
-      this.servlets = new Servlets(this.server, this.scriptRepository, this.Log, this, config.AppBaseDir);
+      this.servlets = new Servlets(this.server, this.scriptRepository, this.Log, this, config.AppBaseDir, this.steam);
       this.UpdateServletSettings();
 
       this.miStartServerBrowser.Visible = this.GetServerBrowserExe() != null;
@@ -103,7 +104,6 @@ namespace ExtraQL
       // make sure the window can be closed even if there are exceptions
       try { this.SaveSettings(); } catch { }
       try { this.server.Stop(); } catch { }
-      try { this.servlets.Dispose(); } catch { }
       try
       {
         if (this.cbCloseServerBrowser.Checked)
@@ -409,6 +409,7 @@ namespace ExtraQL
       this.cbAutoQuit.Checked = config.GetBool("autoquit");
       this.skipWorkshopNotice = config.GetBool("skipWorkshopNotice");
       int.TryParse(config.GetString("steamAppId"), out this.steamAppId);
+      ulong.TryParse(config.GetString("steamId"), out this.steamClientId);
       this.cbStartServerBrowser.Checked = config.GetBool("startServerBrowser");
       this.cbCloseServerBrowser.Checked = config.GetBool("closeServerBrowser");
     }
@@ -468,10 +469,9 @@ namespace ExtraQL
       this.CheckIfStartedFromWorkshopFolder();
       this.FillScriptList();
 
+      this.StartSteamClient();
       if (this.cbAutostart.Checked)
         this.Launch();
-      else
-        this.StartSteamClient();
 
       this.startupCompleted = true;
     }
@@ -569,7 +569,7 @@ namespace ExtraQL
     #region OpenConfigFolder()
     private void OpenConfigFolder(bool extraQlConfig)
     {
-      var dir = extraQlConfig ? this.GetSteamWorkshopPath() : this.GetConfigFolder();
+      var dir = extraQlConfig ? config.AppBaseDir : this.GetConfigFolder();
       if (dir != null)
         Process.Start("explorer.exe", "/e," + dir);
     }
@@ -644,14 +644,38 @@ namespace ExtraQL
     #region StartSteamClient()
     private void StartSteamClient()
     {
-      using (var steam = new Steamworks())
+      if (!steam.IsSteamRunning())
       {
-        if (!steam.IsSteamRunning())
+        this.btnStartQL.Enabled = false;
+        Log("starting Steam Client...");
+        Process.Start("steam://preload/" + QuakeLiveAppId);
+        for (int i = 0; i < 600; i++)
         {
-          Log("starting Steam Client...");
-          Process.Start("steam://preload/" + QuakeLiveAppId);
+          if (steam.IsSteamRunning())
+            break;
+          System.Threading.Thread.Sleep(100);
+          Application.DoEvents();
         }
+
+        // wait 7.5sec to the Steam Client GUI to be fully loaded. Otherwise trying to start QL would fail.
+        for (int i = 0; i < 75; i++)
+        {
+          System.Threading.Thread.Sleep(100);
+          Application.DoEvents();
+        }          
+      }
+
+      if (this.steamClientId == 0)
         this.steamClientId = steam.GetUserID();
+
+      if (this.steamClientId != 0)
+      {
+        this.Log("Using QL config folder for steam ID " + this.steamClientId);
+        this.btnStartQL.Enabled = true;
+      }
+      else
+      {
+        this.Log("Unable to auto-detect your steam ID (needed for the QL config folder). You can manually set steamId=... in extraQL.ini");
       }
     }
     #endregion

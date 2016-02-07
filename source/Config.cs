@@ -39,6 +39,7 @@ namespace ExtraQL
       this.settings["nickSteam"] = "";
       this.settings["skipWorkshopNotice"] = "0";
       this.settings["steamAppId"] = "349090";
+      this.settings["steamId"] = "";
       this.settings["startServerBrowser"] = "0";
       this.settings["closeServerBrowser"] = "0";
       this.settings["webpakWorkshopItem"] = "0";
