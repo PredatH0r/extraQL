@@ -1,12 +1,15 @@
 // ==UserScript==
 // @name           Whois: Adds a /whois command to show alias nicknames stored on qlstats.net
-// @version        1.3
+// @version        1.4
 // @author         PredatH0r
 // @description    Use "/whois nickname -or- client-id (from /players)"
 // @enabled        1
 // ==/UserScript==
 
 /*
+
+Verson 1.4
+- able to parse broken \players output where player name is printed on next line
 
 Version 1.3
 - added flag to indicate players deactivated on qlstats.net (cheaters and other special people)
@@ -212,10 +215,19 @@ Version 1.0
       }
       var players = [];
       var lines = condump.substring(idx).split('\n');
+      var getNameFromNextLine = false;
       lines.forEach(function(line) {
-        var match = /^(?:\[\d+:\d\d\.\d+\] )?([ \d]\d) (\d+) (.) (.+)$/.exec(line);
-        if (match)
+        if (getNameFromNextLine) {
+          getNameFromNextLine = false;
+          players[players.length - 1].name = line;
+          return;
+        }
+        var match = /^(?:\[\d+:\d\d\.\d+\] )?([ \d]\d) (\d+)(?: (.) (.+))?$/.exec(line);
+        if (match) {
           players.push({ clientid: parseInt(match[1].trim()), opflag: match[3], name: match[4], steamid: match[2] });
+          if (!match[4])
+            getNameFromNextLine = true;
+        }
       });
       return players;
     }
@@ -236,7 +248,7 @@ Version 1.0
       pendingAjaxRequest = null;
       return;
     }
-    var url = "http://qlstats.net:8080/aliases/" + steamIds.join("+") + ".json";
+    var url = "http://qlstats.net/aliases/" + steamIds.join("+") + ".json";
     var xhttp = new XMLHttpRequest();
     xhttp.timeout = 5000;
     xhttp.onload = function () { onQlstatsAliases(xhttp, callback); }
