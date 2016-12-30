@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.25";
+    public const string Version = "2.26";
 
     private readonly Config config;
     private readonly HttpServer server;

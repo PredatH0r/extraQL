@@ -37,8 +37,8 @@ namespace ExtraQL
 
     #endregion
 
-    // using the QL Dedicated Linux Server app-id so it won't block the QL client (282440) from starting
-    public ulong AppID { get; set; } = 349090;
+    // using the NVIDIA.SteamLauncher app-id (Config category) to prevent anything from showing up in the friend list nor block starting games
+    public ulong AppID { get; set; } = 236600;
 
     private bool initialized;
 
@@ -81,9 +81,17 @@ namespace ExtraQL
 
       string dllDir = Application.StartupPath + "\\";
 
-      // try the configured AppID
-      File.WriteAllText(dllDir + "steam_appid.txt", AppID.ToString());
+
+      // try NVIDIA.SteamLauncher AppID
+      File.WriteAllText(dllDir + "steam_appid.txt", "236600");
       this.initialized = SteamAPI_Init();
+
+      // try the configured AppID
+      if (!this.initialized)
+      {
+        File.WriteAllText(dllDir + "steam_appid.txt", AppID.ToString());
+        this.initialized = SteamAPI_Init();
+      }
 
       // fallback to Steamworks SDK Redist AppID
       if (!this.initialized && AppID != 1007)
