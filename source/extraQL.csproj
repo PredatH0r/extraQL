@@ -52,7 +52,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <PlatformTarget>x86</PlatformTarget>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\x86\Debug\</OutputPath>
     <DefineConstants>
     </DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
@@ -152,11 +152,21 @@
     <None Include="images\topright.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="scripts\instaBounce.js" />
-    <None Include="scripts\qlstats.js" />
-    <None Include="scripts\whois.js" />
-    <Content Include="scripts\quakeTv.js" />
-    <Content Include="steam_api.dll" />
+    <None Include="scripts\instaBounce.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="scripts\qlstats.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="scripts\whois.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="scripts\quakeTv.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="steam_api.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="scripts\attic\autoInvite.usr.js" />
     <Content Include="scripts\attic\demoBrowser.usr.js" />
     <Content Include="scripts\attic\esreality.usr.js" />
@@ -165,23 +175,23 @@
     <Content Include="scripts\attic\gametype.usr.js" />
     <Content Include="scripts\attic\irc.usr.js" />
     <Content Include="scripts\attic\joinGame.usr.js" />
-    <Content Include="scripts\_cycle.js" />
-    <None Include="scripts\postalDump.js" />
-    <None Include="scripts\autoExec.js" />
-    <None Include="scripts\steamNick.js" />
+    <None Include="scripts\_cycle.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="scripts\postalDump.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="scripts\autoExec.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="scripts\steamNick.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="scripts\attic\links.usr.js" />
     <None Include="scripts\attic\extraQL.js" />
     <None Include="scripts\attic\rosterGroup.usr.js" />
     <None Include="resources\background.png" />
-    <Content Include="c:\users\hbeham\appdata\locallow\id software\focus\home\baseq3\hook.js">
-      <Link>focus\hook.js</Link>
-    </Content>
-    <Content Include="c:\users\hbeham\appdata\locallow\id software\quakelive\home\baseq3\hook.js">
-      <Link>quakelive\hook.js</Link>
-    </Content>
     <Content Include="extraQL.ico" />
-    <Content Include="focus\readme.txt" />
-    <Content Include="quakelive\readme.txt" />
     <None Include="resources\close.png" />
     <None Include="resources\logo.png" />
     <None Include="resources\minimize.png" />
