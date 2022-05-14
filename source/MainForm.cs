@@ -13,7 +13,7 @@ namespace ExtraQL
 {
   public partial class MainForm : Form
   {
-    public const string Version = "2.26";
+    public const string Version = "2.27";
 
     private readonly Config config;
     private readonly HttpServer server;
@@ -504,7 +504,7 @@ namespace ExtraQL
       if (this.skipWorkshopNotice)
         return;
       var exeDir = (Path.GetDirectoryName(Application.ExecutablePath) ?? "").ToLower().Replace("/", "\\").TrimEnd('\\');
-      var wsDir = this.GetSteamWorkshopPath().ToLower().TrimEnd('\\');
+      var wsDir = this.GetSteamWorkshopPath()?.ToLower().TrimEnd('\\');
       if (exeDir != wsDir)
       {
         var answer = MessageBox.Show(this,
@@ -935,6 +935,8 @@ bind mouse5 +hook
         if (!PrepareAlternativeQuakeLiveUI(ref args))
           return;
         this.Log("Starting Quake Live...");
+
+        Directory.SetCurrentDirectory(this.GetQuakeLivePath());
         Process.Start("steam://rungameid/" + QuakeLiveAppId + args);
       }
       this.SetFormVisibility(false);

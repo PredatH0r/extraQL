@@ -14,6 +14,10 @@ c:\program files (x86)\Steam\SteamApps\workshop\content\282440\539252269
 Changelog
 =========
 
+Version 2.27
+---
+- changed requirement to .NET Framework 4.7.2 so that it can run on Win10 without additional installation of .NET 2.0/3.5
+
 Version 2.25
 ---
 - improved log output when steam initialisation failes due to starting extraQL directly from the steam library

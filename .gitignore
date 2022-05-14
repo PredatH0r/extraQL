@@ -8,3 +8,4 @@ source/.vs/extraQL/v14/.suo
 source/extraQL.csproj.user
 workshop/content/
 workshop/buildWorkshopItem.cmd
+/source/.vs/
